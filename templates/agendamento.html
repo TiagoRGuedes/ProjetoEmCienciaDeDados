@@ -1,23 +1,57 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Agendamento</title></head>
-<body>
-  <h1>Agendamento</h1>
-  {% if erro %}<p>{{ erro }}</p>{% endif %}
-  <form method="POST" action="/agendar">
-    <label>Nome: <input type="text" name="nome" required></label><br>
-    <label>Telefone: <input type="text" name="telefone" required></label><br>
-    <label>Email: <input type="email" name="email"></label><br>
-    <label>Serviço:
-      <select name="servico_id" required>
-        {% for s in servicos %}
-        <option value="{{ s.id }}">{{ s.nome }} — R${{ s.preco }}</option>
-        {% endfor %}
-      </select>
-    </label><br>
-    <label>Data: <input type="date" name="data" required></label><br>
-    <label>Horário: <input type="text" name="horario" placeholder="09:00" required></label><br>
-    <button type="submit">Agendar</button>
-  </form>
-</body>
-</html>
+{% extends "base.html" %}
+{% block conteudo %}
+<section class="secao">
+    <div class="container formulario-area">
+        <h2>Agendamento online</h2>
+        <p class="texto-central">Preencha seus dados, escolha o serviço e selecione um horário de atendimento.</p>
+        <p class="texto-central"><strong>Funcionamento:</strong> {{ empresa.horarios }}</p>
+
+        {% if erro %}
+        <div class="mensagem-erro">
+            <strong>{{ erro }}</strong>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('publico.agendar_post') }}" class="form-box">
+            <label>Nome completo:</label>
+            <input type="text" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required>
+
+            <label>Telefone:</label>
+            <input type="text" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required>
+
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ dados.email if dados else '' }}" placeholder="seuemail@email.com">
+
+            <label>Serviço:</label>
+            <select name="servico_id" required>
+                <option value="">Selecione um serviço</option>
+                {% for s in servicos %}
+                <option value="{{ s.id }}" {% if dados and dados.servico_id == s.id|string %}selected{% endif %}>{{ s.nome }} — R$ {{ "%.2f"|format(s.preco) }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Data:</label>
+            <input type="date" name="data" value="{{ dados.data if dados else '' }}" required>
+
+            <label>Horários:</label>
+            <div class="horarios">
+                {% for h in horarios %}
+                    {% if h in horarios_ocupados %}
+                    <label class="horario bloqueado">
+                        <input type="radio" name="horario" value="{{ h }}" disabled>
+                        {{ h }}<br><span>Bloqueado</span>
+                    </label>
+                    {% else %}
+                    <label class="horario disponivel">
+                        <input type="radio" name="horario" value="{{ h }}" {% if dados and dados.horario == h %}checked{% endif %}>
+                        {{ h }}<br><span>Disponível</span>
+                    </label>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="botao-form">Enviar agendamento</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -15,7 +15,8 @@ EMPRESA = {
     'horarios': 'Terça a sábado, das 10h às 19h',
     'instagram_nome': '@refugiodapreta',
     'instagram_url': 'https://www.instagram.com/refugiodapreta/',
-    'foto_dona': 'pamela_francisco.png'
+    'foto_dona': 'pamela_francisco.png',
+    'slogan': 'Beleza, cuidado e acolhimento afro.'
 }
 
 HORARIOS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ empresa.nome }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body>
+    <header class="topo">
+        <div class="container topo-conteudo">
+            <div class="marca">
+                <p class="marca-subtitulo">Studio de manicure afro</p>
+                <h1>{{ empresa.nome }}</h1>
+            </div>
+            <nav>
+                <a href="{{ url_for('publico.index') }}">Início</a>
+                <a href="{{ url_for('publico.index') }}#servicos">Serviços</a>
+                <a href="{{ url_for('publico.index') }}#galeria">Galeria</a>
+                <a href="{{ url_for('publico.agendar_get') }}">Agendar</a>
+                <a href="{{ url_for('admin.login') }}">Admin</a>
+                <a href="#contato">Contato</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    <footer id="contato" class="rodape">
+        <div class="container rodape-grid">
+            <div>
+                <h3>{{ empresa.nome }}</h3>
+                <p>{{ empresa.slogan }}</p>
+                <p><strong>Dona:</strong> {{ empresa.dona }}</p>
+            </div>
+            <div>
+                <h3>Contato</h3>
+                <p><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+                <p><strong>Horários:</strong> {{ empresa.horarios }}</p>
+                <p><strong>Endereço:</strong> {{ empresa.endereco }}</p>
+            </div>
+            <div>
+                <h3>Redes sociais</h3>
+                <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p>
+                <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p>
+                <p>Agendamentos com atendimento de terça a sábado.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
