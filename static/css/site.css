@@ -2,7 +2,346 @@
   --rosa-primario: #d4789a;
   --rosa-escuro: #b85a7d;
   --rosa-claro: #f7d7e0;
-  --rosa-fundo: #fdf2f7;
+  --rosa-fundo: #fdf2f7;:root { /* Cria variáveis de cores e medidas para reutilizar no site inteiro. */
+    --marrom-principal: #7a5a4e; /* Define o marrom principal do tema, sem ficar muito escuro. */
+    --marrom-escuro: #5f4339; /* Define um marrom mais forte para títulos e rodapé. */
+    --rosa-secundario: #c77b95; /* Define o rosa secundário da identidade visual. */
+    --rosa-claro: #efd1db; /* Define um rosa claro para fundos delicados. */
+    --nude-terciario: #e4c7b7; /* Define o nude terciário para combinar com manicure. */
+    --nude-claro: #f5ebe5; /* Define um nude bem claro para o fundo geral. */
+    --texto-base: #4a382f; /* Define a cor padrão dos textos. */
+    --branco: #ffffff; /* Define a cor branca para cartões e áreas claras. */
+    --verde-disponivel: #edf7ec; /* Define fundo verde claro para horários disponíveis. */
+    --verde-borda: #8abd86; /* Define borda verde para horários disponíveis. */
+    --vermelho-bloqueado: #f8e0e0; /* Define fundo vermelho claro para horários bloqueados. */
+    --vermelho-borda: #d08c8c; /* Define borda vermelha suave para horários bloqueados. */
+} /* Fecha o bloco de variáveis. */
+
+* { /* Seleciona todos os elementos da página. */
+    margin: 0; /* Remove margens padrão do navegador. */
+    padding: 0; /* Remove espaçamentos internos padrão do navegador. */
+    box-sizing: border-box; /* Faz largura e altura incluírem padding e borda. */
+} /* Fecha a regra geral. */
+
+body { /* Estiliza o corpo inteiro da página. */
+    font-family: Arial, Helvetica, sans-serif; /* Define uma fonte simples e legível. */
+    background-color: var(--nude-claro); /* Define o fundo geral em nude claro. */
+    color: var(--texto-base); /* Define a cor padrão do texto. */
+    line-height: 1.6; /* Aumenta o espaçamento entre linhas para melhorar leitura. */
+} /* Fecha a regra do body. */
+
+a { /* Estiliza todos os links. */
+    color: inherit; /* Faz os links herdarem a cor do texto ao redor. */
+    text-decoration: none; /* Remove o sublinhado padrão dos links. */
+} /* Fecha a regra dos links. */
+
+.container { /* Cria um container centralizado. */
+    width: 90%; /* Define que o conteúdo ocupa 90% da tela. */
+    max-width: 1180px; /* Limita a largura máxima para não ficar muito largo. */
+    margin: 0 auto; /* Centraliza o container horizontalmente. */
+} /* Fecha a regra do container. */
+
+.topo { /* Estiliza o cabeçalho do site. */
+    background: linear-gradient(90deg, var(--marrom-principal), var(--rosa-secundario)); /* Cria degradê entre marrom e rosa. */
+    color: var(--branco); /* Deixa o texto do topo branco. */
+    padding: 22px 0; /* Adiciona espaço vertical no topo. */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adiciona sombra abaixo do cabeçalho. */
+    position: sticky; /* Mantém o cabeçalho preso no topo ao rolar. */
+    top: 0; /* Define que o cabeçalho fica colado no topo. */
+    z-index: 10; /* Garante que o cabeçalho fique acima dos outros elementos. */
+} /* Fecha a regra do topo. */
+
+.topo-conteudo { /* Organiza os elementos internos do cabeçalho. */
+    display: flex; /* Coloca marca e menu lado a lado. */
+    justify-content: space-between; /* Joga marca para um lado e menu para o outro. */
+    align-items: center; /* Alinha os itens verticalmente no centro. */
+    gap: 20px; /* Adiciona espaço entre os elementos. */
+} /* Fecha a regra do conteúdo do topo. */
+
+.marca-subtitulo { /* Estiliza o subtítulo acima do nome da empresa. */
+    font-size: 13px; /* Define tamanho pequeno para o subtítulo. */
+    letter-spacing: 1px; /* Aumenta o espaço entre as letras. */
+    text-transform: uppercase; /* Deixa o texto em letras maiúsculas. */
+    opacity: 0.9; /* Deixa o subtítulo um pouco mais suave. */
+} /* Fecha a regra do subtítulo da marca. */
+
+.marca h1 { /* Estiliza o nome da empresa no topo. */
+    font-size: 32px; /* Deixa o nome da empresa maior. */
+} /* Fecha a regra do h1 da marca. */
+
+nav a { /* Estiliza os links do menu. */
+    margin-left: 18px; /* Adiciona espaço à esquerda de cada link. */
+    font-weight: bold; /* Deixa os links em negrito. */
+} /* Fecha a regra dos links do menu. */
+
+nav a:hover { /* Estiliza links do menu quando passa o mouse. */
+    opacity: 0.75; /* Deixa o link levemente transparente. */
+} /* Fecha a regra hover dos links. */
+
+.hero { /* Estiliza a primeira seção de destaque. */
+    background: linear-gradient(135deg, rgba(122, 90, 78, 0.96), rgba(199, 123, 149, 0.88)); /* Cria fundo degradê afro/elegante. */
+    color: var(--branco); /* Deixa o texto branco. */
+    padding: 85px 0; /* Adiciona grande espaço vertical para destaque. */
+} /* Fecha a regra hero. */
+
+.hero-conteudo { /* Organiza o conteúdo dentro do hero. */
+    display: grid; /* Usa grade para dividir texto e cartão. */
+    grid-template-columns: 2fr 1fr; /* Define texto maior que o cartão. */
+    gap: 28px; /* Cria espaço entre as colunas. */
+    align-items: center; /* Alinha os blocos no centro vertical. */
+} /* Fecha a regra do conteúdo do hero. */
+
+.subtitulo { /* Estiliza textos curtos de apoio. */
+    text-transform: uppercase; /* Deixa em maiúsculas. */
+    letter-spacing: 1px; /* Aumenta o espaço entre letras. */
+    font-size: 14px; /* Define tamanho menor. */
+    margin-bottom: 12px; /* Cria espaço abaixo. */
+    color: #ffe9f0; /* Usa rosa bem claro para contraste. */
+} /* Fecha a regra de subtítulo. */
+
+.hero-texto h2 { /* Estiliza o título principal da página inicial. */
+    font-size: 48px; /* Deixa o título grande. */
+    margin-bottom: 16px; /* Cria espaço abaixo do título. */
+} /* Fecha a regra do título do hero. */
+
+.hero-texto p { /* Estiliza parágrafos do hero. */
+    margin-bottom: 16px; /* Cria espaço abaixo de cada parágrafo. */
+    max-width: 620px; /* Limita a largura do texto para facilitar leitura. */
+} /* Fecha a regra dos parágrafos do hero. */
+
+.hero-botoes { /* Organiza os botões do hero. */
+    display: flex; /* Coloca botões lado a lado. */
+    gap: 12px; /* Cria espaço entre os botões. */
+    flex-wrap: wrap; /* Permite quebrar linha em telas menores. */
+} /* Fecha a regra dos botões do hero. */
+
+.hero-card { /* Estiliza o cartão lateral do hero. */
+    background-color: rgba(255, 255, 255, 0.14); /* Define fundo branco transparente. */
+    border: 1px solid rgba(255, 255, 255, 0.25); /* Adiciona borda clara transparente. */
+    border-radius: 18px; /* Arredonda os cantos. */
+    padding: 28px; /* Cria espaço interno. */
+} /* Fecha a regra do cartão do hero. */
+
+.hero-card h3 { /* Estiliza o título do cartão lateral. */
+    margin-bottom: 12px; /* Cria espaço abaixo do título. */
+    font-size: 24px; /* Define tamanho do título. */
+} /* Fecha a regra do h3 do cartão. */
+
+.hero-card p { /* Estiliza textos do cartão lateral. */
+    margin-bottom: 8px; /* Cria pequeno espaço entre linhas. */
+} /* Fecha a regra dos textos do cartão. */
+
+.botao, .botao-form, button { /* Estiliza botões principais, botões de formulário e buttons normais. */
+    background-color: var(--rosa-secundario); /* Define fundo rosa. */
+    color: var(--branco); /* Define texto branco. */
+    padding: 12px 22px; /* Adiciona espaço interno. */
+    border-radius: 10px; /* Arredonda os cantos. */
+    border: none; /* Remove borda padrão. */
+    display: inline-block; /* Permite controlar espaçamento como bloco em linha. */
+    font-weight: bold; /* Deixa o texto em negrito. */
+    cursor: pointer; /* Mostra mãozinha ao passar o mouse. */
+} /* Fecha a regra dos botões. */
+
+.botao-secundario { /* Estiliza botões secundários. */
+    background-color: var(--nude-terciario); /* Usa fundo nude. */
+    color: var(--marrom-escuro); /* Usa texto marrom escuro. */
+    padding: 12px 22px; /* Adiciona espaço interno. */
+    border-radius: 10px; /* Arredonda os cantos. */
+    font-weight: bold; /* Deixa o texto em negrito. */
+    display: inline-block; /* Exibe como bloco em linha. */
+} /* Fecha a regra do botão secundário. */
+
+.secao { /* Estiliza seções gerais. */
+    padding: 72px 0; /* Adiciona espaço acima e abaixo. */
+} /* Fecha a regra de seção. */
+
+.secao h2 { /* Estiliza títulos de seções. */
+    text-align: center; /* Centraliza os títulos. */
+    color: var(--marrom-escuro); /* Aplica marrom escuro. */
+    font-size: 34px; /* Define tamanho do título. */
+    margin-bottom: 10px; /* Cria espaço abaixo. */
+} /* Fecha a regra dos h2. */
+
+.texto-central { /* Estiliza textos centralizados. */
+    text-align: center; /* Centraliza o texto. */
+    margin-bottom: 32px; /* Adiciona espaço abaixo. */
+} /* Fecha a regra de texto central. */
+
+.cards-servicos { /* Organiza os cartões de serviços. */
+    display: grid; /* Usa grade para os cartões. */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Cria colunas responsivas. */
+    gap: 20px; /* Cria espaço entre os cartões. */
+} /* Fecha a regra dos cards. */
+
+.card-servico { /* Estiliza cada cartão de serviço. */
+    background-color: var(--branco); /* Define fundo branco. */
+    border: 1px solid #ebd6cd; /* Define borda suave. */
+    border-radius: 16px; /* Arredonda os cantos. */
+    padding: 22px; /* Adiciona espaço interno. */
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06); /* Adiciona sombra leve. */
+} /* Fecha a regra do cartão de serviço. */
+
+.card-servico h3 { /* Estiliza título do cartão de serviço. */
+    color: var(--marrom-principal); /* Usa marrom principal. */
+    margin-bottom: 10px; /* Cria espaço abaixo. */
+} /* Fecha a regra do h3 do serviço. */
+
+.galeria-fundo { /* Estiliza fundo da galeria. */
+    background-color: var(--rosa-claro); /* Usa rosa claro no fundo. */
+} /* Fecha a regra do fundo da galeria. */
+
+.galeria { /* Organiza a galeria. */
+    display: grid; /* Usa grade nas fotos. */
+    gap: 20px; /* Cria espaço entre fotos. */
+} /* Fecha a regra da galeria. */
+
+.galeria-tres-colunas { /* Define a galeria com três colunas. */
+    grid-template-columns: repeat(3, 1fr); /* Cria três colunas iguais. */
+} /* Fecha a regra de três colunas. */
+
+.foto-card { /* Estiliza cada cartão de foto. */
+    background-color: var(--branco); /* Define fundo branco. */
+    border-radius: 16px; /* Arredonda os cantos. */
+    overflow: hidden; /* Esconde partes que ultrapassam a borda arredondada. */
+    text-align: center; /* Centraliza o texto abaixo da imagem. */
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); /* Adiciona sombra. */
+} /* Fecha a regra do cartão de foto. */
+
+.foto-card img { /* Estiliza as fotos da galeria. */
+    width: 100%; /* Faz a imagem ocupar toda a largura do cartão. */
+    height: 360px; /* Define altura fixa para padronizar. */
+    object-fit: cover; /* Faz a foto preencher o espaço sem distorcer. */
+    display: block; /* Remove espaços extras abaixo da imagem. */
+} /* Fecha a regra da imagem da galeria. */
+
+.foto-card p { /* Estiliza o texto da foto. */
+    padding: 14px; /* Adiciona espaço interno. */
+    font-weight: bold; /* Deixa em negrito. */
+    color: var(--marrom-escuro); /* Usa marrom escuro. */
+} /* Fecha a regra do texto da foto. */
+
+.dona-grid { /* Organiza a seção sobre a dona. */
+    display: grid; /* Usa grade para foto e texto. */
+    grid-template-columns: 1fr 1.2fr; /* Define proporção entre imagem e texto. */
+    gap: 32px; /* Cria espaço entre colunas. */
+    align-items: center; /* Alinha verticalmente no centro. */
+} /* Fecha a regra da seção da dona. */
+
+.dona-foto img { /* Estiliza a foto da Pamela. */
+    width: 100%; /* Faz a imagem ocupar a coluna. */
+    border-radius: 18px; /* Arredonda os cantos da foto. */
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08); /* Adiciona sombra. */
+} /* Fecha a regra da foto da dona. */
+
+.dona-texto { /* Estiliza o bloco de texto da dona. */
+    background-color: #fff8f4; /* Define fundo suave. */
+    padding: 28px; /* Adiciona espaço interno. */
+    border-radius: 18px; /* Arredonda cantos. */
+    border: 1px solid #edd6c8; /* Adiciona borda clara. */
+} /* Fecha a regra do texto da dona. */
+
+.dona-texto h2 { /* Estiliza o título dentro da seção da dona. */
+    text-align: left; /* Alinha o título à esquerda. */
+} /* Fecha a regra do título da dona. */
+
+.formulario-area { /* Estiliza a área dos formulários. */
+    max-width: 860px; /* Limita a largura do formulário. */
+} /* Fecha a regra da área de formulário. */
+
+.form-box { /* Estiliza a caixa do formulário. */
+    background-color: var(--branco); /* Define fundo branco. */
+    padding: 28px; /* Adiciona espaço interno. */
+    border-radius: 16px; /* Arredonda os cantos. */
+    border: 1px solid #ebd6cd; /* Adiciona borda suave. */
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06); /* Adiciona sombra. */
+} /* Fecha a regra da caixa de formulário. */
+
+label { /* Estiliza rótulos dos campos. */
+    display: block; /* Faz cada label ocupar uma linha. */
+    margin-top: 14px; /* Cria espaço acima. */
+    font-weight: bold; /* Deixa o texto em negrito. */
+    color: var(--marrom-escuro); /* Usa marrom escuro. */
+} /* Fecha a regra dos labels. */
+
+input, select { /* Estiliza inputs e selects. */
+    width: 100%; /* Ocupa toda a largura disponível. */
+    padding: 12px; /* Adiciona espaço interno. */
+    border: 1px solid #d8b8a8; /* Define borda nude. */
+    border-radius: 10px; /* Arredonda cantos. */
+    margin-top: 5px; /* Cria espaço acima. */
+    background-color: #fffdfb; /* Usa fundo quase branco. */
+} /* Fecha a regra dos campos. */
+
+.horarios { /* Organiza os horários do formulário. */
+    display: grid; /* Usa grade. */
+    grid-template-columns: repeat(5, 1fr); /* Cria cinco colunas. */
+    gap: 12px; /* Cria espaço entre horários. */
+    margin-top: 10px; /* Cria espaço acima. */
+} /* Fecha a regra de horários. */
+
+.horario { /* Estiliza cada opção de horário. */
+    text-align: center; /* Centraliza o conteúdo. */
+    border-radius: 12px; /* Arredonda cantos. */
+    padding: 12px; /* Adiciona espaço interno. */
+    border: 1px solid #ddd; /* Define borda padrão. */
+} /* Fecha a regra de cada horário. */
+
+.horario input { /* Estiliza o radio dentro do horário. */
+    width: auto; /* Impede o radio de ocupar toda a largura. */
+    margin-right: 5px; /* Cria espaço entre radio e texto. */
+} /* Fecha a regra do radio. */
+
+.disponivel { /* Estiliza horários disponíveis. */
+    background-color: var(--verde-disponivel); /* Usa fundo verde claro. */
+    border-color: var(--verde-borda); /* Usa borda verde. */
+} /* Fecha a regra de disponível. */
+
+.bloqueado { /* Estiliza horários bloqueados. */
+    background-color: var(--vermelho-bloqueado); /* Usa fundo vermelho claro. */
+    border-color: var(--vermelho-borda); /* Usa borda vermelha. */
+    color: #777; /* Deixa texto mais apagado. */
+} /* Fecha a regra de bloqueado. */
+
+.mensagem-erro { /* Estiliza caixa de erro. */
+    background-color: #ffe7e7; /* Define fundo vermelho claro. */
+    border: 1px solid #d48a8a; /* Define borda vermelha. */
+    color: #7a2a2a; /* Define texto vermelho escuro. */
+    padding: 15px; /* Adiciona espaço interno. */
+    border-radius: 12px; /* Arredonda cantos. */
+    margin-bottom: 20px; /* Cria espaço abaixo. */
+} /* Fecha a regra de erro. */
+
+.confirmado { /* Estiliza a página de confirmação. */
+    text-align: center; /* Centraliza o conteúdo. */
+    min-height: 420px; /* Garante altura mínima. */
+} /* Fecha a regra de confirmação. */
+
+.rodape { /* Estiliza o rodapé. */
+    background-color: var(--marrom-escuro); /* Usa marrom escuro no fundo. */
+    color: var(--branco); /* Usa texto branco. */
+    padding: 40px 0; /* Adiciona espaço vertical. */
+} /* Fecha a regra do rodapé. */
+
+.rodape-grid { /* Organiza colunas do rodapé. */
+    display: grid; /* Usa grade. */
+    grid-template-columns: repeat(3, 1fr); /* Cria três colunas. */
+    gap: 25px; /* Cria espaço entre colunas. */
+} /* Fecha a regra do grid do rodapé. */
+
+.link-rodape { /* Estiliza link do rodapé. */
+    color: #ffd7e2; /* Usa rosa claro para destaque. */
+    text-decoration: underline; /* Sublinha para indicar que é link. */
+} /* Fecha a regra do link do rodapé. */
+
+@media (max-width: 820px) { /* Cria regras para telas pequenas, como celular. */
+    .topo-conteudo { display: block; text-align: center; } /* Coloca topo em bloco e centralizado. */
+    nav { margin-top: 16px; } /* Adiciona espaço acima do menu. */
+    nav a { display: inline-block; margin: 6px 10px; } /* Ajusta links no celular. */
+    .hero-conteudo, .dona-grid, .rodape-grid { grid-template-columns: 1fr; } /* Deixa layouts em uma coluna. */
+    .hero-texto h2 { font-size: 38px; } /* Reduz título principal no celular. */
+    .galeria-tres-colunas, .cards-servicos, .horarios { grid-template-columns: 1fr; } /* Deixa grades em uma coluna. */
+} /* Fecha o bloco responsivo. */
+
   --lilas: #b58fc4;
   --cinza-900: #2b2233;
   --cinza-700: #5a4f63;
