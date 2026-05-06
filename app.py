@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify, session, flash
 from database import init_db, get_db
 
 app = Flask(__name__)
@@ -105,17 +105,35 @@ def logout():
 def dashboard():
     if not session.get('logado'):
         return redirect(url_for('admin.login'))
+    filtro_status = request.args.get('status', '').strip()
+    filtro_data = request.args.get('data', '').strip()
+
+    sql = '''SELECT a.id, a.data, a.horario, a.status,
+                    c.nome AS cliente_nome, c.telefone, c.email,
+                    s.nome AS servico_nome, s.preco, s.duracao_min
+             FROM agendamentos a
+             JOIN clientes c ON c.id = a.cliente_id
+             JOIN servicos s ON s.id = a.servico_id'''
+    where = []
+    params = []
+    if filtro_status in ('pendente', 'confirmado', 'cancelado'):
+        where.append('a.status = ?')
+        params.append(filtro_status)
+    if filtro_data:
+        where.append('a.data = ?')
+        params.append(filtro_data)
+    if where:
+        sql += ' WHERE ' + ' AND '.join(where)
+    sql += ' ORDER BY a.data, a.horario'
+
     db = get_db()
-    agendamentos = db.execute(
-        '''SELECT a.id, a.data, a.horario, a.status,
-                  c.nome AS cliente_nome, c.telefone, c.email,
-                  s.nome AS servico_nome, s.preco, s.duracao_min
-           FROM agendamentos a
-           JOIN clientes c ON c.id = a.cliente_id
-           JOIN servicos s ON s.id = a.servico_id
-           ORDER BY a.data, a.horario'''
-    ).fetchall()
-    return render_template('admin/dashboard.html', agendamentos=agendamentos)
+    agendamentos = db.execute(sql, params).fetchall()
+    return render_template(
+        'admin/dashboard.html',
+        agendamentos=agendamentos,
+        filtro_status=filtro_status,
+        filtro_data=filtro_data,
+    )
 
 @admin.route('/agendamento/<int:id>/status', methods=['POST'])
 def atualizar_status(id):
@@ -132,8 +150,97 @@ def servicos():
     if not session.get('logado'):
         return redirect(url_for('admin.login'))
     db = get_db()
-    lista = db.execute('SELECT * FROM servicos').fetchall()
+    lista = db.execute('SELECT * FROM servicos ORDER BY nome').fetchall()
     return render_template('admin/servicos.html', servicos=lista)
+
+
+def _parse_servico_form():
+    nome = request.form.get('nome', '').strip()
+    preco_raw = request.form.get('preco', '').strip().replace(',', '.')
+    duracao_raw = request.form.get('duracao_min', '').strip()
+    erro = None
+    preco = duracao = None
+    try:
+        preco = float(preco_raw)
+        duracao = int(duracao_raw)
+    except ValueError:
+        erro = 'Preço e duração precisam ser numéricos.'
+    if not erro:
+        if not nome:
+            erro = 'Nome é obrigatório.'
+        elif preco < 0:
+            erro = 'Preço não pode ser negativo.'
+        elif duracao <= 0:
+            erro = 'Duração deve ser maior que zero.'
+    return nome, preco, duracao, erro
+
+
+@admin.route('/servicos/novo', methods=['GET', 'POST'])
+def servico_novo():
+    if not session.get('logado'):
+        return redirect(url_for('admin.login'))
+    if request.method == 'POST':
+        nome, preco, duracao, erro = _parse_servico_form()
+        if erro:
+            return render_template('admin/servico_form.html', servico=None, form=request.form, erro=erro)
+        db = get_db()
+        db.execute(
+            'INSERT INTO servicos (nome, preco, duracao_min) VALUES (?, ?, ?)',
+            (nome, preco, duracao),
+        )
+        db.commit()
+        flash(f'Serviço "{nome}" criado com sucesso.', 'success')
+        return redirect(url_for('admin.servicos'))
+    return render_template('admin/servico_form.html', servico=None, form=None)
+
+
+@admin.route('/servicos/<int:id>/editar', methods=['GET', 'POST'])
+def servico_editar(id):
+    if not session.get('logado'):
+        return redirect(url_for('admin.login'))
+    db = get_db()
+    servico = db.execute('SELECT * FROM servicos WHERE id = ?', (id,)).fetchone()
+    if servico is None:
+        flash('Serviço não encontrado.', 'error')
+        return redirect(url_for('admin.servicos'))
+    if request.method == 'POST':
+        nome, preco, duracao, erro = _parse_servico_form()
+        if erro:
+            return render_template('admin/servico_form.html', servico=servico, form=request.form, erro=erro)
+        db.execute(
+            'UPDATE servicos SET nome = ?, preco = ?, duracao_min = ? WHERE id = ?',
+            (nome, preco, duracao, id),
+        )
+        db.commit()
+        flash(f'Serviço "{nome}" atualizado.', 'success')
+        return redirect(url_for('admin.servicos'))
+    return render_template('admin/servico_form.html', servico=servico, form=None)
+
+
+@admin.route('/servicos/<int:id>/excluir', methods=['POST'])
+def servico_excluir(id):
+    if not session.get('logado'):
+        return redirect(url_for('admin.login'))
+    db = get_db()
+    servico = db.execute('SELECT * FROM servicos WHERE id = ?', (id,)).fetchone()
+    if servico is None:
+        flash('Serviço não encontrado.', 'error')
+        return redirect(url_for('admin.servicos'))
+    em_uso = db.execute(
+        'SELECT COUNT(*) AS n FROM agendamentos WHERE servico_id = ?',
+        (id,),
+    ).fetchone()['n']
+    if em_uso:
+        flash(
+            f'Não é possível excluir "{servico["nome"]}": existem {em_uso} agendamento(s) usando este serviço.',
+            'error',
+        )
+        return redirect(url_for('admin.servicos'))
+    db.execute('DELETE FROM servicos WHERE id = ?', (id,))
+    db.commit()
+    flash(f'Serviço "{servico["nome"]}" excluído.', 'success')
+    return redirect(url_for('admin.servicos'))
+
 
 app.register_blueprint(publico)
 app.register_blueprint(admin)
