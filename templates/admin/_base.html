@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin{% endblock %} — Esmalteria</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Esmalteria · Admin</a>
+    <div class="navbar-links">
+      <a href="{{ url_for('admin.dashboard') }}"
+         class="navbar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Agendamentos</a>
+      <a href="{{ url_for('admin.servicos') }}"
+         class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a>
+      <a href="{{ url_for('admin.logout') }}" class="navbar-link">Sair</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for category, msg in messages %}
+            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
