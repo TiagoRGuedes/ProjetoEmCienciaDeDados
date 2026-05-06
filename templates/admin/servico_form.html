@@ -1,45 +1,37 @@
-{% extends 'admin/_base.html' %}
-{% block title %}{% if servico %}Editar serviço{% else %}Novo serviço{% endif %}{% endblock %}
-{% block content %}
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}{% if servico %}Editar serviço{% else %}Novo serviço{% endif %}{% endblock %} {# Define o título conforme criação ou edição. #}
+{% block content %} {# Começa o conteúdo principal da página. #}
 
-<div class="page-header">
-  <h1 class="page-title">{% if servico %}Editar serviço{% else %}Novo serviço{% endif %}</h1>
-</div>
+<div class="page-header"> <!-- Cria o cabeçalho da página. -->
+  <h1 class="page-title">{% if servico %}Editar serviço{% else %}Novo serviço{% endif %}</h1> <!-- Mostra título diferente para edição ou criação. -->
+</div> <!-- Fecha o cabeçalho da página. -->
 
-<div class="card" style="max-width: 560px;">
-  {% if erro %}
-    <ul class="flash-list"><li class="flash flash-error">{{ erro }}</li></ul>
-  {% endif %}
+<div class="card" style="max-width: 560px;"> <!-- Cria um cartão visual para o formulário. -->
+  {% if erro %} <!-- Verifica se existe erro enviado pelo Flask. -->
+    <ul class="flash-list"><li class="flash flash-error">{{ erro }}</li></ul> <!-- Mostra a mensagem de erro. -->
+  {% endif %} <!-- Fecha a verificação de erro. -->
 
-  <form method="POST" class="form-grid">
-    <div class="form-group">
-      <label class="form-label" for="nome">Nome do serviço</label>
-      <input class="form-input" type="text" id="nome" name="nome"
-             value="{{ form.nome if form else (servico.nome if servico else '') }}"
-             required maxlength="80" autofocus>
-    </div>
+  <form method="POST" class="form-grid"> <!-- Cria o formulário que envia dados via POST. -->
+    <div class="form-group"> <!-- Agrupa o campo nome. -->
+      <label class="form-label" for="nome">Nome do serviço</label> <!-- Rótulo do campo nome. -->
+      <input class="form-input" type="text" id="nome" name="nome" value="{{ form.nome if form else (servico.nome if servico else '') }}" required maxlength="80" autofocus> <!-- Campo para digitar o nome do serviço. -->
+    </div> <!-- Fecha o grupo do nome. -->
 
-    <div class="form-group">
-      <label class="form-label" for="preco">Preço (R$)</label>
-      <input class="form-input" type="number" id="preco" name="preco"
-             value="{{ form.preco if form else (servico.preco if servico else '') }}"
-             step="0.01" min="0" required>
-    </div>
+    <div class="form-group"> <!-- Agrupa o campo preço. -->
+      <label class="form-label" for="preco">Preço (R$)</label> <!-- Rótulo do campo preço. -->
+      <input class="form-input" type="number" id="preco" name="preco" value="{{ form.preco if form else (servico.preco if servico else '') }}" step="0.01" min="0" required> <!-- Campo numérico para preço. -->
+    </div> <!-- Fecha o grupo do preço. -->
 
-    <div class="form-group">
-      <label class="form-label" for="duracao_min">Duração (minutos)</label>
-      <input class="form-input" type="number" id="duracao_min" name="duracao_min"
-             value="{{ form.duracao_min if form else (servico.duracao_min if servico else '') }}"
-             step="5" min="5" required>
-    </div>
+    <div class="form-group"> <!-- Agrupa o campo duração. -->
+      <label class="form-label" for="duracao_min">Duração (minutos)</label> <!-- Rótulo do campo duração. -->
+      <input class="form-input" type="number" id="duracao_min" name="duracao_min" value="{{ form.duracao_min if form else (servico.duracao_min if servico else '') }}" step="5" min="5" required> <!-- Campo numérico para duração. -->
+    </div> <!-- Fecha o grupo da duração. -->
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        {% if servico %}Salvar alterações{% else %}Criar serviço{% endif %}
-      </button>
-      <a href="{{ url_for('admin.servicos') }}" class="btn btn-secondary">Cancelar</a>
-    </div>
-  </form>
-</div>
+    <div class="form-actions"> <!-- Cria área dos botões do formulário. -->
+      <button type="submit" class="btn btn-primary">{% if servico %}Salvar alterações{% else %}Criar serviço{% endif %}</button> <!-- Botão principal que salva o serviço. -->
+      <a href="{{ url_for('admin.servicos') }}" class="btn btn-secondary">Cancelar</a> <!-- Link para cancelar e voltar para a lista. -->
+    </div> <!-- Fecha a área dos botões. -->
+  </form> <!-- Fecha o formulário. -->
+</div> <!-- Fecha o cartão do formulário. -->
 
-{% endblock %}
+{% endblock %} {# Finaliza o conteúdo da página. #}

@@ -1,7 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Confirmação</title></head>
-<body>
-  <p>Agendamento realizado com sucesso!</p>
-</body>
-</html>
+{% extends "base.html" %} {# Usa o layout base do site. #}
+{% block conteudo %} {# Começa o conteúdo específico da confirmação. #}
+<section class="secao confirmado"> <!-- Cria a seção visual de confirmação. -->
+    <div class="container"> <!-- Centraliza o conteúdo da confirmação. -->
+        <h2>Agendamento enviado com sucesso!</h2> <!-- Mostra a mensagem principal de sucesso. -->
+        <p>Seu pedido foi registrado como pendente e a equipe do {{ empresa.nome }} entrará em contato para confirmar.</p> <!-- Explica que o agendamento ainda será confirmado. -->
+        <p><strong>Contato:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone para contato. -->
+        <a class="botao" href="{{ url_for('publico.index') }}">Voltar ao início</a> <!-- Botão para voltar à página inicial. -->
+        <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a> <!-- Botão para abrir um novo formulário de agendamento. -->
+    </div> <!-- Fecha o container. -->
+</section> <!-- Fecha a seção de confirmação. -->
+{% endblock %} {# Finaliza o conteúdo da confirmação. #}
