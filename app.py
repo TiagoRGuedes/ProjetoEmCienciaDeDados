@@ -16,7 +16,7 @@ EMPRESA = {  # Cria um dicionário com os dados fixos da empresa para usar nos t
     'instagram_nome': '@refugiodapreta',  # Guarda o nome do perfil do Instagram.
     'instagram_url': 'https://www.instagram.com/refugiodapreta/',  # Guarda o link clicável do Instagram.
     'foto_dona': 'pamela_francisco.png',  # Guarda o nome da imagem da Pamela dentro da pasta static/img.
-    'slogan': 'Beleza, cuidado e acolhimento afro.'  # Guarda uma frase curta para apresentar a identidade da marca.
+    'slogan': 'Beleza, cuidado e acolhimento.'  # Guarda uma frase curta para apresentar a identidade da marca.
 }  # Fecha o dicionário EMPRESA.
 
 HORARIOS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']  # Define os horários disponíveis para agendamento.
@@ -283,7 +283,7 @@ EMPRESA = {  # Cria um dicionário com os dados fixos da empresa para usar nos t
     'instagram_nome': '@refugiodapreta',  # Guarda o nome do perfil do Instagram.
     'instagram_url': 'https://www.instagram.com/refugiodapreta/',  # Guarda o link clicável do Instagram.
     'foto_dona': 'pamela_francisco.png',  # Guarda o nome da imagem da Pamela dentro da pasta static/img.
-    'slogan': 'Beleza, cuidado e acolhimento afro.'  # Guarda uma frase curta para apresentar a identidade da marca.
+    'slogan': 'Beleza, cuidado e acolhimento.'  # Guarda uma frase curta para apresentar a identidade da marca.
 }  # Fecha o dicionário EMPRESA.
 
 HORARIOS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']  # Define os horários disponíveis para agendamento.
