@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Serviços</title></head>
+<body>
+  <h1>Serviços</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Preço</th>
+        <th>Duração (min)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in servicos %}
+      <tr>
+        <td>{{ s.nome }}</td>
+        <td>R${{ s.preco }}</td>
+        <td>{{ s.duracao_min }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

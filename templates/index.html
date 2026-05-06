@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Esmalteria</title></head>
+<body>
+  <h1>Serviços</h1>
+  <ul>
+    {% for s in servicos %}
+    <li>{{ s.nome }} — R${{ s.preco }} — {{ s.duracao_min }} min</li>
+    {% endfor %}
+  </ul>
+  <a href="/agendar">Agendar</a>
+</body>
+</html>

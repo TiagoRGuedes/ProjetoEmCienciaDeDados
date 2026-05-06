@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Agendamento</title></head>
+<body>
+  <h1>Agendamento</h1>
+  {% if erro %}<p>{{ erro }}</p>{% endif %}
+  <form method="POST" action="/agendar">
+    <label>Nome: <input type="text" name="nome" required></label><br>
+    <label>Telefone: <input type="text" name="telefone" required></label><br>
+    <label>Email: <input type="email" name="email"></label><br>
+    <label>Serviço:
+      <select name="servico_id" required>
+        {% for s in servicos %}
+        <option value="{{ s.id }}">{{ s.nome }} — R${{ s.preco }}</option>
+        {% endfor %}
+      </select>
+    </label><br>
+    <label>Data: <input type="date" name="data" required></label><br>
+    <label>Horário: <input type="text" name="horario" placeholder="09:00" required></label><br>
+    <button type="submit">Agendar</button>
+  </form>
+</body>
+</html>

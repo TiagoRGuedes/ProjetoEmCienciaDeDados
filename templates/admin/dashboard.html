@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Dashboard</title></head>
+<body>
+  <h1>Dashboard</h1>
+  <a href="/admin/logout">Logout</a>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Serviço</th>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in agendamentos %}
+      <tr>
+        <td>{{ a.cliente_nome }}</td>
+        <td>{{ a.servico_nome }}</td>
+        <td>{{ a.data }}</td>
+        <td>{{ a.horario }}</td>
+        <td>{{ a.status }}</td>
+        <td>
+          <form method="POST" action="/admin/agendamento/{{ a.id }}/status">
+            <input type="hidden" name="novo_status" value="confirmado">
+            <button type="submit">Confirmar</button>
+          </form>
+          <form method="POST" action="/admin/agendamento/{{ a.id }}/status">
+            <input type="hidden" name="novo_status" value="cancelado">
+            <button type="submit">Cancelar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
