@@ -68,11 +68,11 @@
     </div> <!-- Fecha a grade da seção da dona. -->
 </section> <!-- Fecha a seção da dona. -->
 
-<section class="secao chamada-final"> <!-- Cria uma última chamada para ação. -->
-    <div class="container"> <!-- Centraliza o conteúdo da chamada final. -->
-        <h2>Pronta para reservar seu atendimento?</h2> <!-- Mostra o título da chamada final. -->
-        <p>Escolha um serviço, verifique os horários disponíveis e envie seu agendamento em poucos passos.</p> <!-- Explica o próximo passo. -->
-        <a class="botao" href="{{ url_for('publico.agendar_get') }}">Ir para agendamento</a> <!-- Botão final para abrir o formulário. -->
-    </div> <!-- Fecha o container da chamada final. -->
-</section> <!-- Fecha a seção da chamada final. -->
+<section class="secao chamada-final">
+    <div class="container chamada-final-conteudo">
+        <h2>Pronta para reservar seu atendimento?</h2>
+        <p class="texto-central">Escolha um serviço, verifique os horários disponíveis e envie seu agendamento em poucos passos.</p>
+        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">Ir para agendamento</a>
+    </div>
+</section>
 {% endblock %} {# Finaliza o bloco de conteúdo da página inicial. #}

@@ -333,6 +333,27 @@ input, select { /* Estiliza inputs e selects. */
     text-decoration: underline; /* Sublinha para indicar que é link. */
 } /* Fecha a regra do link do rodapé. */
 
+.chamada-final-conteudo {
+    text-align: center;
+}
+
+.botao-destaque {
+    display: inline-block;
+    background-color: #C2185B;
+    color: #ffffff;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.botao-destaque:hover {
+    background-color: #a31550;
+}
+
 @media (max-width: 820px) { /* Cria regras para telas pequenas, como celular. */
     .topo-conteudo { display: block; text-align: center; } /* Coloca topo em bloco e centralizado. */
     nav { margin-top: 16px; } /* Adiciona espaço acima do menu. */

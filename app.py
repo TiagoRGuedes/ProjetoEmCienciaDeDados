@@ -10,7 +10,7 @@ admin = Blueprint('admin', __name__, url_prefix='/admin')
 EMPRESA = {
     'nome': 'Refúgio da Preta',
     'dona': 'Pamela Francisco',
-    'telefone': '99220-4706',
+    'telefone': '(11) 99220-4706',
     'endereco': 'Rua Carapicuíba, 143 - BNH Grajaú',
     'horarios': 'Terça a sábado, das 10h às 19h',
     'instagram_nome': '@refugiodapreta',
