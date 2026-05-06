@@ -1,94 +1,90 @@
-{% extends 'admin/_base.html' %}
-{% block title %}Agendamentos{% endblock %}
-{% block content %}
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Agendamentos{% endblock %} {# Define o título da página admin como Agendamentos. #}
+{% block content %} {# Começa o conteúdo principal desta página. #}
 
-<div class="page-header">
-  <h1 class="page-title">
-    Agendamentos
-    <span class="page-counter">{{ agendamentos|length }} no total</span>
-  </h1>
-</div>
+<div class="page-header"> <!-- Cria o cabeçalho da página. -->
+  <h1 class="page-title"> <!-- Cria o título principal do dashboard. -->
+    Agendamentos <!-- Texto do título. -->
+    <span class="page-counter">{{ agendamentos|length }} no total</span> <!-- Mostra a quantidade de agendamentos carregados. -->
+  </h1> <!-- Fecha o título principal. -->
+</div> <!-- Fecha o cabeçalho da página. -->
 
-<form class="filters" method="GET" action="{{ url_for('admin.dashboard') }}">
-  <div class="form-group">
-    <label class="form-label" for="filtro-status">Status</label>
-    <select class="form-select" name="status" id="filtro-status">
-      <option value="">Todos</option>
-      <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option>
-      <option value="confirmado" {% if filtro_status == 'confirmado' %}selected{% endif %}>Confirmado</option>
-      <option value="cancelado" {% if filtro_status == 'cancelado' %}selected{% endif %}>Cancelado</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label class="form-label" for="filtro-data">Data</label>
-    <input class="form-input" type="date" name="data" id="filtro-data" value="{{ filtro_data or '' }}">
-  </div>
-  <div class="filter-actions">
-    <button type="submit" class="btn btn-primary">Filtrar</button>
-    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Limpar</a>
-  </div>
-</form>
+<form class="filters" method="GET" action="{{ url_for('admin.dashboard') }}"> <!-- Cria formulário de filtros usando GET. -->
+  <div class="form-group"> <!-- Agrupa o filtro de status. -->
+    <label class="form-label" for="filtro-status">Status</label> <!-- Rótulo do filtro de status. -->
+    <select class="form-select" name="status" id="filtro-status"> <!-- Cria lista de seleção de status. -->
+      <option value="">Todos</option> <!-- Opção para mostrar todos os status. -->
+      <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option> <!-- Opção para filtrar pendentes. -->
+      <option value="confirmado" {% if filtro_status == 'confirmado' %}selected{% endif %}>Confirmado</option> <!-- Opção para filtrar confirmados. -->
+      <option value="cancelado" {% if filtro_status == 'cancelado' %}selected{% endif %}>Cancelado</option> <!-- Opção para filtrar cancelados. -->
+    </select> <!-- Fecha a lista de status. -->
+  </div> <!-- Fecha o grupo de status. -->
+  <div class="form-group"> <!-- Agrupa o filtro de data. -->
+    <label class="form-label" for="filtro-data">Data</label> <!-- Rótulo do filtro de data. -->
+    <input class="form-input" type="date" name="data" id="filtro-data" value="{{ filtro_data or '' }}"> <!-- Campo para filtrar por data. -->
+  </div> <!-- Fecha o grupo de data. -->
+  <div class="filter-actions"> <!-- Cria área dos botões do filtro. -->
+    <button type="submit" class="btn btn-primary">Filtrar</button> <!-- Botão para aplicar os filtros. -->
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Limpar</a> <!-- Link para limpar os filtros. -->
+  </div> <!-- Fecha a área dos botões. -->
+</form> <!-- Fecha o formulário de filtros. -->
 
-{% if agendamentos %}
-<div class="table-wrapper">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Cliente</th>
-        <th>Contato</th>
-        <th>Serviço</th>
-        <th>Data</th>
-        <th>Horário</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for a in agendamentos %}
-      <tr>
-        <td><strong>{{ a.cliente_nome }}</strong></td>
-        <td>
-          <div>{{ a.telefone }}</div>
-          {% if a.email %}<div style="font-size:0.85rem;color:var(--cinza-500);">{{ a.email }}</div>{% endif %}
-        </td>
-        <td>{{ a.servico_nome }}<div style="font-size:0.85rem;color:var(--cinza-500);">R$ {{ '%.2f'|format(a.preco)|replace('.', ',') }} · {{ a.duracao_min }} min</div></td>
-        <td>{{ a.data }}</td>
-        <td>{{ a.horario }}</td>
-        <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
-        <td class="actions">
-          {% if a.status != 'confirmado' %}
-          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
-            <input type="hidden" name="novo_status" value="confirmado">
-            <button type="submit" class="btn btn-sm btn-success">Confirmar</button>
-          </form>
-          {% endif %}
-          {% if a.status != 'cancelado' %}
-          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
-            <input type="hidden" name="novo_status" value="cancelado">
-            <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
-          </form>
-          {% endif %}
-          {% if a.status != 'pendente' %}
-          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
-            <input type="hidden" name="novo_status" value="pendente">
-            <button type="submit" class="btn btn-sm btn-secondary">Pendente</button>
-          </form>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% else %}
-<div class="card empty-state">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-    <rect x="3" y="4" width="18" height="18" rx="2"/>
-    <path d="M16 2v4M8 2v4M3 10h18"/>
-  </svg>
-  <p><strong>Nenhum agendamento encontrado.</strong></p>
-  <p>Quando clientes agendarem pelo site, eles aparecem aqui.</p>
-</div>
-{% endif %}
+{% if agendamentos %} {# Verifica se existem agendamentos para listar. #}
+<div class="table-wrapper"> <!-- Cria uma área com rolagem horizontal para a tabela. -->
+  <table class="table"> <!-- Cria a tabela de agendamentos. -->
+    <thead> <!-- Abre o cabeçalho da tabela. -->
+      <tr> <!-- Cria a linha de cabeçalho. -->
+        <th>Cliente</th> <!-- Coluna do nome do cliente. -->
+        <th>Contato</th> <!-- Coluna de contato do cliente. -->
+        <th>Serviço</th> <!-- Coluna do serviço escolhido. -->
+        <th>Data</th> <!-- Coluna da data. -->
+        <th>Horário</th> <!-- Coluna do horário. -->
+        <th>Status</th> <!-- Coluna do status. -->
+        <th>Ações</th> <!-- Coluna de ações administrativas. -->
+      </tr> <!-- Fecha a linha de cabeçalho. -->
+    </thead> <!-- Fecha o cabeçalho da tabela. -->
+    <tbody> <!-- Abre o corpo da tabela. -->
+      {% for a in agendamentos %} {# Percorre cada agendamento recebido do Flask. #}
+      <tr> <!-- Cria uma linha para um agendamento. -->
+        <td><strong>{{ a.cliente_nome }}</strong></td> <!-- Mostra o nome do cliente. -->
+        <td> <!-- Abre a célula de contato. -->
+          <div>{{ a.telefone }}</div> <!-- Mostra o telefone do cliente. -->
+          {% if a.email %}<div style="font-size:0.85rem;color:var(--cinza-500);">{{ a.email }}</div>{% endif %} <!-- Mostra o email se ele existir. -->
+        </td> <!-- Fecha a célula de contato. -->
+        <td>{{ a.servico_nome }}<div style="font-size:0.85rem;color:var(--cinza-500);">R$ {{ '%.2f'|format(a.preco)|replace('.', ',') }} · {{ a.duracao_min }} min</div></td> <!-- Mostra nome, preço e duração do serviço. -->
+        <td>{{ a.data }}</td> <!-- Mostra a data do atendimento. -->
+        <td>{{ a.horario }}</td> <!-- Mostra o horário do atendimento. -->
+        <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td> <!-- Mostra o status com cor visual. -->
+        <td class="actions"> <!-- Abre a célula de ações. -->
+          {% if a.status != 'confirmado' %} <!-- Só mostra confirmar se ainda não estiver confirmado. -->
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}"> <!-- Formulário para confirmar agendamento. -->
+            <input type="hidden" name="novo_status" value="confirmado"> <!-- Campo escondido com o novo status confirmado. -->
+            <button type="submit" class="btn btn-sm btn-success">Confirmar</button> <!-- Botão para confirmar. -->
+          </form> <!-- Fecha o formulário de confirmar. -->
+          {% endif %} <!-- Fecha a condição de confirmar. -->
+          {% if a.status != 'cancelado' %} <!-- Só mostra cancelar se ainda não estiver cancelado. -->
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}"> <!-- Formulário para cancelar agendamento. -->
+            <input type="hidden" name="novo_status" value="cancelado"> <!-- Campo escondido com o novo status cancelado. -->
+            <button type="submit" class="btn btn-sm btn-danger">Cancelar</button> <!-- Botão para cancelar. -->
+          </form> <!-- Fecha o formulário de cancelar. -->
+          {% endif %} <!-- Fecha a condição de cancelar. -->
+          {% if a.status != 'pendente' %} <!-- Só mostra pendente se o status atual for diferente de pendente. -->
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}"> <!-- Formulário para voltar para pendente. -->
+            <input type="hidden" name="novo_status" value="pendente"> <!-- Campo escondido com o novo status pendente. -->
+            <button type="submit" class="btn btn-sm btn-secondary">Pendente</button> <!-- Botão para marcar como pendente. -->
+          </form> <!-- Fecha o formulário de pendente. -->
+          {% endif %} <!-- Fecha a condição de pendente. -->
+        </td> <!-- Fecha a célula de ações. -->
+      </tr> <!-- Fecha a linha do agendamento. -->
+      {% endfor %} {# Finaliza o loop dos agendamentos. #}
+    </tbody> <!-- Fecha o corpo da tabela. -->
+  </table> <!-- Fecha a tabela. -->
+</div> <!-- Fecha o wrapper da tabela. -->
+{% else %} <!-- Caso não existam agendamentos. -->
+<div class="card empty-state"> <!-- Cria um cartão de estado vazio. -->
+  <p><strong>Nenhum agendamento encontrado.</strong></p> <!-- Mostra mensagem principal de vazio. -->
+  <p>Quando clientes agendarem pelo site, eles aparecem aqui.</p> <!-- Explica quando aparecerão dados. -->
+</div> <!-- Fecha o cartão de estado vazio. -->
+{% endif %} {# Finaliza a verificação de agendamentos. #}
 
-{% endblock %}
+{% endblock %} {# Finaliza o conteúdo da página. #}
