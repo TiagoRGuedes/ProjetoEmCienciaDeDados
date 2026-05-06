@@ -1,38 +1,38 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Esmalteria Admin</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body class="login-page">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="icon">E</div>
-      <h1>Esmalteria · Admin</h1>
-      <div class="subtitle">Acesso restrito</div>
-    </div>
+<!DOCTYPE html> <!-- Informa ao navegador que o arquivo usa HTML5. -->
+<html lang="pt-BR"> <!-- Abre o documento HTML em português do Brasil. -->
+<head> <!-- Abre a área de configurações da tela de login. -->
+  <meta charset="UTF-8"> <!-- Permite acentos e caracteres especiais. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajusta o layout para celular e computador. -->
+  <title>Login — Esmalteria Admin</title> <!-- Define o título da aba do navegador. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Carrega o CSS do admin. -->
+</head> <!-- Fecha o head. -->
+<body class="login-page"> <!-- Abre o corpo da página com classe específica de login. -->
+  <div class="login-card"> <!-- Cria o cartão centralizado de login. -->
+    <div class="login-logo"> <!-- Cria a área visual do logo. -->
+      <div class="icon">R</div> <!-- Mostra uma inicial visual da marca. -->
+      <h1>Refúgio da Preta · Admin</h1> <!-- Mostra o título da área administrativa. -->
+      <div class="subtitle">Acesso restrito</div> <!-- Mostra um subtítulo de segurança. -->
+    </div> <!-- Fecha a área do logo. -->
 
-    {% if erro %}
-      <ul class="flash-list">
-        <li class="flash flash-error">{{ erro }}</li>
-      </ul>
-    {% endif %}
+    {% if erro %} {# Verifica se existe erro de login enviado pelo Flask. #}
+      <ul class="flash-list"> <!-- Cria lista de mensagens. -->
+        <li class="flash flash-error">{{ erro }}</li> <!-- Mostra a mensagem de erro. -->
+      </ul> <!-- Fecha a lista de mensagens. -->
+    {% endif %} {# Finaliza a verificação de erro. #}
 
-    <form method="POST" action="{{ url_for('admin.login') }}" class="form-grid">
-      <div class="form-group">
-        <label class="form-label" for="usuario">Usuário</label>
-        <input class="form-input" type="text" id="usuario" name="usuario" autocomplete="username" required autofocus>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="senha">Senha</label>
-        <input class="form-input" type="password" id="senha" name="senha" autocomplete="current-password" required>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary" style="width:100%;">Entrar</button>
-      </div>
-    </form>
-  </div>
-</body>
-</html>
+    <form method="POST" action="{{ url_for('admin.login') }}" class="form-grid"> <!-- Cria formulário que envia login e senha para a rota admin.login. -->
+      <div class="form-group"> <!-- Agrupa o campo de usuário. -->
+        <label class="form-label" for="usuario">Usuário</label> <!-- Rótulo do campo de usuário. -->
+        <input class="form-input" type="text" id="usuario" name="usuario" autocomplete="username" required autofocus> <!-- Campo para digitar o usuário. -->
+      </div> <!-- Fecha o grupo do usuário. -->
+      <div class="form-group"> <!-- Agrupa o campo de senha. -->
+        <label class="form-label" for="senha">Senha</label> <!-- Rótulo do campo de senha. -->
+        <input class="form-input" type="password" id="senha" name="senha" autocomplete="current-password" required> <!-- Campo para digitar a senha escondida. -->
+      </div> <!-- Fecha o grupo da senha. -->
+      <div class="form-actions"> <!-- Cria área para o botão de envio. -->
+        <button type="submit" class="btn btn-primary" style="width:100%;">Entrar</button> <!-- Botão que envia o formulário de login. -->
+      </div> <!-- Fecha a área do botão. -->
+    </form> <!-- Fecha o formulário de login. -->
+  </div> <!-- Fecha o cartão de login. -->
+</body> <!-- Fecha o corpo da página. -->
+</html> <!-- Fecha o documento HTML. -->
