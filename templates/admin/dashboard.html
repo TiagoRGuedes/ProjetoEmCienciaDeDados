@@ -1,13 +1,41 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Dashboard</title></head>
-<body>
-  <h1>Dashboard</h1>
-  <a href="/admin/logout">Logout</a>
-  <table border="1">
+{% extends 'admin/_base.html' %}
+{% block title %}Agendamentos{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    Agendamentos
+    <span class="page-counter">{{ agendamentos|length }} no total</span>
+  </h1>
+</div>
+
+<form class="filters" method="GET" action="{{ url_for('admin.dashboard') }}">
+  <div class="form-group">
+    <label class="form-label" for="filtro-status">Status</label>
+    <select class="form-select" name="status" id="filtro-status">
+      <option value="">Todos</option>
+      <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option>
+      <option value="confirmado" {% if filtro_status == 'confirmado' %}selected{% endif %}>Confirmado</option>
+      <option value="cancelado" {% if filtro_status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="filtro-data">Data</label>
+    <input class="form-input" type="date" name="data" id="filtro-data" value="{{ filtro_data or '' }}">
+  </div>
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Limpar</a>
+  </div>
+</form>
+
+{% if agendamentos %}
+<div class="table-wrapper">
+  <table class="table">
     <thead>
       <tr>
         <th>Cliente</th>
+        <th>Contato</th>
         <th>Serviço</th>
         <th>Data</th>
         <th>Horário</th>
@@ -18,24 +46,49 @@
     <tbody>
       {% for a in agendamentos %}
       <tr>
-        <td>{{ a.cliente_nome }}</td>
-        <td>{{ a.servico_nome }}</td>
+        <td><strong>{{ a.cliente_nome }}</strong></td>
+        <td>
+          <div>{{ a.telefone }}</div>
+          {% if a.email %}<div style="font-size:0.85rem;color:var(--cinza-500);">{{ a.email }}</div>{% endif %}
+        </td>
+        <td>{{ a.servico_nome }}<div style="font-size:0.85rem;color:var(--cinza-500);">R$ {{ '%.2f'|format(a.preco)|replace('.', ',') }} · {{ a.duracao_min }} min</div></td>
         <td>{{ a.data }}</td>
         <td>{{ a.horario }}</td>
-        <td>{{ a.status }}</td>
-        <td>
-          <form method="POST" action="/admin/agendamento/{{ a.id }}/status">
+        <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+        <td class="actions">
+          {% if a.status != 'confirmado' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
             <input type="hidden" name="novo_status" value="confirmado">
-            <button type="submit">Confirmar</button>
+            <button type="submit" class="btn btn-sm btn-success">Confirmar</button>
           </form>
-          <form method="POST" action="/admin/agendamento/{{ a.id }}/status">
+          {% endif %}
+          {% if a.status != 'cancelado' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
             <input type="hidden" name="novo_status" value="cancelado">
-            <button type="submit">Cancelar</button>
+            <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
           </form>
+          {% endif %}
+          {% if a.status != 'pendente' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}">
+            <input type="hidden" name="novo_status" value="pendente">
+            <button type="submit" class="btn btn-sm btn-secondary">Pendente</button>
+          </form>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-</body>
-</html>
+</div>
+{% else %}
+<div class="card empty-state">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <path d="M16 2v4M8 2v4M3 10h18"/>
+  </svg>
+  <p><strong>Nenhum agendamento encontrado.</strong></p>
+  <p>Quando clientes agendarem pelo site, eles aparecem aqui.</p>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,25 +1,54 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Serviços</title></head>
-<body>
-  <h1>Serviços</h1>
-  <table border="1">
+{% extends 'admin/_base.html' %}
+{% block title %}Serviços{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    Serviços
+    <span class="page-counter">{{ servicos|length }} cadastrado{{ '' if servicos|length == 1 else 's' }}</span>
+  </h1>
+  <a href="{{ url_for('admin.servico_novo') }}" class="btn btn-primary">+ Novo serviço</a>
+</div>
+
+{% if servicos %}
+<div class="table-wrapper">
+  <table class="table">
     <thead>
       <tr>
         <th>Nome</th>
         <th>Preço</th>
-        <th>Duração (min)</th>
+        <th>Duração</th>
+        <th style="width: 220px;">Ações</th>
       </tr>
     </thead>
     <tbody>
       {% for s in servicos %}
       <tr>
-        <td>{{ s.nome }}</td>
-        <td>R${{ s.preco }}</td>
-        <td>{{ s.duracao_min }}</td>
+        <td><strong>{{ s.nome }}</strong></td>
+        <td>R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }}</td>
+        <td>{{ s.duracao_min }} min</td>
+        <td class="actions">
+          <a href="{{ url_for('admin.servico_editar', id=s.id) }}" class="btn btn-sm btn-secondary">Editar</a>
+          <form method="POST" action="{{ url_for('admin.servico_excluir', id=s.id) }}"
+                onsubmit="return confirm('Excluir o serviço &quot;{{ s.nome }}&quot;?');">
+            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-</body>
-</html>
+</div>
+{% else %}
+<div class="card empty-state">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M20 7l-8 4-8-4 8-4 8 4z"/>
+    <path d="M4 7v10l8 4 8-4V7"/>
+  </svg>
+  <p><strong>Nenhum serviço cadastrado.</strong></p>
+  <p>Adicione o primeiro serviço para começar a receber agendamentos.</p>
+  <a href="{{ url_for('admin.servico_novo') }}" class="btn btn-primary" style="margin-top:10px;">+ Novo serviço</a>
+</div>
+{% endif %}
+
+{% endblock %}
