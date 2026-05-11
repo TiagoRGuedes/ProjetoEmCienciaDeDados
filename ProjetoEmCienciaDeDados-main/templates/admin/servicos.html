@@ -1,0 +1,49 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Serviços{% endblock %} {# Define o título da aba como Serviços. #}
+{% block content %} {# Começa o conteúdo principal da página. #}
+
+<div class="page-header"> <!-- Cria o cabeçalho da página de serviços. -->
+  <h1 class="page-title"> <!-- Cria o título principal. -->
+    Serviços <!-- Texto do título. -->
+    <span class="page-counter">{{ servicos|length }} cadastrado{{ '' if servicos|length == 1 else 's' }}</span> <!-- Mostra a quantidade de serviços cadastrados. -->
+  </h1> <!-- Fecha o título principal. -->
+  <a href="{{ url_for('admin.servico_novo') }}" class="btn btn-primary">+ Novo serviço</a> <!-- Link para cadastrar novo serviço. -->
+</div> <!-- Fecha o cabeçalho da página. -->
+
+{% if servicos %} {# Verifica se existem serviços cadastrados. #}
+<div class="table-wrapper"> <!-- Cria uma área com rolagem horizontal para a tabela. -->
+  <table class="table"> <!-- Cria a tabela de serviços. -->
+    <thead> <!-- Abre o cabeçalho da tabela. -->
+      <tr> <!-- Cria a linha do cabeçalho. -->
+        <th>Nome</th> <!-- Coluna do nome do serviço. -->
+        <th>Preço</th> <!-- Coluna do preço. -->
+        <th>Duração</th> <!-- Coluna da duração. -->
+        <th style="width: 220px;">Ações</th> <!-- Coluna de botões de ação. -->
+      </tr> <!-- Fecha a linha do cabeçalho. -->
+    </thead> <!-- Fecha o cabeçalho da tabela. -->
+    <tbody> <!-- Abre o corpo da tabela. -->
+      {% for s in servicos %} {# Percorre cada serviço recebido do Flask. #}
+      <tr> <!-- Cria uma linha para um serviço. -->
+        <td><strong>{{ s.nome }}</strong></td> <!-- Mostra o nome do serviço em negrito. -->
+        <td>R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }}</td> <!-- Mostra o preço formatado em reais. -->
+        <td>{{ s.duracao_min }} min</td> <!-- Mostra a duração em minutos. -->
+        <td class="actions"> <!-- Abre a célula de ações. -->
+          <a href="{{ url_for('admin.servico_editar', id=s.id) }}" class="btn btn-sm btn-secondary">Editar</a> <!-- Link para editar o serviço. -->
+          <form method="POST" action="{{ url_for('admin.servico_excluir', id=s.id) }}" onsubmit="return confirm('Excluir o serviço &quot;{{ s.nome }}&quot;?');"> <!-- Formulário para excluir serviço com confirmação. -->
+            <button type="submit" class="btn btn-sm btn-danger">Excluir</button> <!-- Botão que envia a exclusão. -->
+          </form> <!-- Fecha o formulário de exclusão. -->
+        </td> <!-- Fecha a célula de ações. -->
+      </tr> <!-- Fecha a linha do serviço. -->
+      {% endfor %} {# Finaliza o loop de serviços. #}
+    </tbody> <!-- Fecha o corpo da tabela. -->
+  </table> <!-- Fecha a tabela. -->
+</div> <!-- Fecha o wrapper da tabela. -->
+{% else %} <!-- Caso não exista nenhum serviço. -->
+<div class="card empty-state"> <!-- Cria um cartão de estado vazio. -->
+  <p><strong>Nenhum serviço cadastrado.</strong></p> <!-- Mostra a mensagem principal. -->
+  <p>Adicione o primeiro serviço para começar a receber agendamentos.</p> <!-- Explica o próximo passo. -->
+  <a href="{{ url_for('admin.servico_novo') }}" class="btn btn-primary" style="margin-top:10px;">+ Novo serviço</a> <!-- Botão para criar o primeiro serviço. -->
+</div> <!-- Fecha o cartão de estado vazio. -->
+{% endif %} {# Finaliza a verificação de serviços. #}
+
+{% endblock %} {# Finaliza o conteúdo da página. #}

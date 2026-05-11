@@ -1,0 +1,287 @@
+{% extends "base.html" %} {# Usa o layout base com cabeçalho e rodapé. #}
+{% block conteudo %} {# Começa o conteúdo específico da página de agendamento. #}
+<section class="secao agendamento-page"> <!-- Cria a seção principal do agendamento. -->
+    <div class="container formulario-area"> <!-- Centraliza e limita a largura do conteúdo. -->
+        <div class="agendamento-cabecalho"> <!-- Cria o cabeçalho visual da tela de agendamento. -->
+            <p class="subtitulo subtitulo-escuro">Agendamento online</p> <!-- Mostra um subtítulo da página. -->
+            <h2>Escolha seu atendimento</h2> <!-- Mostra o título principal. -->
+            <p>Selecione o serviço, veja as profissionais disponíveis para esse serviço, escolha uma data no calendário e finalize com nome e telefone.</p> <!-- Explica o fluxo novo em uma frase. -->
+            <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
+        </div> <!-- Fecha o cabeçalho visual. -->
+
+        {% if erro %} {# Verifica se existe mensagem de erro enviada pelo Flask. #}
+        <div class="mensagem-erro"> <!-- Cria uma caixa visual para o erro. -->
+            <strong>{{ erro }}</strong> <!-- Mostra o texto do erro. -->
+        </div> <!-- Fecha a caixa de erro. -->
+        {% endif %} {# Finaliza a verificação de erro. #}
+
+        <form method="POST" action="{{ url_for('publico.agendar_post') }}" class="form-box agendamento-form" id="form-agendamento"> <!-- Cria o formulário que envia os dados para a rota POST /agendar. -->
+            <div class="passo-agendamento"> <!-- Cria o primeiro bloco do agendamento. -->
+                <span class="numero-passo">1</span> <!-- Mostra o número do passo. -->
+                <div> <!-- Abre a área de conteúdo do passo. -->
+                    <h3>Escolha o serviço e a profissional</h3> <!-- Mostra o título do primeiro passo unificado. -->
+                    <p>Ao selecionar o serviço, o sistema mostra somente as profissionais disponíveis para esse procedimento.</p> <!-- Explica que os cards aparecem conforme o serviço. -->
+                </div> <!-- Fecha a área de conteúdo do passo. -->
+            </div> <!-- Fecha o primeiro bloco. -->
+
+            <label for="servico_id">Serviço:</label> <!-- Identifica o campo de serviço. -->
+            <select id="servico_id" name="servico_id" required> <!-- Cria a lista de serviços obrigatória. -->
+                <option value="">Selecione um serviço</option> <!-- Cria a opção inicial vazia. -->
+                {% for s in servicos %} {# Percorre todos os serviços recebidos do banco. #}
+                <option value="{{ s.id }}" {% if dados and dados.servico_id == s.id|string %}selected{% endif %}>{{ s.nome }} — R$ {{ "%.2f"|format(s.preco) }} · {{ s.duracao_min }} min</option> <!-- Cria uma opção com nome, preço e duração do serviço. -->
+                {% endfor %} {# Finaliza o loop dos serviços. #}
+            </select> <!-- Fecha a lista de serviços. -->
+
+            <div class="bloco-profissionais oculto" id="bloco-profissionais"> <!-- Cria o bloco de profissionais que só aparece após escolher o serviço. -->
+                <h4>Profissionais disponíveis para o serviço escolhido</h4> <!-- Mostra o título do bloco de profissionais. -->
+                <p id="aviso-profissionais" class="mensagem-ajuda">Escolha um serviço para visualizar as profissionais disponíveis.</p> <!-- Mostra uma mensagem de apoio ao usuário. -->
+                <div class="profissionais-grid" id="profissionais-grid"> <!-- Cria a grade visual das profissionais. -->
+                    {% for p in profissionais %} {# Percorre as profissionais cadastradas. #}
+                    <label class="profissional-card {% if dados and dados.profissional_id == p.id|string %}selecionada{% endif %}" data-profissional-id="{{ p.id }}"> <!-- Cria um card clicável de profissional com id no atributo data. -->
+                        <input type="radio" name="profissional_id" value="{{ p.id }}" {% if dados and dados.profissional_id == p.id|string %}checked{% endif %} required> <!-- Cria o radio obrigatório da profissional. -->
+                        <img src="{{ url_for('static', filename='img/' + p.foto) }}" alt="{{ p.nome }}"> <!-- Mostra a foto da profissional ou imagem de apoio. -->
+                        <span class="profissional-info"> <!-- Cria a área textual do card. -->
+                            <strong>{{ p.nome }}</strong> <!-- Mostra o nome da profissional. -->
+                            <small>{{ p.especialidade }}</small> <!-- Mostra a especialidade da profissional. -->
+                        </span> <!-- Fecha a área textual do card. -->
+                    </label> <!-- Fecha o card de profissional. -->
+                    {% endfor %} {# Finaliza o loop das profissionais. #}
+                </div> <!-- Fecha a grade de profissionais. -->
+            </div> <!-- Fecha o bloco de profissionais. -->
+
+            <div class="passo-agendamento"> <!-- Cria o segundo bloco do agendamento. -->
+                <span class="numero-passo">2</span> <!-- Mostra o número do passo. -->
+                <div> <!-- Abre a área do passo. -->
+                    <h3>Escolha a data no calendário</h3> <!-- Mostra o título do segundo passo. -->
+                    <p>O calendário libera os dias conforme a profissional selecionada e mostra horários livres automaticamente.</p> <!-- Explica a função do calendário. -->
+                </div> <!-- Fecha a área do passo. -->
+            </div> <!-- Fecha o segundo bloco. -->
+
+            <input type="hidden" id="data" name="data" value="{{ dados.data if dados else '' }}" required> <!-- Guarda a data selecionada sem mostrar campo digitável para a cliente. -->
+
+            <div class="calendario-card"> <!-- Cria o cartão visual do calendário. -->
+                <div class="calendario-topo"> <!-- Cria o topo do calendário. -->
+                    <button type="button" class="calendario-nav" id="mes-anterior">‹</button> <!-- Botão para voltar um mês. -->
+                    <strong id="calendario-titulo">Carregando...</strong> <!-- Mostra o mês e o ano atual do calendário. -->
+                    <button type="button" class="calendario-nav" id="mes-proximo">›</button> <!-- Botão para avançar um mês. -->
+                </div> <!-- Fecha o topo do calendário. -->
+                <div class="calendario-semana"> <!-- Cria a linha com nomes dos dias da semana. -->
+                    <span>Dom</span> <!-- Mostra domingo. -->
+                    <span>Seg</span> <!-- Mostra segunda. -->
+                    <span>Ter</span> <!-- Mostra terça. -->
+                    <span>Qua</span> <!-- Mostra quarta. -->
+                    <span>Qui</span> <!-- Mostra quinta. -->
+                    <span>Sex</span> <!-- Mostra sexta. -->
+                    <span>Sáb</span> <!-- Mostra sábado. -->
+                </div> <!-- Fecha a linha de semana. -->
+                <div class="calendario-grade" id="calendario-grade"> <!-- Cria a grade onde os dias serão montados pelo JavaScript. -->
+                </div> <!-- Fecha a grade do calendário. -->
+                <div class="calendario-legenda"> <!-- Cria legenda visual do calendário. -->
+                    <span><i class="legenda livre"></i> Disponível</span> <!-- Mostra legenda de dia disponível. -->
+                    <span><i class="legenda lotado"></i> Sem horários</span> <!-- Mostra legenda de dia lotado ou bloqueado. -->
+                    <span><i class="legenda fechado"></i> Fechado</span> <!-- Mostra legenda de dia fora do funcionamento. -->
+                </div> <!-- Fecha a legenda. -->
+            </div> <!-- Fecha o cartão do calendário. -->
+
+            <div class="painel-horarios oculto" id="painel-horarios"> <!-- Cria painel de horários inicialmente escondido. -->
+                <label>Horários disponíveis em <span id="data-escolhida-texto"></span>:</label> <!-- Mostra o dia selecionado para os horários. -->
+                <div class="horarios" id="horarios-grade"> <!-- Cria a grade visual de horários preenchida pelo JavaScript. -->
+                </div> <!-- Fecha a grade de horários. -->
+            </div> <!-- Fecha o painel de horários. -->
+
+            <div class="passo-agendamento"> <!-- Cria o terceiro bloco do agendamento. -->
+                <span class="numero-passo">3</span> <!-- Mostra o número do passo. -->
+                <div> <!-- Abre a área do passo. -->
+                    <h3>Seus dados</h3> <!-- Mostra o título do terceiro passo. -->
+                    <p>Informe apenas nome e telefone para finalizarmos a confirmação.</p> <!-- Explica que não há email no cadastro. -->
+                </div> <!-- Fecha a área do passo. -->
+            </div> <!-- Fecha o terceiro bloco. -->
+
+            <label for="nome">Nome completo:</label> <!-- Identifica o campo de nome. -->
+            <input type="text" id="nome" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required> <!-- Campo para digitar o nome da cliente. -->
+
+            <label for="telefone">Telefone:</label> <!-- Identifica o campo de telefone. -->
+            <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required> <!-- Campo para digitar o telefone da cliente. -->
+
+            <button type="submit" class="botao-form botao-finalizar">Confirmar agendamento</button> <!-- Botão que envia o formulário para o Flask. -->
+        </form> <!-- Fecha o formulário de agendamento. -->
+    </div> <!-- Fecha o container do formulário. -->
+</section> <!-- Fecha a seção de agendamento. -->
+
+<script> // Abre o JavaScript que controla serviço, profissionais, calendário e horários.
+const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']; // Cria nomes dos meses em português.
+const campoServico = document.getElementById('servico_id'); // Busca o campo de seleção de serviço.
+const blocoProfissionais = document.getElementById('bloco-profissionais'); // Busca o bloco que contém os profissionais.
+const avisoProfissionais = document.getElementById('aviso-profissionais'); // Busca o texto de aviso dos profissionais.
+const mapaProfissionaisServicos = {{ profissionais_servicos|tojson }}; // Recebe do Flask o mapa de quais serviços cada profissional atende.
+const tituloCalendario = document.getElementById('calendario-titulo'); // Busca o texto do título do calendário.
+const gradeCalendario = document.getElementById('calendario-grade'); // Busca a grade onde os dias serão exibidos.
+const botaoAnterior = document.getElementById('mes-anterior'); // Busca o botão de mês anterior.
+const botaoProximo = document.getElementById('mes-proximo'); // Busca o botão de próximo mês.
+const campoData = document.getElementById('data'); // Busca o campo escondido que guarda a data escolhida.
+const painelHorarios = document.getElementById('painel-horarios'); // Busca o painel que mostra os horários.
+const gradeHorarios = document.getElementById('horarios-grade'); // Busca a grade de horários.
+const textoDataEscolhida = document.getElementById('data-escolhida-texto'); // Busca o texto que mostra a data selecionada.
+let hoje = new Date(); // Cria uma data com o dia atual do computador.
+let anoAtual = hoje.getFullYear(); // Guarda o ano atual para iniciar o calendário.
+let mesAtual = hoje.getMonth(); // Guarda o mês atual no formato JavaScript, começando em zero.
+let dataSelecionada = campoData.value; // Guarda a data selecionada quando a página carrega.
+
+function servicoSelecionado() { // Cria função para descobrir qual serviço foi selecionado.
+    return campoServico.value; // Retorna o valor atual do select de serviço.
+} // Fecha a função de serviço selecionado.
+
+function profissionalSelecionada() { // Cria função para descobrir qual profissional foi marcada.
+    const marcada = document.querySelector('input[name="profissional_id"]:checked'); // Procura o radio de profissional selecionado.
+    return marcada ? marcada.value : ''; // Retorna o id da profissional ou vazio se nenhuma foi escolhida.
+} // Fecha a função de profissional selecionada.
+
+function limparDataEHorario() { // Cria função para limpar data e horário quando serviço ou profissional mudar.
+    dataSelecionada = ''; // Limpa a variável da data selecionada.
+    campoData.value = ''; // Limpa o campo escondido da data.
+    gradeHorarios.innerHTML = ''; // Limpa os horários exibidos anteriormente.
+    painelHorarios.classList.add('oculto'); // Esconde o painel de horários.
+} // Fecha a função de limpeza de agenda.
+
+function atualizarProfissionaisDisponiveis(limparSelecao) { // Cria função que mostra somente profissionais que atendem o serviço selecionado.
+    const servicoId = servicoSelecionado(); // Pega o serviço selecionado.
+    let quantidadeVisivel = 0; // Cria contador de profissionais disponíveis.
+    document.querySelectorAll('.profissional-card').forEach(card => { // Percorre todos os cards de profissionais.
+        const input = card.querySelector('input[name="profissional_id"]'); // Busca o radio dentro do card.
+        const profissionalId = input.value; // Pega o id da profissional do radio.
+        const servicosDaProfissional = mapaProfissionaisServicos[profissionalId] || []; // Busca quais serviços essa profissional atende.
+        const atendeServico = servicoId !== '' && servicosDaProfissional.includes(servicoId); // Verifica se a profissional atende o serviço selecionado.
+        if (atendeServico) { // Entra aqui se a profissional pode atender o serviço.
+            card.classList.remove('oculto'); // Mostra o card da profissional.
+            input.disabled = false; // Habilita o radio da profissional.
+            quantidadeVisivel++; // Soma uma profissional disponível.
+        } else { // Entra aqui se a profissional não atende o serviço ou se nenhum serviço foi escolhido.
+            card.classList.add('oculto'); // Esconde o card da profissional.
+            input.disabled = true; // Desabilita o radio para não enviar profissional errada.
+            input.checked = false; // Desmarca o radio caso ele estivesse marcado.
+            card.classList.remove('selecionada'); // Remove destaque visual do card.
+        } // Fecha a verificação de disponibilidade da profissional.
+    }); // Fecha o loop dos cards.
+    if (servicoId === '') { // Verifica se ainda não existe serviço escolhido.
+        blocoProfissionais.classList.add('oculto'); // Esconde o bloco de profissionais.
+        avisoProfissionais.textContent = 'Escolha um serviço para visualizar as profissionais disponíveis.'; // Atualiza o aviso inicial.
+    } else { // Entra aqui quando existe serviço escolhido.
+        blocoProfissionais.classList.remove('oculto'); // Mostra o bloco de profissionais.
+        avisoProfissionais.textContent = quantidadeVisivel > 0 ? 'Selecione uma profissional para carregar o calendário dela.' : 'Nenhuma profissional disponível para este serviço.'; // Mostra aviso conforme a quantidade de profissionais.
+    } // Fecha a verificação do serviço.
+    if (limparSelecao) { // Verifica se a troca de serviço deve limpar a agenda.
+        limparDataEHorario(); // Limpa data e horário antigos porque o serviço mudou.
+    } // Fecha a limpeza opcional.
+} // Fecha a função que filtra profissionais.
+
+function formatarDataBrasil(dataISO) { // Cria função para mostrar a data no formato brasileiro.
+    const partes = dataISO.split('-'); // Divide a data AAAA-MM-DD em partes.
+    return `${partes[2]}/${partes[1]}/${partes[0]}`; // Retorna a data como DD/MM/AAAA.
+} // Fecha a função de formatação de data.
+
+async function carregarCalendario() { // Cria função assíncrona para carregar os dias disponíveis do mês.
+    const servicoId = servicoSelecionado(); // Pega o serviço selecionado.
+    const profissionalId = profissionalSelecionada(); // Pega a profissional selecionada.
+    tituloCalendario.textContent = `${meses[mesAtual]} de ${anoAtual}`; // Atualiza o título com mês e ano.
+    gradeCalendario.innerHTML = ''; // Limpa a grade antes de redesenhar.
+    if (!servicoId) { // Verifica se nenhum serviço foi escolhido.
+        gradeCalendario.innerHTML = '<div class="calendario-aviso">Escolha um serviço para visualizar profissionais e calendário.</div>'; // Mostra aviso para escolher serviço.
+        painelHorarios.classList.add('oculto'); // Esconde horários enquanto falta serviço.
+        return; // Para a função.
+    } // Fecha a verificação de serviço.
+    if (!profissionalId) { // Verifica se nenhuma profissional foi escolhida.
+        gradeCalendario.innerHTML = '<div class="calendario-aviso">Escolha uma profissional disponível para ver o calendário.</div>'; // Mostra aviso para escolher profissional.
+        painelHorarios.classList.add('oculto'); // Esconde horários enquanto falta profissional.
+        return; // Para a função.
+    } // Fecha a verificação de profissional.
+    const resposta = await fetch(`/disponibilidade-mes?ano=${anoAtual}&mes=${mesAtual + 1}&profissional_id=${profissionalId}`); // Chama o Flask para buscar disponibilidade do mês.
+    const disponibilidade = await resposta.json(); // Converte a resposta JSON em objeto.
+    const primeiroDia = new Date(anoAtual, mesAtual, 1).getDay(); // Descobre em qual dia da semana o mês começa.
+    const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate(); // Descobre o último dia do mês.
+    for (let vazio = 0; vazio < primeiroDia; vazio++) { // Cria espaços vazios antes do primeiro dia.
+        const espaco = document.createElement('div'); // Cria uma célula vazia.
+        espaco.className = 'dia-vazio'; // Define classe da célula vazia.
+        gradeCalendario.appendChild(espaco); // Adiciona a célula vazia na grade.
+    } // Fecha o loop de espaços vazios.
+    for (let dia = 1; dia <= ultimoDia; dia++) { // Percorre todos os dias do mês.
+        const dataISO = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`; // Monta a data no formato AAAA-MM-DD.
+        const info = disponibilidade[dataISO]; // Busca disponibilidade daquele dia.
+        const botao = document.createElement('button'); // Cria um botão para o dia.
+        botao.type = 'button'; // Define que o botão não envia o formulário.
+        botao.className = 'dia-calendario'; // Define a classe base do dia.
+        botao.innerHTML = `<strong>${dia}</strong><small>${info && info.livres ? info.livres + ' horários' : 'Indisponível'}</small>`; // Mostra número do dia e resumo de horários.
+        if (!info || !info.aberto) { // Verifica se o dia é fechado.
+            botao.classList.add('fechado'); // Marca o dia como fechado.
+            botao.disabled = true; // Impede clique em dia fechado.
+        } else if (info.livres <= 0) { // Verifica se não existem horários livres.
+            botao.classList.add('lotado'); // Marca o dia como lotado.
+            botao.disabled = true; // Impede clique em dia lotado.
+        } else { // Entra aqui quando existe horário livre.
+            botao.classList.add('livre'); // Marca o dia como disponível.
+            botao.addEventListener('click', () => selecionarData(dataISO)); // Adiciona clique para escolher a data.
+        } // Fecha a verificação de disponibilidade.
+        if (dataISO === dataSelecionada) { // Verifica se esse dia é o selecionado.
+            botao.classList.add('selecionado'); // Destaca o dia selecionado.
+        } // Fecha destaque da seleção.
+        gradeCalendario.appendChild(botao); // Adiciona o botão do dia na grade.
+    } // Fecha o loop dos dias.
+} // Fecha a função de carregar calendário.
+
+async function selecionarData(dataISO) { // Cria função para escolher uma data e abrir horários.
+    dataSelecionada = dataISO; // Guarda a data selecionada na variável.
+    campoData.value = dataISO; // Salva a data no input escondido para enviar ao Flask.
+    await carregarCalendario(); // Recarrega o calendário para destacar o dia escolhido.
+    await carregarHorarios(); // Carrega os horários disponíveis da data selecionada.
+} // Fecha a função de selecionar data.
+
+async function carregarHorarios() { // Cria função para buscar horários de uma data.
+    const profissionalId = profissionalSelecionada(); // Pega a profissional selecionada.
+    gradeHorarios.innerHTML = ''; // Limpa horários anteriores.
+    if (!profissionalId || !dataSelecionada) { // Verifica se falta profissional ou data.
+        painelHorarios.classList.add('oculto'); // Esconde painel de horários.
+        return; // Para a função.
+    } // Fecha verificação de dados mínimos.
+    const resposta = await fetch(`/horarios-disponiveis?data=${dataSelecionada}&profissional_id=${profissionalId}`); // Busca horários no Flask.
+    const dados = await resposta.json(); // Converte resposta em JSON.
+    textoDataEscolhida.textContent = formatarDataBrasil(dataSelecionada); // Mostra a data escolhida em formato brasileiro.
+    painelHorarios.classList.remove('oculto'); // Mostra o painel de horários.
+    dados.horarios.forEach(item => { // Percorre cada horário recebido.
+        const label = document.createElement('label'); // Cria o bloco visual do horário.
+        label.className = item.disponivel ? 'horario disponivel' : 'horario bloqueado'; // Define classe conforme disponibilidade.
+        const disabled = item.disponivel ? '' : 'disabled'; // Define disabled se estiver indisponível.
+        label.innerHTML = `<input type="radio" name="horario" value="${item.horario}" ${disabled}> ${item.horario}<br><span>${item.disponivel ? 'Disponível' : 'Indisponível'}</span>`; // Monta o radio do horário.
+        gradeHorarios.appendChild(label); // Adiciona o horário na grade.
+    }); // Fecha o loop dos horários.
+} // Fecha a função de carregar horários.
+
+botaoAnterior.addEventListener('click', () => { // Cria ação do botão de mês anterior.
+    mesAtual--; // Diminui um mês.
+    if (mesAtual < 0) { mesAtual = 11; anoAtual--; } // Ajusta para dezembro do ano anterior quando necessário.
+    carregarCalendario(); // Recarrega o calendário.
+}); // Fecha ação do mês anterior.
+
+botaoProximo.addEventListener('click', () => { // Cria ação do botão de próximo mês.
+    mesAtual++; // Aumenta um mês.
+    if (mesAtual > 11) { mesAtual = 0; anoAtual++; } // Ajusta para janeiro do próximo ano quando necessário.
+    carregarCalendario(); // Recarrega o calendário.
+}); // Fecha ação do próximo mês.
+
+campoServico.addEventListener('change', () => { // Cria ação quando o serviço muda.
+    atualizarProfissionaisDisponiveis(true); // Filtra profissionais e limpa agenda antiga.
+    carregarCalendario(); // Recarrega o calendário conforme a nova escolha.
+}); // Fecha ação de mudança de serviço.
+
+document.querySelectorAll('input[name="profissional_id"]').forEach(campo => { // Percorre os radios de profissionais.
+    campo.addEventListener('change', () => { // Cria ação quando a profissional muda.
+        limparDataEHorario(); // Limpa a agenda anterior porque a profissional mudou.
+        document.querySelectorAll('.profissional-card').forEach(card => card.classList.remove('selecionada')); // Remove destaque de todos os cards.
+        campo.closest('.profissional-card').classList.add('selecionada'); // Destaca o card selecionado.
+        carregarCalendario(); // Recarrega calendário da nova profissional.
+    }); // Fecha evento de mudança.
+}); // Fecha loop das profissionais.
+
+atualizarProfissionaisDisponiveis(false); // Aplica a filtragem inicial caso a página volte com serviço preenchido.
+carregarCalendario(); // Carrega o calendário quando a página abre.
+if (dataSelecionada) { carregarHorarios(); } // Recarrega horários se a página voltou com uma data preenchida.
+</script> <!-- Fecha o JavaScript. -->
+{% endblock %} {# Finaliza o conteúdo da página. #}
