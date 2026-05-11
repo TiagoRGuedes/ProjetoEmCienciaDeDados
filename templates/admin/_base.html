@@ -8,9 +8,10 @@
 </head> <!-- Fecha o head. -->
 <body> <!-- Abre o corpo visível da página admin. -->
   <nav class="navbar"> <!-- Cria a barra de navegação do admin. -->
-    <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Esmalteria · Admin</a> <!-- Link principal para o dashboard. -->
+    <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Refúgio da Preta · Admin</a> <!-- Link principal para o dashboard. -->
     <div class="navbar-links"> <!-- Cria a área dos links do menu admin. -->
       <a href="{{ url_for('admin.dashboard') }}" class="navbar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Agendamentos</a> <!-- Link para agendamentos com classe active se estiver nessa página. -->
+      <a href="{{ url_for('admin.bloqueios') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Link para folgas, feriados e horários bloqueados. -->
       <a href="{{ url_for('admin.servicos') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a> <!-- Link para serviços com classe active quando estiver nas rotas de serviço. -->
       <a href="{{ url_for('admin.logout') }}" class="navbar-link">Sair</a> <!-- Link para sair da área administrativa. -->
     </div> <!-- Fecha a área dos links. -->

@@ -6,7 +6,7 @@
         <p>Seu pedido foi registrado como pendente e a equipe do {{ empresa.nome }} entrará em contato para confirmar.</p> <!-- Explica que o agendamento ainda será confirmado. -->
         <p><strong>Contato:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone para contato. -->
         <a class="botao" href="{{ url_for('publico.index') }}">Voltar ao início</a> <!-- Botão para voltar à página inicial. -->
-        <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a> <!-- Botão para abrir um novo formulário de agendamento. -->
+        <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a> <!-- Botão para abrir novo agendamento. -->
     </div> <!-- Fecha o container. -->
 </section> <!-- Fecha a seção de confirmação. -->
 {% endblock %} {# Finaliza o conteúdo da confirmação. #}

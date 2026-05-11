@@ -9,30 +9,30 @@
 <body class="login-page"> <!-- Abre o corpo da página com classe específica de login. -->
   <div class="login-card"> <!-- Cria o cartão centralizado de login. -->
     <div class="login-logo"> <!-- Cria a área visual do logo. -->
-      <div class="icon">R</div> <!-- Mostra uma inicial visual da marca. -->
+      <div class="icon">R</div> <!-- Mostra a inicial da marca. -->
       <h1>Refúgio da Preta · Admin</h1> <!-- Mostra o título da área administrativa. -->
-      <div class="subtitle">Acesso restrito</div> <!-- Mostra um subtítulo de segurança. -->
+      <div class="subtitle">Acesso restrito</div> <!-- Mostra um subtítulo. -->
     </div> <!-- Fecha a área do logo. -->
 
-    {% if erro %} {# Verifica se existe erro de login enviado pelo Flask. #}
+    {% if erro %} {# Verifica se existe erro de login. #}
       <ul class="flash-list"> <!-- Cria lista de mensagens. -->
-        <li class="flash flash-error">{{ erro }}</li> <!-- Mostra a mensagem de erro. -->
-      </ul> <!-- Fecha a lista de mensagens. -->
-    {% endif %} {# Finaliza a verificação de erro. #}
+        <li class="flash flash-error">{{ erro }}</li> <!-- Mostra erro de login. -->
+      </ul> <!-- Fecha lista de mensagens. -->
+    {% endif %} {# Fecha a verificação de erro. #}
 
-    <form method="POST" action="{{ url_for('admin.login') }}" class="form-grid"> <!-- Cria formulário que envia login e senha para a rota admin.login. -->
-      <div class="form-group"> <!-- Agrupa o campo de usuário. -->
-        <label class="form-label" for="usuario">Usuário</label> <!-- Rótulo do campo de usuário. -->
-        <input class="form-input" type="text" id="usuario" name="usuario" autocomplete="username" required autofocus> <!-- Campo para digitar o usuário. -->
-      </div> <!-- Fecha o grupo do usuário. -->
-      <div class="form-group"> <!-- Agrupa o campo de senha. -->
-        <label class="form-label" for="senha">Senha</label> <!-- Rótulo do campo de senha. -->
-        <input class="form-input" type="password" id="senha" name="senha" autocomplete="current-password" required> <!-- Campo para digitar a senha escondida. -->
-      </div> <!-- Fecha o grupo da senha. -->
-      <div class="form-actions"> <!-- Cria área para o botão de envio. -->
-        <button type="submit" class="btn btn-primary" style="width:100%;">Entrar</button> <!-- Botão que envia o formulário de login. -->
-      </div> <!-- Fecha a área do botão. -->
-    </form> <!-- Fecha o formulário de login. -->
-  </div> <!-- Fecha o cartão de login. -->
-</body> <!-- Fecha o corpo da página. -->
-</html> <!-- Fecha o documento HTML. -->
+    <form method="POST" action="{{ url_for('admin.login') }}" class="form-grid"> <!-- Cria formulário de login. -->
+      <div class="form-group"> <!-- Agrupa o campo usuário. -->
+        <label class="form-label" for="usuario">Usuário</label> <!-- Rótulo do usuário. -->
+        <input class="form-input" type="text" id="usuario" name="usuario" autocomplete="username" required autofocus> <!-- Campo de usuário. -->
+      </div> <!-- Fecha grupo de usuário. -->
+      <div class="form-group"> <!-- Agrupa o campo senha. -->
+        <label class="form-label" for="senha">Senha</label> <!-- Rótulo da senha. -->
+        <input class="form-input" type="password" id="senha" name="senha" autocomplete="current-password" required> <!-- Campo de senha. -->
+      </div> <!-- Fecha grupo da senha. -->
+      <div class="form-actions"> <!-- Cria área do botão. -->
+        <button type="submit" class="btn btn-primary" style="width:100%;">Entrar</button> <!-- Botão que envia o login. -->
+      </div> <!-- Fecha área do botão. -->
+    </form> <!-- Fecha formulário de login. -->
+  </div> <!-- Fecha cartão de login. -->
+</body> <!-- Fecha corpo. -->
+</html> <!-- Fecha documento HTML. -->
