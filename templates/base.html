@@ -1,53 +1,53 @@
-<!DOCTYPE html> <!-- Informa ao navegador que o arquivo usa HTML5. -->
+<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
 <html lang="pt-BR"> <!-- Abre o documento HTML e define o idioma como português do Brasil. -->
-<head> <!-- Abre a área de configurações da página, que não aparece diretamente para o usuário. -->
+<head> <!-- Abre a área de configurações da página. -->
     <meta charset="UTF-8"> <!-- Permite exibir acentos e caracteres especiais corretamente. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o layout se adaptar melhor em celular, tablet e computador. -->
-    <title>{{ empresa.nome }}</title> <!-- Define o título da aba do navegador usando o nome da empresa recebido do Flask. -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}"> <!-- Carrega o CSS público localizado em static/css/site.css. -->
-</head> <!-- Fecha a área de configurações da página. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o layout se adaptar em celular, tablet e computador. -->
+    <title>{{ empresa.nome }}</title> <!-- Define o título da aba do navegador com o nome da empresa. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}"> <!-- Carrega o CSS público do site. -->
+</head> <!-- Fecha a área de configurações. -->
 <body> <!-- Abre o corpo visível da página. -->
-    <header class="topo"> <!-- Cria o cabeçalho principal do site. -->
-        <div class="container topo-conteudo"> <!-- Cria um container para centralizar e organizar o topo. -->
-            <div class="marca"> <!-- Cria a área da marca no cabeçalho. -->
-                <p class="marca-subtitulo">Studio de manicure e beleza</p> <!-- Mostra um subtítulo pequeno da marca. -->
-                <h1>{{ empresa.nome }}</h1> <!-- Mostra o nome da empresa usando a variável do Flask. -->
-            </div> <!-- Fecha a área da marca. -->
-            <nav> <!-- Cria o menu de navegação do site. -->
+    <header class="topo"> <!-- Cria a barra superior fixa do site. -->
+        <div class="container topo-conteudo"> <!-- Centraliza e organiza o conteúdo do topo. -->
+            <div class="marca"> <!-- Cria a área de marca. -->
+                <p class="marca-subtitulo">Studio de manicure e beleza</p> <!-- Mostra um subtítulo pequeno. -->
+                <h1>{{ empresa.nome }}</h1> <!-- Mostra o nome da empresa. -->
+            </div> <!-- Fecha a área de marca. -->
+            <nav> <!-- Cria o menu de navegação. -->
                 <a href="{{ url_for('publico.index') }}">Início</a> <!-- Link para a página inicial. -->
-                <a href="{{ url_for('publico.index') }}#servicos">Serviços</a> <!-- Link para a seção de serviços da página inicial. -->
-                <a href="{{ url_for('publico.index') }}#galeria">Galeria</a> <!-- Link para a seção de galeria da página inicial. -->
-                <a href="{{ url_for('publico.agendar_get') }}">Agendar</a> <!-- Link para abrir o formulário de agendamento. -->
-                <a href="{{ url_for('admin.login') }}">Admin</a> <!-- Link para a tela de login administrativo. -->
-                <a href="#contato">Contato</a> <!-- Link para descer até o rodapé de contato. -->
+                <a href="{{ url_for('publico.index') }}#servicos">Serviços</a> <!-- Link para a seção de serviços. -->
+                <a href="{{ url_for('publico.index') }}#galeria">Galeria</a> <!-- Link para a seção de galeria. -->
+                <a href="{{ url_for('publico.agendar_get') }}">Agendar</a> <!-- Link para a página de agendamento. -->
+                <a href="{{ url_for('admin.login') }}">Admin</a> <!-- Link para o login administrativo. -->
+                <a href="#contato">Contato</a> <!-- Link para o rodapé de contato. -->
             </nav> <!-- Fecha o menu de navegação. -->
         </div> <!-- Fecha o container do topo. -->
     </header> <!-- Fecha o cabeçalho. -->
 
-    <main> <!-- Abre a área principal onde cada página coloca seu conteúdo próprio. -->
-        {% block conteudo %}{% endblock %} <!-- Bloco Jinja que será substituído pelo conteúdo de cada página filha. -->
+    <main> <!-- Abre a área principal da página. -->
+        {% block conteudo %}{% endblock %} <!-- Cria o bloco que será preenchido por cada página filha. -->
     </main> <!-- Fecha a área principal. -->
 
-    <footer id="contato" class="rodape"> <!-- Cria o rodapé com id contato para o menu conseguir chegar nele. -->
-        <div class="container rodape-grid"> <!-- Cria uma grade para dividir o rodapé em colunas. -->
+    <footer id="contato" class="rodape"> <!-- Cria o rodapé e permite chegar nele pelo link Contato. -->
+        <div class="container rodape-grid"> <!-- Organiza o rodapé em colunas. -->
             <div> <!-- Abre a primeira coluna do rodapé. -->
-                <h3>{{ empresa.nome }}</h3> <!-- Mostra o nome da empresa no rodapé. -->
-                <p>{{ empresa.slogan }}</p> <!-- Mostra o slogan da empresa vindo do Flask. -->
-                <p><strong>Dona:</strong> {{ empresa.dona }}</p> <!-- Mostra o nome da dona/profissional. -->
-            </div> <!-- Fecha a primeira coluna do rodapé. -->
+                <h3>{{ empresa.nome }}</h3> <!-- Mostra o nome da empresa. -->
+                <p>{{ empresa.slogan }}</p> <!-- Mostra o slogan da empresa. -->
+                <p><strong>Dona:</strong> {{ empresa.dona }}</p> <!-- Mostra a dona/profissional principal. -->
+            </div> <!-- Fecha a primeira coluna. -->
             <div> <!-- Abre a segunda coluna do rodapé. -->
-                <h3>Contato</h3> <!-- Mostra o título da coluna de contato. -->
+                <h3>Contato</h3> <!-- Mostra o título da coluna. -->
                 <p><strong>Telefone:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone da empresa. -->
-                <p><strong>Horários:</strong> {{ empresa.horarios }}</p> <!-- Mostra os dias e horários de atendimento. -->
+                <p><strong>Horários:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
                 <p><strong>Endereço:</strong> {{ empresa.endereco }}</p> <!-- Mostra o endereço da empresa. -->
-            </div> <!-- Fecha a segunda coluna do rodapé. -->
+            </div> <!-- Fecha a segunda coluna. -->
             <div> <!-- Abre a terceira coluna do rodapé. -->
-                <h3>Redes sociais</h3> <!-- Mostra o título da coluna de redes sociais. -->
+                <h3>Redes sociais</h3> <!-- Mostra o título da coluna. -->
                 <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p> <!-- Mostra o usuário do Instagram. -->
-                <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p> <!-- Cria um link para abrir o Instagram em nova aba. -->
-                <p>Agendamentos com atendimento de terça a sábado.</p> <!-- Reforça a disponibilidade de atendimento. -->
-            </div> <!-- Fecha a terceira coluna do rodapé. -->
-        </div> <!-- Fecha a grade do rodapé. -->
+                <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p> <!-- Cria link para o Instagram. -->
+                <p>Agendamentos com atendimento de terça a sábado.</p> <!-- Reforça o horário de atendimento. -->
+            </div> <!-- Fecha a terceira coluna. -->
+        </div> <!-- Fecha o grid do rodapé. -->
     </footer> <!-- Fecha o rodapé. -->
 </body> <!-- Fecha o corpo da página. -->
 </html> <!-- Fecha o documento HTML. -->
