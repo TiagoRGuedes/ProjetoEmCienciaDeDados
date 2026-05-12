@@ -1,95 +1,127 @@
 :root { /* Cria variáveis globais para o painel administrativo. */
-  --rosa-primario: #d4789a; /* Define a cor rosa principal. */
-  --rosa-escuro: #b85a7d; /* Define um rosa mais escuro para hover. */
-  --rosa-claro: #f7d7e0; /* Define rosa claro para mensagens e fundos. */
-  --rosa-fundo: #fdf2f7; /* Define fundo geral rosado. */
-  --lilas: #b58fc4; /* Define lilás para degradês. */
-  --branco-quente: #fdf9fb; /* Define branco levemente quente. */
-  --cinza-900: #2b2233; /* Define cinza escuro para textos. */
-  --cinza-700: #5a4f63; /* Define cinza médio para textos secundários. */
-  --cinza-500: #8a8094; /* Define cinza claro para detalhes. */
-  --cinza-300: #d8d2dd; /* Define cinza claro para bordas. */
-  --cinza-100: #f1ecf3; /* Define cinza muito claro para fundos. */
-  --verde-sucesso: #4caf50; /* Define verde para sucesso. */
-  --verde-fundo: #e6f5e7; /* Define fundo verde claro. */
-  --amarelo-aviso: #f0a500; /* Define amarelo para aviso. */
-  --amarelo-fundo: #fff4d6; /* Define fundo amarelo claro. */
-  --vermelho-erro: #d24868; /* Define vermelho para erro. */
-  --vermelho-fundo: #fbe0e6; /* Define fundo vermelho claro. */
+  --marrom-principal: #6f4f3f; /* Define o marrom principal alinhado ao site público. */
+  --marrom-escuro: #4b3329; /* Define um marrom escuro para títulos e fundo da navbar. */
+  --marrom-medio: #8a6a58; /* Define um marrom médio para detalhes e hover. */
+  --bege-principal: #efe0d1; /* Define o bege principal do fundo. */
+  --bege-claro: #f8f0e8; /* Define um bege bem claro para áreas suaves. */
+  --bege-card: #fffaf5; /* Define um bege quase branco para cartões e linhas. */
+  --nude: #d9bca8; /* Define o nude usado em bordas e detalhes. */
+  --rosa-detalhe: #c9879a; /* Define o rosa apenas como detalhe visual. */
+  --rosa-claro: #f3dbe2; /* Define rosa claro para destaques pequenos. */
+  --texto-base: #3f2d25; /* Define a cor principal dos textos. */
+  --texto-suave: #6f5a4f; /* Define a cor de textos secundários. */
+  --cinza-300: #d8cfc4; /* Define um tom bege/cinza para bordas. */
+  --cinza-100: #f1eae0; /* Define um tom bege bem claro para fundos. */
+  --verde-sucesso: #4f8a4f; /* Define verde para sucesso. */
+  --verde-fundo: #e8f1e2; /* Define fundo verde claro. */
+  --amarelo-aviso: #a87a1a; /* Define dourado para aviso, combinando com a paleta. */
+  --amarelo-fundo: #f6e9c8; /* Define fundo amarelo claro. */
+  --vermelho-erro: #b14b59; /* Define vermelho/rosa escuro para erro. */
+  --vermelho-fundo: #f3d8dd; /* Define fundo vermelho claro. */
   --radius: 10px; /* Define arredondamento padrão. */
   --radius-sm: 6px; /* Define arredondamento menor. */
-  --shadow: 0 2px 10px rgba(43, 34, 51, 0.08); /* Define sombra padrão. */
-  --shadow-lg: 0 8px 24px rgba(43, 34, 51, 0.12); /* Define sombra grande. */
+  --shadow: 0 2px 10px rgba(63, 45, 37, 0.10); /* Define sombra padrão com tom marrom. */
+  --shadow-lg: 0 8px 24px rgba(63, 45, 37, 0.16); /* Define sombra grande. */
 } /* Fecha as variáveis do admin. */
 
 * { box-sizing: border-box; } /* Faz todos os elementos calcularem tamanho incluindo padding e borda. */
 html, body { margin: 0; padding: 0; } /* Remove margem e padding padrão do navegador. */
-body { font-family: Arial, Helvetica, sans-serif; color: var(--cinza-900); background: var(--rosa-fundo); min-height: 100vh; } /* Estiliza o corpo do admin. */
-a { color: var(--rosa-escuro); text-decoration: none; } /* Estiliza links do admin. */
-a:hover { text-decoration: underline; } /* Sublinha links ao passar o mouse. */
-h1, h2, h3 { margin: 0 0 12px 0; color: var(--cinza-900); } /* Estiliza títulos do admin. */
+body { font-family: Arial, Helvetica, sans-serif; color: var(--texto-base); background: var(--bege-principal); min-height: 100vh; } /* Estiliza o corpo do admin com a paleta marrom/bege. */
+a { color: var(--marrom-principal); text-decoration: none; } /* Estiliza links do admin. */
+a:hover { text-decoration: underline; color: var(--marrom-escuro); } /* Sublinha links ao passar o mouse. */
+h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); } /* Estiliza títulos do admin. */
 
-.navbar { background: linear-gradient(135deg, var(--rosa-primario), var(--lilas)); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; } /* Cria a barra superior do admin. */
-.navbar-brand { font-size: 1.15rem; font-weight: 700; color: white; } /* Estiliza a marca do admin. */
-.navbar-links { display: flex; gap: 6px; align-items: center; } /* Organiza links da navbar. */
+.navbar { background: var(--marrom-escuro); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; border-bottom: 3px solid var(--nude); } /* Cria a barra superior do admin combinando com o site público. */
+.navbar-brand { font-size: 1.15rem; font-weight: 700; color: white; letter-spacing: 0.3px; } /* Estiliza a marca do admin. */
+.navbar-links { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } /* Organiza links da navbar. */
 .navbar-link { color: rgba(255, 255, 255, 0.92); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 500; } /* Estiliza links do menu admin. */
 .navbar-link:hover { background: rgba(255, 255, 255, 0.18); text-decoration: none; color: white; } /* Define hover dos links admin. */
-.navbar-link.active { background: rgba(255, 255, 255, 0.25); color: white; } /* Destaca link ativo. */
+.navbar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Destaca link ativo com o nude que aparece no topo do site. */
 
-.container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 48px; } /* Centraliza conteúdo admin. */
+.container { max-width: 1180px; margin: 0 auto; padding: 28px 24px 48px; } /* Centraliza conteúdo admin alinhado ao container do site. */
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; } /* Organiza cabeçalho da página. */
-.page-title { display: flex; align-items: baseline; gap: 12px; margin: 0; } /* Organiza título com contador. */
-.page-counter { font-size: 0.9rem; color: var(--cinza-500); font-weight: 500; } /* Estiliza contador. */
-.card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; } /* Cria cartões brancos. */
+.page-title { display: flex; align-items: baseline; gap: 12px; margin: 0; color: var(--marrom-escuro); } /* Organiza título com contador. */
+.page-counter { font-size: 0.9rem; color: var(--texto-suave); font-weight: 500; } /* Estiliza contador. */
+.card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; border: 1px solid var(--nude); } /* Cria cartões com tom bege claro. */
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.92rem; font-weight: 500; cursor: pointer; text-decoration: none; } /* Estiliza botões base. */
 .btn:hover { text-decoration: none; } /* Remove sublinhado no hover de botões. */
-.btn-primary { background: var(--rosa-primario); color: white; } /* Estiliza botão principal. */
-.btn-primary:hover { background: var(--rosa-escuro); } /* Escurece botão principal ao passar mouse. */
-.btn-secondary { background: white; color: var(--cinza-700); border-color: var(--cinza-300); } /* Estiliza botão secundário. */
-.btn-success { background: var(--verde-sucesso); color: white; } /* Estiliza botão de sucesso. */
-.btn-danger { background: var(--vermelho-erro); color: white; } /* Estiliza botão de perigo. */
+.btn-primary { background: var(--marrom-principal); color: white; } /* Botão principal em marrom. */
+.btn-primary:hover { background: var(--marrom-escuro); color: white; } /* Escurece botão principal ao passar mouse. */
+.btn-secondary { background: var(--bege-card); color: var(--marrom-escuro); border-color: var(--nude); } /* Botão secundário em bege claro. */
+.btn-secondary:hover { background: var(--bege-claro); color: var(--marrom-escuro); } /* Hover do botão secundário. */
+.btn-success { background: var(--verde-sucesso); color: white; } /* Botão de confirmação. */
+.btn-success:hover { background: #3f6f3f; color: white; } /* Hover do botão de sucesso. */
+.btn-danger { background: var(--vermelho-erro); color: white; } /* Botão de cancelamento. */
+.btn-danger:hover { background: #8d3a46; color: white; } /* Hover do botão de perigo. */
+.btn-accent { background: var(--rosa-detalhe); color: white; } /* Botão de detalhe rosa, usado com parcimônia. */
+.btn-accent:hover { background: #b3697e; color: white; } /* Hover do botão de detalhe. */
 .btn-sm { padding: 6px 11px; font-size: 0.85rem; } /* Cria botões menores. */
+.btn-block { width: 100%; } /* Botão ocupando toda a largura. */
 
-.table-wrapper { overflow-x: auto; background: white; border-radius: var(--radius); box-shadow: var(--shadow); } /* Cria área para tabela com rolagem. */
+.table-wrapper { overflow-x: auto; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--nude); } /* Cria área para tabela com rolagem. */
 .table { width: 100%; border-collapse: collapse; font-size: 0.94rem; } /* Estiliza tabela. */
-.table thead th { text-align: left; padding: 14px 16px; background: var(--cinza-100); color: var(--cinza-700); font-weight: 600; border-bottom: 1px solid var(--cinza-300); } /* Estiliza cabeçalho da tabela. */
-.table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--cinza-100); vertical-align: middle; } /* Estiliza células da tabela. */
-.table tbody tr:hover { background: var(--rosa-fundo); } /* Destaca linha ao passar mouse. */
+.table thead th { text-align: left; padding: 14px 16px; background: var(--bege-claro); color: var(--marrom-escuro); font-weight: 600; border-bottom: 2px solid var(--nude); } /* Estiliza cabeçalho da tabela. */
+.table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--cinza-100); vertical-align: middle; color: var(--texto-base); } /* Estiliza células da tabela. */
+.table tbody tr:hover { background: var(--bege-claro); } /* Destaca linha ao passar mouse. */
 .table .actions { display: flex; gap: 6px; flex-wrap: wrap; } /* Organiza botões de ação. */
 .table .actions form { margin: 0; display: inline; } /* Remove margem dos formulários dentro da tabela. */
 
 .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; text-transform: capitalize; } /* Estiliza etiquetas de status. */
-.badge-pendente { background: var(--amarelo-fundo); color: #8a5d00; } /* Estiliza status pendente. */
-.badge-confirmado { background: var(--verde-fundo); color: #2e6b30; } /* Estiliza status confirmado. */
+.badge-pendente { background: var(--amarelo-fundo); color: var(--amarelo-aviso); } /* Estiliza status pendente. */
+.badge-confirmado { background: var(--verde-fundo); color: #2f6432; } /* Estiliza status confirmado. */
 .badge-cancelado { background: var(--vermelho-fundo); color: #8b2a40; } /* Estiliza status cancelado. */
+.badge-ativo { background: var(--verde-fundo); color: #2f6432; } /* Etiqueta de profissional ativa. */
+.badge-inativo { background: var(--cinza-100); color: var(--texto-suave); } /* Etiqueta de profissional inativa. */
 
 .form-grid { display: grid; gap: 16px; } /* Organiza formulários em grade. */
 .form-group { display: flex; flex-direction: column; gap: 6px; } /* Organiza label e campo em coluna. */
-.form-label { font-weight: 500; font-size: 0.9rem; color: var(--cinza-700); } /* Estiliza labels. */
-.form-input, .form-select { padding: 10px 12px; border: 1px solid var(--cinza-300); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: white; color: var(--cinza-900); } /* Estiliza inputs e selects. */
-.form-input:focus, .form-select:focus { outline: none; border-color: var(--rosa-primario); box-shadow: 0 0 0 3px rgba(212, 120, 154, 0.18); } /* Estiliza foco dos campos. */
-.form-actions { display: flex; gap: 10px; margin-top: 8px; } /* Organiza botões de formulário. */
-.filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 16px 18px; background: white; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; } /* Estiliza filtros do dashboard. */
+.form-label { font-weight: 500; font-size: 0.9rem; color: var(--marrom-escuro); } /* Estiliza labels. */
+.form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid var(--nude); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: white; color: var(--texto-base); } /* Estiliza inputs, selects e textareas. */
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--marrom-medio); box-shadow: 0 0 0 3px rgba(138, 106, 88, 0.20); } /* Estiliza foco dos campos. */
+.form-textarea { resize: vertical; min-height: 90px; } /* Permite redimensionar textareas. */
+.form-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; } /* Organiza botões de formulário. */
+.form-help { font-size: 0.82rem; color: var(--texto-suave); } /* Estiliza textos auxiliares dos formulários. */
+.filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 16px 18px; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; border: 1px solid var(--nude); } /* Estiliza filtros do dashboard. */
 .filter-actions { display: flex; gap: 8px; margin-left: auto; } /* Organiza botões dos filtros. */
 
 .flash-list { list-style: none; padding: 0; margin: 0 0 18px 0; display: flex; flex-direction: column; gap: 8px; } /* Organiza mensagens flash. */
 .flash { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.93rem; border-left: 4px solid; } /* Estiliza mensagem base. */
-.flash-success { background: var(--verde-fundo); border-color: var(--verde-sucesso); color: #2e6b30; } /* Estiliza sucesso. */
+.flash-success { background: var(--verde-fundo); border-color: var(--verde-sucesso); color: #2f6432; } /* Estiliza sucesso. */
 .flash-error { background: var(--vermelho-fundo); border-color: var(--vermelho-erro); color: #8b2a40; } /* Estiliza erro. */
-.flash-info { background: var(--rosa-claro); border-color: var(--rosa-primario); color: var(--rosa-escuro); } /* Estiliza informação. */
-.empty-state { text-align: center; padding: 48px 20px; color: var(--cinza-500); } /* Estiliza estado vazio. */
+.flash-info { background: var(--bege-claro); border-color: var(--nude); color: var(--marrom-escuro); } /* Estiliza informação. */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--texto-suave); } /* Estiliza estado vazio. */
 
-.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, var(--rosa-claro) 0%, #e0d0ec 100%); } /* Centraliza tela de login. */
-.login-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 36px 32px; width: 100%; max-width: 380px; } /* Estiliza cartão de login. */
+.kpi-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 22px; } /* Cria a grade dos cartões resumo. */
+.kpi { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; } /* Estiliza cada KPI. */
+.kpi-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-suave); margin-bottom: 6px; } /* Rótulo do KPI. */
+.kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--marrom-escuro); line-height: 1.1; } /* Valor principal do KPI. */
+.kpi-detail { font-size: 0.85rem; color: var(--texto-suave); margin-top: 4px; } /* Detalhe complementar do KPI. */
+
+.profissional-card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } /* Grade para cards de profissionais. */
+.profissional-card { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 8px; } /* Estiliza cada card de profissional. */
+.profissional-card img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bege-claro); } /* Estiliza a foto da profissional. */
+.profissional-card h3 { margin: 4px 0 0; color: var(--marrom-escuro); } /* Estiliza o nome da profissional. */
+.profissional-card .servicos-chips { display: flex; gap: 6px; flex-wrap: wrap; } /* Linha de "chips" com os serviços. */
+.chip { background: var(--bege-claro); color: var(--marrom-escuro); padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; border: 1px solid var(--nude); } /* Estiliza cada chip de serviço. */
+.chip-rosa { background: var(--rosa-claro); color: var(--marrom-escuro); border-color: var(--rosa-detalhe); } /* Chip com detalhe rosa para destacar pontualmente. */
+
+.checkbox-group { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } /* Organiza checkboxes lado a lado. */
+.checkbox-item { display: flex; align-items: center; gap: 8px; background: var(--bege-claro); border: 1px solid var(--nude); padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; } /* Cada checkbox como cartão. */
+.checkbox-item input { accent-color: var(--marrom-principal); } /* Cor do "check". */
+.checkbox-item:has(input:checked) { background: var(--bege-card); border-color: var(--marrom-medio); } /* Destaca opção selecionada. */
+
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, var(--bege-principal) 0%, var(--nude) 100%); } /* Centraliza tela de login com fundo bege. */
+.login-card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 36px 32px; width: 100%; max-width: 380px; border: 1px solid var(--nude); } /* Estiliza cartão de login. */
 .login-logo { text-align: center; margin-bottom: 22px; } /* Centraliza logo de login. */
-.login-logo .icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--rosa-primario), var(--lilas)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; } /* Estiliza ícone circular do login. */
-.login-logo h1 { font-size: 1.35rem; margin: 0; } /* Estiliza título do login. */
-.login-logo .subtitle { font-size: 0.88rem; color: var(--cinza-500); margin-top: 4px; } /* Estiliza subtítulo do login. */
+.login-logo .icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--marrom-principal), var(--marrom-medio)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; } /* Estiliza ícone circular do login. */
+.login-logo h1 { font-size: 1.35rem; margin: 0; color: var(--marrom-escuro); } /* Estiliza título do login. */
+.login-logo .subtitle { font-size: 0.88rem; color: var(--texto-suave); margin-top: 4px; } /* Estiliza subtítulo do login. */
 
 @media (max-width: 768px) { /* Cria regras para telas menores. */
   .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; } /* Ajusta navbar no celular. */
   .navbar-links { flex-wrap: wrap; } /* Permite quebrar links do menu. */
   .container { padding: 18px 14px 40px; } /* Ajusta espaçamento em telas pequenas. */
   .filter-actions { margin-left: 0; width: 100%; } /* Ajusta botões de filtro no celular. */
+  .kpi-value { font-size: 1.4rem; } /* Reduz valor do KPI em telas pequenas. */
 } /* Fecha regras responsivas. */

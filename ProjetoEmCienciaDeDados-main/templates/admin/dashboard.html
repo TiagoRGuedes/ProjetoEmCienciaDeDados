@@ -5,34 +5,9 @@
 <div class="page-header"> <!-- Cria o cabeçalho da página. -->
   <h1 class="page-title"> <!-- Cria o título principal. -->
     Agendamentos <!-- Texto do título. -->
-    <span class="page-counter">{{ agendamentos|length }} no resultado</span> <!-- Mostra a quantidade de agendamentos exibidos. -->
+    <span class="page-counter">{{ agendamentos|length }} no total</span> <!-- Mostra a quantidade de agendamentos. -->
   </h1> <!-- Fecha o título. -->
 </div> <!-- Fecha o cabeçalho. -->
-
-{% if kpis %} {# Mostra os KPIs sempre que estiverem disponíveis. #}
-<div class="kpi-grid"> <!-- Cria a grade dos KPIs. -->
-  <div class="kpi"> <!-- Cartão de KPI. -->
-    <div class="kpi-label">Atendimentos hoje</div> <!-- Rótulo. -->
-    <div class="kpi-value">{{ kpis.hoje }}</div> <!-- Total geral. -->
-    <div class="kpi-detail">{{ kpis.confirmados_hoje }} confirmado{{ '' if kpis.confirmados_hoje == 1 else 's' }}</div> <!-- Detalhe. -->
-  </div> <!-- Fecha o KPI. -->
-  <div class="kpi"> <!-- Cartão de KPI. -->
-    <div class="kpi-label">Pendentes futuras</div> <!-- Rótulo. -->
-    <div class="kpi-value">{{ kpis.pendentes }}</div> <!-- Quantidade pendente. -->
-    <div class="kpi-detail">Aguardando confirmação</div> <!-- Texto auxiliar. -->
-  </div> <!-- Fecha o KPI. -->
-  <div class="kpi"> <!-- Cartão de KPI. -->
-    <div class="kpi-label">Receita prevista da semana</div> <!-- Rótulo. -->
-    <div class="kpi-value">R$ {{ '%.2f'|format(kpis.receita_semana or 0)|replace('.', ',') }}</div> <!-- Valor formatado em real. -->
-    <div class="kpi-detail">Soma dos serviços não cancelados</div> <!-- Detalhe. -->
-  </div> <!-- Fecha o KPI. -->
-  <div class="kpi"> <!-- Cartão de KPI. -->
-    <div class="kpi-label">Profissionais ativas</div> <!-- Rótulo. -->
-    <div class="kpi-value">{{ kpis.profissionais_ativas }}</div> <!-- Quantidade ativa. -->
-    <div class="kpi-detail"><a href="{{ url_for('admin.profissionais') }}">Gerenciar</a></div> <!-- Atalho para a área. -->
-  </div> <!-- Fecha o KPI. -->
-</div> <!-- Fecha a grade. -->
-{% endif %} {# Fecha a verificação dos KPIs. #}
 
 <form class="filters" method="GET" action="{{ url_for('admin.dashboard') }}"> <!-- Cria formulário de filtros usando GET. -->
   <div class="form-group"> <!-- Agrupa filtro de status. -->

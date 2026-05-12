@@ -18,7 +18,6 @@
         <th>Nome</th> <!-- Coluna do nome do serviço. -->
         <th>Preço</th> <!-- Coluna do preço. -->
         <th>Duração</th> <!-- Coluna da duração. -->
-        <th>Profissionais</th> <!-- Coluna com as profissionais vinculadas. -->
         <th style="width: 220px;">Ações</th> <!-- Coluna de botões de ação. -->
       </tr> <!-- Fecha a linha do cabeçalho. -->
     </thead> <!-- Fecha o cabeçalho da tabela. -->
@@ -28,17 +27,6 @@
         <td><strong>{{ s.nome }}</strong></td> <!-- Mostra o nome do serviço em negrito. -->
         <td>R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }}</td> <!-- Mostra o preço formatado em reais. -->
         <td>{{ s.duracao_min }} min</td> <!-- Mostra a duração em minutos. -->
-        <td> <!-- Mostra as profissionais vinculadas como chips. -->
-          {% if s.profissionais_atendem %} {# Verifica se há profissionais vinculadas. #}
-            <div class="servicos-chips"> <!-- Reusa o estilo de chips. -->
-              {% for nome_prof in s.profissionais_atendem.split(', ') %} {# Cria um chip para cada profissional. #}
-                <span class="chip">{{ nome_prof }}</span> <!-- Exibe o chip da profissional. -->
-              {% endfor %} {# Encerra o loop. #}
-            </div> <!-- Fecha o grupo de chips. -->
-          {% else %} <!-- Sem vínculo cadastrado. -->
-            <span class="chip chip-rosa">Sem profissional vinculada</span> <!-- Avisa visualmente. -->
-          {% endif %} <!-- Fecha o if. -->
-        </td> <!-- Fecha a célula. -->
         <td class="actions"> <!-- Abre a célula de ações. -->
           <a href="{{ url_for('admin.servico_editar', id=s.id) }}" class="btn btn-sm btn-secondary">Editar</a> <!-- Link para editar o serviço. -->
           <form method="POST" action="{{ url_for('admin.servico_excluir', id=s.id) }}" onsubmit="return confirm('Excluir o serviço &quot;{{ s.nome }}&quot;?');"> <!-- Formulário para excluir serviço com confirmação. -->

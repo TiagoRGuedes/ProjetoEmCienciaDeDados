@@ -27,25 +27,6 @@
       <input class="form-input" type="number" id="duracao_min" name="duracao_min" value="{{ form.duracao_min if form else (servico.duracao_min if servico else '') }}" step="5" min="5" required> <!-- Campo numérico para duração. -->
     </div> <!-- Fecha o grupo da duração. -->
 
-    <div class="form-group"> <!-- Agrupa o seletor de profissionais. -->
-      <label class="form-label">Profissionais que atendem este serviço</label> <!-- Rótulo do grupo. -->
-      {% if profissionais %} {# Verifica se há profissionais cadastradas. #}
-      <div class="checkbox-group"> <!-- Cria a grade de checkboxes. -->
-        {% for p in profissionais %} {# Percorre cada profissional. #}
-          <label class="checkbox-item"> <!-- Cria um checkbox-card por profissional. -->
-            <input type="checkbox" name="profissionais_ids" value="{{ p.id }}" {% if p.id|string in profissionais_selecionadas %}checked{% endif %}> <!-- Marca quando a profissional já atende esse serviço. -->
-            <span>{{ p.nome }}{% if not p.ativo %} <small style="color:var(--texto-suave);">(inativa)</small>{% endif %}</span> <!-- Mostra o nome e marca quando estiver inativa. -->
-          </label> <!-- Fecha o card. -->
-        {% endfor %} {# Encerra o loop. #}
-      </div> <!-- Fecha o grupo. -->
-      <span class="form-help">O serviço só aparecerá no agendamento público se houver pelo menos uma profissional ativa vinculada.</span> <!-- Texto auxiliar. -->
-      {% else %} <!-- Caso ainda não exista nenhuma profissional. -->
-      <p class="form-help"> <!-- Mostra orientação clara. -->
-        Nenhuma profissional cadastrada. <a href="{{ url_for('admin.profissional_nova') }}">Cadastrar profissional</a> antes de vincular. <!-- Link rápido para cadastrar. -->
-      </p> <!-- Fecha a orientação. -->
-      {% endif %} <!-- Fecha a verificação. -->
-    </div> <!-- Fecha o grupo. -->
-
     <div class="form-actions"> <!-- Cria área dos botões do formulário. -->
       <button type="submit" class="btn btn-primary">{% if servico %}Salvar alterações{% else %}Criar serviço{% endif %}</button> <!-- Botão principal que salva o serviço. -->
       <a href="{{ url_for('admin.servicos') }}" class="btn btn-secondary">Cancelar</a> <!-- Link para cancelar e voltar para a lista. -->
