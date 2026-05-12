@@ -1,0 +1,52 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Cliente · {{ cliente.nome }}{% endblock %} {# Define o título com o nome da cliente. #}
+{% block content %} {# Começa o conteúdo principal. #}
+
+<div class="page-header"> <!-- Cria o cabeçalho. -->
+  <h1 class="page-title">{{ cliente.nome }}</h1> <!-- Mostra o nome da cliente. -->
+  <a href="{{ url_for('admin.clientes') }}" class="btn btn-secondary">Voltar</a> <!-- Botão para voltar à listagem. -->
+</div> <!-- Fecha o cabeçalho. -->
+
+<div class="card" style="max-width:560px;"> <!-- Cria um cartão com os dados básicos. -->
+  <p><strong>Telefone:</strong> {{ cliente.telefone }}</p> <!-- Mostra o telefone. -->
+  <p style="color:var(--texto-suave);">Total de agendamentos: {{ agendamentos|length }}</p> <!-- Mostra o total geral. -->
+</div> <!-- Fecha o cartão. -->
+
+<h2>Histórico de agendamentos</h2> <!-- Subtítulo do histórico. -->
+
+{% if agendamentos %} {# Verifica se há histórico. #}
+<div class="table-wrapper"> <!-- Cria a área da tabela. -->
+  <table class="table"> <!-- Cria a tabela. -->
+    <thead> <!-- Abre o cabeçalho. -->
+      <tr> <!-- Cria a linha de cabeçalho. -->
+        <th>Data</th> <!-- Coluna da data. -->
+        <th>Horário</th> <!-- Coluna do horário. -->
+        <th>Serviço</th> <!-- Coluna do serviço. -->
+        <th>Profissional</th> <!-- Coluna da profissional. -->
+        <th>Status</th> <!-- Coluna do status. -->
+        <th>Ações</th> <!-- Coluna de ações. -->
+      </tr> <!-- Fecha a linha. -->
+    </thead> <!-- Fecha o cabeçalho. -->
+    <tbody> <!-- Abre o corpo. -->
+      {% for a in agendamentos %} {# Percorre cada agendamento. #}
+      <tr> <!-- Cria a linha. -->
+        <td>{{ a.data }}</td> <!-- Data. -->
+        <td>{{ a.horario }}</td> <!-- Horário. -->
+        <td>{{ a.servico_nome }}<div style="font-size:0.82rem;color:var(--texto-suave);">R$ {{ '%.2f'|format(a.preco)|replace('.', ',') }}</div></td> <!-- Serviço com preço. -->
+        <td>{{ a.profissional_nome }}</td> <!-- Profissional. -->
+        <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td> <!-- Status colorido. -->
+        <td class="actions"> <!-- Ações. -->
+          <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.agendamento_editar', id=a.id) }}">Abrir</a> <!-- Atalho para o detalhe do agendamento. -->
+        </td> <!-- Fecha a célula. -->
+      </tr> <!-- Fecha a linha. -->
+      {% endfor %} {# Finaliza o loop. #}
+    </tbody> <!-- Fecha o corpo. -->
+  </table> <!-- Fecha a tabela. -->
+</div> <!-- Fecha o wrapper. -->
+{% else %} <!-- Sem histórico. -->
+<div class="card empty-state"> <!-- Cria um cartão vazio. -->
+  <p><strong>Esta cliente ainda não fez agendamentos.</strong></p> <!-- Mensagem. -->
+</div> <!-- Fecha o cartão. -->
+{% endif %} {# Finaliza a verificação. #}
+
+{% endblock %} {# Finaliza o conteúdo. #}

@@ -4,8 +4,8 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from database import init_db, get_db
 # Importa do arquivo database.py as funções responsáveis por criar e acessar o banco SQLite.
 
-from datetime import date, datetime, timedelta
-# Importa date para validar dias de funcionamento, datetime para combinar dia/horário e timedelta para janelas no dashboard.
+from datetime import date
+# Importa date para validar dias de funcionamento e montar disponibilidade do calendário.
 
 import calendar
 # Importa calendar para descobrir quantos dias existem em cada mês.
@@ -505,66 +505,8 @@ def dashboard():
     # Executa a consulta final.
     profissionais = buscar_profissionais(False)
     # Busca profissionais para o filtro.
-    kpis = calcular_kpis_dashboard(db)
-    # Calcula indicadores rápidos para o admin acompanhar a operação.
-    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=EMPRESA, kpis=kpis)
-    # Renderiza o dashboard com KPIs e lista filtrada.
-
-
-def calcular_kpis_dashboard(db):
-    # Cria função auxiliar que monta um pequeno painel de números do dia/semana.
-    hoje = date.today().isoformat()
-    # Pega a data de hoje no formato AAAA-MM-DD para usar nas consultas.
-    inicio_semana = (date.today() - timedelta(days=date.today().weekday())).isoformat()
-    # Calcula a segunda-feira da semana corrente para servir de janela.
-    fim_semana = (date.today() + timedelta(days=6 - date.today().weekday())).isoformat()
-    # Calcula o domingo da semana corrente como fim da janela.
-    total_hoje = db.execute(
-        # Conta quantos agendamentos não cancelados estão marcados para hoje.
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status != 'cancelado'",
-        (hoje,)
-    ).fetchone()['n']
-    # Salva o número de atendimentos do dia para o KPI.
-    confirmados_hoje = db.execute(
-        # Conta apenas os agendamentos de hoje já confirmados.
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status = 'confirmado'",
-        (hoje,)
-    ).fetchone()['n']
-    # Salva o número de confirmados.
-    pendentes = db.execute(
-        # Conta quantos agendamentos futuros ainda estão pendentes (precisam de confirmação).
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE status = 'pendente' AND data >= ?",
-        (hoje,)
-    ).fetchone()['n']
-    # Salva pendentes para o KPI.
-    receita_semana = db.execute(
-        # Soma a receita estimada da semana, considerando apenas agendamentos não cancelados.
-        """SELECT COALESCE(SUM(s.preco), 0) AS total
-           FROM agendamentos a
-           JOIN servicos s ON s.id = a.servico_id
-           WHERE a.data BETWEEN ? AND ? AND a.status != 'cancelado'""",
-        (inicio_semana, fim_semana)
-    ).fetchone()['total']
-    # Salva a soma da receita prevista na semana.
-    profissionais_ativas = db.execute(
-        # Conta quantas profissionais estão ativas e podem receber agendamento.
-        "SELECT COUNT(*) AS n FROM profissionais WHERE ativo = 1"
-    ).fetchone()['n']
-    # Salva o número de profissionais ativas.
-    return {
-        # Retorna os KPIs em um dicionário simples consumido pelo template.
-        'hoje': total_hoje,
-        # Total de atendimentos previstos para hoje.
-        'confirmados_hoje': confirmados_hoje,
-        # Quantos atendimentos de hoje já estão confirmados.
-        'pendentes': pendentes,
-        # Quantos agendamentos futuros aguardam confirmação.
-        'receita_semana': receita_semana,
-        # Receita prevista para a semana corrente.
-        'profissionais_ativas': profissionais_ativas,
-        # Quantas profissionais estão ativas na agenda.
-    }
-    # Encerra o cálculo dos KPIs.
+    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=EMPRESA)
+    # Renderiza o dashboard.
 
 
 @admin.route('/agendamento/<int:id>/status', methods=['POST'])
@@ -617,8 +559,6 @@ def agendamento_editar(id):
     # Busca serviços para o formulário.
     profissionais = buscar_profissionais(False)
     # Busca profissionais para o formulário.
-    profissionais_servicos = buscar_vinculos_profissionais_servicos()
-    # Busca vínculos para filtrar profissionais por serviço no formulário do admin.
     if request.method == 'POST':
         # Verifica se o formulário de edição foi enviado.
         servico_id = request.form.get('servico_id', '').strip()
@@ -635,25 +575,19 @@ def agendamento_editar(id):
             # Verifica campos obrigatórios.
             flash('Preencha todos os campos do agendamento.', 'error')
             # Mostra erro.
-            lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
-            # Recalcula a disponibilidade do horário para mostrar no formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, horarios=HORARIOS, empresa=EMPRESA)
             # Reabre formulário.
         if not profissional_atende_servico(profissional_id, servico_id):
             # Verifica se o serviço e a profissional combinam.
             flash('A profissional escolhida não atende esse serviço.', 'error')
             # Mostra mensagem de erro.
-            lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
-            # Recalcula a disponibilidade para devolver ao formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, horarios=HORARIOS, empresa=EMPRESA)
             # Reabre formulário.
         if status != 'cancelado' and conflito_agenda(data_texto, horario, profissional_id, id):
             # Verifica conflito ao remarcar, ignorando o próprio agendamento.
             flash('Este horário está indisponível para a profissional escolhida.', 'error')
             # Mostra erro.
-            lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
-            # Recalcula a disponibilidade do horário para mostrar no formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, horarios=HORARIOS, empresa=EMPRESA)
             # Reabre formulário.
         db.execute('UPDATE agendamentos SET servico_id = ?, profissional_id = ?, data = ?, horario = ?, status = ? WHERE id = ?', (servico_id, profissional_id, data_texto, horario, status, id))
         # Atualiza o agendamento; a vaga antiga volta automaticamente porque a linha mudou.
@@ -663,10 +597,8 @@ def agendamento_editar(id):
         # Mostra sucesso.
         return redirect(url_for('admin.dashboard'))
         # Volta para o dashboard.
-    lista_horarios = montar_lista_horarios(agendamento['data'], str(agendamento['profissional_id']), ignorar_agendamento_id=id)
-    # Calcula horários disponíveis para a combinação data/profissional do agendamento atual, ignorando ele mesmo.
-    return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
-    # Abre o formulário de edição com horários filtrados por disponibilidade.
+    return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, horarios=HORARIOS, empresa=EMPRESA)
+    # Abre o formulário de edição.
 
 
 @admin.route('/servicos')
@@ -677,22 +609,10 @@ def servicos():
         # Verifica login.
         return redirect(url_for('admin.login'))
         # Redireciona para login.
-    db = get_db()
-    # Abre o banco para enriquecer a lista com as profissionais que atendem cada serviço.
-    lista = db.execute(
-        # Faz uma única consulta agrupando os nomes das profissionais vinculadas a cada serviço.
-        """SELECT s.id, s.nome, s.preco, s.duracao_min,
-                  COALESCE(GROUP_CONCAT(p.nome, ', '), '') AS profissionais_atendem
-           FROM servicos s
-           LEFT JOIN profissionais_servicos ps ON ps.servico_id = s.id
-           LEFT JOIN profissionais p ON p.id = ps.profissional_id AND p.ativo = 1
-           GROUP BY s.id
-           ORDER BY s.id"""
-        # Junta serviços com as profissionais ativas vinculadas, para exibir no painel.
-    ).fetchall()
-    # Carrega o resultado para o template.
+    lista = buscar_servicos()
+    # Busca serviços.
     return render_template('admin/servicos.html', servicos=lista, empresa=EMPRESA)
-    # Renderiza a lista de serviços com as profissionais.
+    # Renderiza a lista de serviços.
 
 
 def _parse_servico_form():
@@ -743,42 +663,26 @@ def servico_novo():
         # Verifica login.
         return redirect(url_for('admin.login'))
         # Redireciona para login.
-    db = get_db()
-    # Abre o banco para buscar profissionais disponíveis e gravar vínculos depois.
-    profissionais = buscar_profissionais(False)
-    # Carrega todas as profissionais (ativas e inativas) para o admin ligar ao serviço.
     if request.method == 'POST':
         # Verifica envio do formulário.
         nome, preco, duracao, erro = _parse_servico_form()
         # Lê e valida dados.
-        ids_profissionais = request.form.getlist('profissionais_ids')
-        # Lê quais profissionais foram marcadas como aptas a realizar o serviço.
         if erro:
             # Verifica erro.
-            return render_template('admin/servico_form.html', servico=None, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=EMPRESA)
-            # Reabre formulário com erro mantendo as profissionais marcadas.
-        cursor = db.execute('INSERT INTO servicos (nome, preco, duracao_min) VALUES (?, ?, ?)', (nome, preco, duracao))
+            return render_template('admin/servico_form.html', servico=None, form=request.form, erro=erro, empresa=EMPRESA)
+            # Reabre formulário com erro.
+        db = get_db()
+        # Abre banco.
+        db.execute('INSERT INTO servicos (nome, preco, duracao_min) VALUES (?, ?, ?)', (nome, preco, duracao))
         # Insere serviço.
-        novo_id = cursor.lastrowid
-        # Pega o id recém-criado para gravar vínculos a seguir.
-        for pid in ids_profissionais:
-            # Percorre cada profissional marcada no formulário.
-            db.execute(
-                # Insere o vínculo entre a profissional e o novo serviço.
-                'INSERT OR IGNORE INTO profissionais_servicos (profissional_id, servico_id) VALUES (?, ?)',
-                # Usa OR IGNORE para evitar duplicidade caso o admin marque duas vezes.
-                (pid, novo_id)
-                # Envia os ids para o SQLite.
-            )
-            # Finaliza o insert do vínculo.
         db.commit()
-        # Salva serviço e vínculos.
+        # Salva serviço.
         flash(f'Serviço "{nome}" criado com sucesso.', 'success')
         # Mostra sucesso.
         return redirect(url_for('admin.servicos'))
         # Volta para serviços.
-    return render_template('admin/servico_form.html', servico=None, form=None, profissionais=profissionais, profissionais_selecionadas=set(), empresa=EMPRESA)
-    # Abre formulário vazio com a lista de profissionais para vincular.
+    return render_template('admin/servico_form.html', servico=None, form=None, empresa=EMPRESA)
+    # Abre formulário vazio.
 
 
 @admin.route('/servicos/<int:id>/editar', methods=['GET', 'POST'])
@@ -799,48 +703,24 @@ def servico_editar(id):
         # Mostra erro.
         return redirect(url_for('admin.servicos'))
         # Volta para lista.
-    profissionais = buscar_profissionais(False)
-    # Lista profissionais (ativas e inativas) para o admin marcar as aptas.
-    vinculadas_atual = {
-        # Constrói um conjunto com os ids das profissionais já vinculadas a este serviço.
-        str(linha['profissional_id'])
-        # Converte cada id para texto para casar com o value do checkbox.
-        for linha in db.execute('SELECT profissional_id FROM profissionais_servicos WHERE servico_id = ?', (id,)).fetchall()
-        # Busca os vínculos atuais no banco.
-    }
-    # Fecha o set de profissionais vinculadas.
     if request.method == 'POST':
         # Verifica envio do formulário.
         nome, preco, duracao, erro = _parse_servico_form()
         # Lê e valida formulário.
-        ids_profissionais = request.form.getlist('profissionais_ids')
-        # Lê as profissionais marcadas no formulário.
         if erro:
             # Verifica erro.
-            return render_template('admin/servico_form.html', servico=servico, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=EMPRESA)
-            # Reabre formulário com erro mantendo o que foi marcado.
+            return render_template('admin/servico_form.html', servico=servico, form=request.form, erro=erro, empresa=EMPRESA)
+            # Reabre formulário com erro.
         db.execute('UPDATE servicos SET nome = ?, preco = ?, duracao_min = ? WHERE id = ?', (nome, preco, duracao, id))
         # Atualiza serviço.
-        db.execute('DELETE FROM profissionais_servicos WHERE servico_id = ?', (id,))
-        # Remove os vínculos antigos para reescrever conforme as marcações atuais.
-        for pid in ids_profissionais:
-            # Percorre cada profissional marcada.
-            db.execute(
-                # Insere o vínculo atualizado.
-                'INSERT OR IGNORE INTO profissionais_servicos (profissional_id, servico_id) VALUES (?, ?)',
-                # Usa OR IGNORE para evitar erro caso o admin marque a mesma duas vezes.
-                (pid, id)
-                # Envia os ids da profissional e do serviço.
-            )
-            # Finaliza o vínculo atual.
         db.commit()
-        # Salva atualização e vínculos.
+        # Salva atualização.
         flash(f'Serviço "{nome}" atualizado.', 'success')
         # Mostra sucesso.
         return redirect(url_for('admin.servicos'))
         # Volta para lista.
-    return render_template('admin/servico_form.html', servico=servico, form=None, profissionais=profissionais, profissionais_selecionadas=vinculadas_atual, empresa=EMPRESA)
-    # Abre formulário preenchido com profissionais já vinculadas marcadas.
+    return render_template('admin/servico_form.html', servico=servico, form=None, empresa=EMPRESA)
+    # Abre formulário preenchido.
 
 
 @admin.route('/servicos/<int:id>/excluir', methods=['POST'])
@@ -950,331 +830,6 @@ def bloqueio_excluir(id):
     # Mostra mensagem de sucesso.
     return redirect(url_for('admin.bloqueios'))
     # Volta para a tela de bloqueios.
-
-
-@admin.route('/profissionais')
-# Cria a rota administrativa de profissionais.
-def profissionais():
-    # Define a função que lista profissionais cadastradas.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco para consultar profissionais e seus vínculos.
-    lista = db.execute(
-        # Faz a consulta agregando os serviços que cada profissional atende.
-        """SELECT p.id, p.nome, p.especialidade, p.foto, p.ativo,
-                  COALESCE(GROUP_CONCAT(s.nome, ', '), '') AS servicos_atende
-           FROM profissionais p
-           LEFT JOIN profissionais_servicos ps ON ps.profissional_id = p.id
-           LEFT JOIN servicos s ON s.id = ps.servico_id
-           GROUP BY p.id
-           ORDER BY p.ativo DESC, p.nome"""
-        # Junta as tabelas para listar profissionais com seus serviços.
-    ).fetchall()
-    # Carrega a lista para o template.
-    return render_template('admin/profissionais.html', profissionais=lista, empresa=EMPRESA)
-    # Renderiza a página de profissionais.
-
-
-def _parse_profissional_form():
-    # Cria função auxiliar para ler o formulário de profissional.
-    nome = request.form.get('nome', '').strip()
-    # Lê o nome digitado.
-    especialidade = request.form.get('especialidade', '').strip()
-    # Lê a especialidade.
-    foto = request.form.get('foto', '').strip()
-    # Lê o nome do arquivo de foto (já presente em static/img).
-    ativo = 1 if request.form.get('ativo') == 'on' else 0
-    # Converte o checkbox em 0 ou 1 para o banco.
-    erro = None
-    # Inicializa a variável de erro.
-    if len(nome) < 2:
-        # Verifica nome muito curto.
-        erro = 'Informe o nome da profissional.'
-        # Define a mensagem.
-    elif len(especialidade) < 2:
-        # Verifica especialidade vazia.
-        erro = 'Informe a especialidade.'
-        # Define a mensagem.
-    elif foto == '':
-        # Verifica se a foto foi informada.
-        erro = 'Informe o nome do arquivo da foto (ex: pamela_francisco.png).'
-        # Define mensagem padrão sobre a foto.
-    return nome, especialidade, foto, ativo, erro
-    # Retorna os dados normalizados e o erro de validação.
-
-
-@admin.route('/profissionais/nova', methods=['GET', 'POST'])
-# Cria rota para cadastrar uma nova profissional.
-def profissional_nova():
-    # Define a função de cadastro.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco para gravar a profissional e seus vínculos.
-    servicos = buscar_servicos()
-    # Lista os serviços para permitir escolher quais a profissional atende.
-    if request.method == 'POST':
-        # Verifica envio do formulário.
-        nome, especialidade, foto, ativo, erro = _parse_profissional_form()
-        # Lê e valida os dados do formulário.
-        ids_servicos = request.form.getlist('servicos_ids')
-        # Lê quais serviços foram marcados para essa profissional.
-        if erro:
-            # Verifica se houve erro de validação.
-            return render_template('admin/profissional_form.html', profissional=None, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=EMPRESA)
-            # Reabre o formulário com erro mantendo o que foi digitado.
-        cursor = db.execute(
-            # Insere a profissional no banco.
-            'INSERT INTO profissionais (nome, especialidade, foto, ativo) VALUES (?, ?, ?, ?)',
-            # Usa parâmetros para evitar injeção de SQL.
-            (nome, especialidade, foto, ativo)
-            # Envia os dados.
-        )
-        # Finaliza o insert principal.
-        novo_id = cursor.lastrowid
-        # Guarda o id da nova profissional para os vínculos a seguir.
-        for sid in ids_servicos:
-            # Percorre cada serviço marcado.
-            db.execute(
-                # Insere o vínculo entre profissional e serviço.
-                'INSERT OR IGNORE INTO profissionais_servicos (profissional_id, servico_id) VALUES (?, ?)',
-                # OR IGNORE evita duplicidade.
-                (novo_id, sid)
-                # Envia os ids.
-            )
-            # Encerra o vínculo atual.
-        db.commit()
-        # Salva tudo de uma vez.
-        flash(f'Profissional "{nome}" cadastrada com sucesso.', 'success')
-        # Mostra mensagem de sucesso.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    return render_template('admin/profissional_form.html', profissional=None, form=None, servicos=servicos, servicos_selecionados=set(), empresa=EMPRESA)
-    # Abre o formulário vazio.
-
-
-@admin.route('/profissionais/<int:id>/editar', methods=['GET', 'POST'])
-# Cria rota para editar dados de uma profissional.
-def profissional_editar(id):
-    # Define a função de edição.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco.
-    profissional = db.execute('SELECT * FROM profissionais WHERE id = ?', (id,)).fetchone()
-    # Busca a profissional.
-    if profissional is None:
-        # Verifica se existe.
-        flash('Profissional não encontrada.', 'error')
-        # Mostra erro.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    servicos = buscar_servicos()
-    # Lista todos os serviços para o admin marcar quais ela atende.
-    vinculadas_atual = {
-        # Calcula os ids dos serviços já vinculados.
-        str(linha['servico_id'])
-        # Converte cada id para texto.
-        for linha in db.execute('SELECT servico_id FROM profissionais_servicos WHERE profissional_id = ?', (id,)).fetchall()
-        # Busca os vínculos atuais.
-    }
-    # Fecha o set de serviços vinculados.
-    if request.method == 'POST':
-        # Verifica envio do formulário.
-        nome, especialidade, foto, ativo, erro = _parse_profissional_form()
-        # Lê e valida os dados.
-        ids_servicos = request.form.getlist('servicos_ids')
-        # Lê os serviços marcados.
-        if erro:
-            # Verifica erro de validação.
-            return render_template('admin/profissional_form.html', profissional=profissional, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=EMPRESA)
-            # Reabre o formulário mantendo o que foi digitado.
-        db.execute(
-            # Atualiza os dados principais da profissional.
-            'UPDATE profissionais SET nome = ?, especialidade = ?, foto = ?, ativo = ? WHERE id = ?',
-            # Atualiza tudo de uma vez.
-            (nome, especialidade, foto, ativo, id)
-            # Envia os dados para o SQLite.
-        )
-        # Finaliza o update principal.
-        db.execute('DELETE FROM profissionais_servicos WHERE profissional_id = ?', (id,))
-        # Apaga os vínculos antigos para reescrever conforme a tela.
-        for sid in ids_servicos:
-            # Percorre cada serviço marcado.
-            db.execute(
-                # Insere o vínculo atualizado.
-                'INSERT OR IGNORE INTO profissionais_servicos (profissional_id, servico_id) VALUES (?, ?)',
-                # Mantém OR IGNORE por segurança.
-                (id, sid)
-                # Envia os ids.
-            )
-            # Encerra o vínculo atual.
-        db.commit()
-        # Salva tudo.
-        flash(f'Profissional "{nome}" atualizada.', 'success')
-        # Mensagem de sucesso.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    return render_template('admin/profissional_form.html', profissional=profissional, form=None, servicos=servicos, servicos_selecionados=vinculadas_atual, empresa=EMPRESA)
-    # Abre o formulário preenchido com os dados atuais.
-
-
-@admin.route('/profissionais/<int:id>/ativar', methods=['POST'])
-# Cria rota para alternar o status ativo/inativo da profissional.
-def profissional_alternar_ativo(id):
-    # Define a função que alterna o status.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco.
-    profissional = db.execute('SELECT * FROM profissionais WHERE id = ?', (id,)).fetchone()
-    # Busca a profissional.
-    if profissional is None:
-        # Verifica se existe.
-        flash('Profissional não encontrada.', 'error')
-        # Mostra erro.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    novo_status = 0 if profissional['ativo'] else 1
-    # Calcula o status invertido.
-    db.execute('UPDATE profissionais SET ativo = ? WHERE id = ?', (novo_status, id))
-    # Aplica a mudança.
-    db.commit()
-    # Salva.
-    if novo_status:
-        # Verifica se foi reativada.
-        flash(f'Profissional "{profissional["nome"]}" reativada.', 'success')
-        # Mensagem para reativada.
-    else:
-        # Caso contrário, foi inativada.
-        flash(f'Profissional "{profissional["nome"]}" inativada. Ela deixa de aparecer no agendamento.', 'info')
-        # Mensagem para inativada.
-    return redirect(url_for('admin.profissionais'))
-    # Volta para a lista.
-
-
-@admin.route('/profissionais/<int:id>/excluir', methods=['POST'])
-# Cria rota para excluir uma profissional definitivamente.
-def profissional_excluir(id):
-    # Define a função de exclusão.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco.
-    profissional = db.execute('SELECT * FROM profissionais WHERE id = ?', (id,)).fetchone()
-    # Busca a profissional.
-    if profissional is None:
-        # Verifica se existe.
-        flash('Profissional não encontrada.', 'error')
-        # Mostra erro.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    em_uso = db.execute('SELECT COUNT(*) AS n FROM agendamentos WHERE profissional_id = ?', (id,)).fetchone()['n']
-    # Conta quantos agendamentos referenciam essa profissional.
-    if em_uso:
-        # Verifica se existem agendamentos.
-        flash(f'Não é possível excluir "{profissional["nome"]}": existem {em_uso} agendamento(s) associado(s). Inative em vez de excluir.', 'error')
-        # Mensagem orientando o admin a inativar.
-        return redirect(url_for('admin.profissionais'))
-        # Volta para a lista.
-    db.execute('DELETE FROM profissionais_servicos WHERE profissional_id = ?', (id,))
-    # Remove os vínculos antes de apagar a profissional.
-    db.execute('DELETE FROM bloqueios_agenda WHERE profissional_id = ?', (id,))
-    # Remove eventuais bloqueios cadastrados para essa profissional.
-    db.execute('DELETE FROM profissionais WHERE id = ?', (id,))
-    # Exclui a profissional.
-    db.commit()
-    # Salva tudo.
-    flash(f'Profissional "{profissional["nome"]}" excluída.', 'success')
-    # Mensagem de sucesso.
-    return redirect(url_for('admin.profissionais'))
-    # Volta para a lista.
-
-
-@admin.route('/clientes')
-# Cria a rota administrativa de clientes.
-def clientes():
-    # Define a função que lista clientes que já agendaram.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    busca = request.args.get('q', '').strip()
-    # Lê o termo de busca opcional.
-    db = get_db()
-    # Abre o banco.
-    sql = """SELECT c.id, c.nome, c.telefone,
-                    COUNT(a.id) AS total_agendamentos,
-                    SUM(CASE WHEN a.status = 'cancelado' THEN 1 ELSE 0 END) AS total_cancelados,
-                    SUM(CASE WHEN a.status = 'confirmado' THEN 1 ELSE 0 END) AS total_confirmados,
-                    MAX(a.data) AS ultimo_atendimento
-             FROM clientes c
-             LEFT JOIN agendamentos a ON a.cliente_id = c.id"""
-    # Monta a consulta principal somando estatísticas por cliente.
-    params = []
-    # Cria a lista de parâmetros.
-    if busca:
-        # Verifica se há busca.
-        sql += ' WHERE c.nome LIKE ? OR c.telefone LIKE ?'
-        # Adiciona filtro por nome ou telefone.
-        like = f'%{busca}%'
-        # Monta o padrão LIKE.
-        params.extend([like, like])
-        # Adiciona o padrão para nome e telefone.
-    sql += ' GROUP BY c.id ORDER BY c.nome'
-    # Finaliza agrupando por cliente.
-    lista = db.execute(sql, params).fetchall()
-    # Executa a consulta.
-    return render_template('admin/clientes.html', clientes=lista, busca=busca, empresa=EMPRESA)
-    # Renderiza a página de clientes.
-
-
-@admin.route('/clientes/<int:id>')
-# Cria a rota de detalhe da cliente.
-def cliente_detalhe(id):
-    # Define a função que mostra histórico de uma cliente.
-    if not esta_logado():
-        # Verifica login.
-        return redirect(url_for('admin.login'))
-        # Redireciona para login.
-    db = get_db()
-    # Abre o banco.
-    cliente = db.execute('SELECT * FROM clientes WHERE id = ?', (id,)).fetchone()
-    # Busca a cliente.
-    if cliente is None:
-        # Verifica se existe.
-        flash('Cliente não encontrada.', 'error')
-        # Mostra erro.
-        return redirect(url_for('admin.clientes'))
-        # Volta para a lista.
-    agendamentos = db.execute(
-        # Busca todo o histórico de agendamentos da cliente.
-        """SELECT a.id, a.data, a.horario, a.status,
-                  s.nome AS servico_nome, s.preco,
-                  p.nome AS profissional_nome
-           FROM agendamentos a
-           JOIN servicos s ON s.id = a.servico_id
-           JOIN profissionais p ON p.id = a.profissional_id
-           WHERE a.cliente_id = ?
-           ORDER BY a.data DESC, a.horario DESC""",
-        # Busca os agendamentos ordenados do mais recente para o mais antigo.
-        (id,)
-        # Envia o id da cliente.
-    ).fetchall()
-    # Carrega o histórico.
-    return render_template('admin/cliente_detalhe.html', cliente=cliente, agendamentos=agendamentos, empresa=EMPRESA)
-    # Renderiza a página de detalhe.
 
 
 app.register_blueprint(publico)

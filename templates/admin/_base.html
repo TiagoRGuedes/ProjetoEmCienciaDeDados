@@ -1,0 +1,36 @@
+<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
+<html lang="pt-BR"> <!-- Abre o documento HTML e define português do Brasil como idioma. -->
+<head> <!-- Abre a área de configurações da página admin. -->
+  <meta charset="UTF-8"> <!-- Permite acentos e caracteres especiais. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o painel se adaptar a diferentes telas. -->
+  <title>{% block title %}Admin{% endblock %} — Esmalteria</title> <!-- Define o título da aba com um bloco editável. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Carrega o CSS do painel administrativo. -->
+</head> <!-- Fecha o head. -->
+<body> <!-- Abre o corpo visível da página admin. -->
+  <nav class="navbar"> <!-- Cria a barra de navegação do admin. -->
+    <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Refúgio da Preta · Admin</a> <!-- Link principal para o dashboard. -->
+    <div class="navbar-links"> <!-- Cria a área dos links do menu admin. -->
+      <a href="{{ url_for('admin.dashboard') }}" class="navbar-link {% if request.endpoint and (request.endpoint == 'admin.dashboard' or request.endpoint.startswith('admin.agendamento')) %}active{% endif %}">Agendamentos</a> <!-- Link para agendamentos, ativo também na edição. -->
+      <a href="{{ url_for('admin.profissionais') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.profissional') %}active{% endif %}">Profissionais</a> <!-- Link para a área de profissionais, novidade do model atual. -->
+      <a href="{{ url_for('admin.servicos') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a> <!-- Link para serviços com classe active quando estiver nas rotas de serviço. -->
+      <a href="{{ url_for('admin.bloqueios') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Link para folgas, feriados e horários bloqueados. -->
+      <a href="{{ url_for('admin.clientes') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.client') %}active{% endif %}">Clientes</a> <!-- Link para a lista de clientes que agendaram. -->
+      <a href="{{ url_for('admin.logout') }}" class="navbar-link">Sair</a> <!-- Link para sair da área administrativa. -->
+    </div> <!-- Fecha a área dos links. -->
+  </nav> <!-- Fecha a barra de navegação. -->
+
+  <main class="container"> <!-- Abre o conteúdo principal do admin dentro de um container. -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {# Busca mensagens temporárias enviadas pelo Flask. #}
+      {% if messages %} {# Verifica se existem mensagens para mostrar. #}
+        <ul class="flash-list"> <!-- Cria uma lista visual de mensagens. -->
+          {% for category, msg in messages %} {# Percorre cada mensagem recebida. #}
+            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li> <!-- Mostra a mensagem com classe de cor adequada. -->
+          {% endfor %} {# Finaliza o loop de mensagens. #}
+        </ul> <!-- Fecha a lista de mensagens. -->
+      {% endif %} {# Finaliza a verificação de mensagens. #}
+    {% endwith %} {# Finaliza o bloco de mensagens flash. #}
+
+    {% block content %}{% endblock %} <!-- Define o espaço onde cada página admin coloca seu conteúdo. -->
+  </main> <!-- Fecha o conteúdo principal do admin. -->
+</body> <!-- Fecha o corpo da página. -->
+</html> <!-- Fecha o documento HTML. -->
