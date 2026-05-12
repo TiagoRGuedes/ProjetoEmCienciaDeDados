@@ -1,0 +1,59 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}{% if profissional %}Editar profissional{% else %}Nova profissional{% endif %}{% endblock %} {# Define o título conforme cadastro ou edição. #}
+{% block content %} {# Começa o conteúdo da página. #}
+
+<div class="page-header"> <!-- Cria o cabeçalho. -->
+  <h1 class="page-title">{% if profissional %}Editar profissional{% else %}Nova profissional{% endif %}</h1> <!-- Mostra o título conforme o modo. -->
+</div> <!-- Fecha o cabeçalho. -->
+
+<div class="card" style="max-width: 720px;"> <!-- Cria um cartão limitando a largura. -->
+  {% if erro %} <!-- Verifica se há erro. -->
+    <ul class="flash-list"><li class="flash flash-error">{{ erro }}</li></ul> <!-- Mostra a mensagem de erro. -->
+  {% endif %} <!-- Fecha a verificação. -->
+
+  <form method="POST" class="form-grid"> <!-- Cria o formulário de cadastro/edição. -->
+    <div class="form-group"> <!-- Agrupa o nome. -->
+      <label class="form-label" for="nome">Nome</label> <!-- Rótulo do nome. -->
+      <input class="form-input" type="text" id="nome" name="nome" value="{{ form.nome if form else (profissional.nome if profissional else '') }}" required maxlength="80" autofocus> <!-- Campo de nome. -->
+    </div> <!-- Fecha o grupo de nome. -->
+
+    <div class="form-group"> <!-- Agrupa a especialidade. -->
+      <label class="form-label" for="especialidade">Especialidade principal</label> <!-- Rótulo da especialidade. -->
+      <input class="form-input" type="text" id="especialidade" name="especialidade" value="{{ form.especialidade if form else (profissional.especialidade if profissional else '') }}" required maxlength="120" placeholder="Ex: Manicure e nail designer"> <!-- Campo de especialidade. -->
+    </div> <!-- Fecha o grupo. -->
+
+    <div class="form-group"> <!-- Agrupa a foto. -->
+      <label class="form-label" for="foto">Arquivo da foto</label> <!-- Rótulo do arquivo. -->
+      <input class="form-input" type="text" id="foto" name="foto" value="{{ form.foto if form else (profissional.foto if profissional else '') }}" required placeholder="ex: pamela_francisco.png"> <!-- Campo para o nome do arquivo. -->
+      <span class="form-help">A foto precisa estar dentro de <code>static/img/</code>. Use o mesmo nome do arquivo.</span> <!-- Ajuda sobre onde colocar a foto. -->
+    </div> <!-- Fecha o grupo. -->
+
+    <div class="form-group"> <!-- Agrupa o status. -->
+      <label class="form-label">Status</label> <!-- Rótulo do status. -->
+      <label class="checkbox-item" style="display:inline-flex;width:auto;"> <!-- Reusa o estilo de checkbox-card. -->
+        <input type="checkbox" id="ativo" name="ativo" {% if (form is none and (profissional is none or profissional.ativo)) or (form and form.get('ativo') == 'on') %}checked{% endif %}> <!-- Marca como ativa por padrão em novo cadastro. -->
+        <span>Profissional ativa (aparece no agendamento)</span> <!-- Texto explicativo. -->
+      </label> <!-- Fecha o checkbox. -->
+    </div> <!-- Fecha o grupo. -->
+
+    <div class="form-group"> <!-- Agrupa os serviços atendidos. -->
+      <label class="form-label">Serviços que atende</label> <!-- Rótulo do bloco. -->
+      <div class="checkbox-group"> <!-- Cria a grade de checkboxes. -->
+        {% for s in servicos %} {# Percorre cada serviço cadastrado. #}
+          <label class="checkbox-item"> <!-- Cria um checkbox-card por serviço. -->
+            <input type="checkbox" name="servicos_ids" value="{{ s.id }}" {% if s.id|string in servicos_selecionados %}checked{% endif %}> <!-- Marca quando o serviço já está vinculado. -->
+            <span>{{ s.nome }}</span> <!-- Mostra o nome do serviço. -->
+          </label> <!-- Fecha o checkbox-card. -->
+        {% endfor %} {# Finaliza o loop. #}
+      </div> <!-- Fecha o grupo de checkboxes. -->
+      <span class="form-help">A profissional só aparecerá para a cliente nos serviços marcados aqui.</span> <!-- Ajuda. -->
+    </div> <!-- Fecha o grupo de serviços. -->
+
+    <div class="form-actions"> <!-- Cria a área de botões. -->
+      <button type="submit" class="btn btn-primary">{% if profissional %}Salvar alterações{% else %}Cadastrar profissional{% endif %}</button> <!-- Botão principal. -->
+      <a href="{{ url_for('admin.profissionais') }}" class="btn btn-secondary">Cancelar</a> <!-- Link para voltar sem salvar. -->
+    </div> <!-- Fecha a área de botões. -->
+  </form> <!-- Fecha o formulário. -->
+</div> <!-- Fecha o cartão. -->
+
+{% endblock %} {# Finaliza o conteúdo. #}
