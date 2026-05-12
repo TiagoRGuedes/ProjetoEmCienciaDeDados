@@ -695,3 +695,118 @@ input:focus, select:focus { /* Estiliza campos focados. */
     .dia-calendario strong { font-size: 15px; } /* Reduz número do dia no celular. */
     .dia-calendario small { display: none; } /* Esconde texto pequeno para caber melhor. */
 } /* Fecha responsividade extra. */
+
+.modal-fundo { /* Estiliza o fundo escuro do pop-up. */
+    position: fixed; /* Fixa o fundo na tela. */
+    inset: 0; /* Ocupa toda a tela. */
+    background-color: rgba(45, 26, 18, 0.55); /* Cria véu marrom translúcido. */
+    display: flex; /* Centraliza o conteúdo do modal. */
+    align-items: center; /* Centraliza verticalmente. */
+    justify-content: center; /* Centraliza horizontalmente. */
+    padding: 20px; /* Cria espaço interno para celulares. */
+    z-index: 1000; /* Mantém o modal acima do resto da página. */
+    overflow-y: auto; /* Permite rolagem quando o modal é grande. */
+} /* Fecha fundo do modal. */
+
+.modal-caixa { /* Estiliza a caixa branca do pop-up. */
+    background-color: var(--bege-card); /* Usa fundo bege claro combinando com o site. */
+    border: 1px solid var(--nude); /* Usa borda nude. */
+    border-radius: 18px; /* Arredonda os cantos. */
+    padding: 26px; /* Cria espaço interno. */
+    width: 100%; /* Faz a caixa ocupar a largura disponível. */
+    max-width: 520px; /* Limita a largura máxima. */
+    box-shadow: 0 12px 28px rgba(63, 45, 37, 0.25); /* Cria sombra marrom mais forte. */
+    max-height: 90vh; /* Limita a altura para caber na tela. */
+    overflow-y: auto; /* Permite rolagem interna se necessário. */
+} /* Fecha caixa do modal. */
+
+.modal-caixa-grande { /* Estiliza modais maiores como o calendário. */
+    max-width: 680px; /* Aumenta a largura máxima. */
+} /* Fecha modal grande. */
+
+.modal-cabecalho { /* Estiliza o cabeçalho de cada modal. */
+    display: flex; /* Coloca número e texto lado a lado. */
+    align-items: center; /* Centraliza verticalmente. */
+    gap: 14px; /* Cria espaço entre número e texto. */
+    margin-bottom: 12px; /* Cria espaço abaixo do cabeçalho. */
+} /* Fecha cabeçalho do modal. */
+
+.modal-cabecalho h3 { /* Estiliza título do modal. */
+    color: var(--marrom-escuro); /* Usa marrom escuro. */
+    margin-bottom: 2px; /* Cria pequeno espaço abaixo. */
+} /* Fecha título do modal. */
+
+.modal-cabecalho p { /* Estiliza texto do modal. */
+    color: var(--texto-suave); /* Usa texto suave. */
+    font-size: 14px; /* Define tamanho menor. */
+    margin: 0; /* Remove margens padrão. */
+} /* Fecha texto do modal. */
+
+.modal-acoes { /* Estiliza barra de botões do modal. */
+    display: flex; /* Coloca botões lado a lado. */
+    gap: 12px; /* Cria espaço entre botões. */
+    margin-top: 20px; /* Cria espaço acima da barra. */
+    flex-wrap: wrap; /* Quebra a linha em telas menores. */
+} /* Fecha barra de ações do modal. */
+
+.modal-acoes .botao-form { /* Estiliza botões dentro do modal. */
+    flex: 1 1 160px; /* Faz cada botão ocupar espaço igual. */
+    margin-top: 0; /* Remove margem extra. */
+} /* Fecha botões do modal. */
+
+.botao-secundario { /* Estiliza o botão secundário (voltar/cancelar). */
+    background-color: var(--bege-claro); /* Usa bege claro como fundo. */
+    color: var(--marrom-escuro); /* Usa texto marrom escuro. */
+    border: 1px solid var(--nude); /* Usa borda nude. */
+} /* Fecha botão secundário. */
+
+.botao-secundario:hover { /* Estiliza hover do botão secundário. */
+    background-color: var(--nude); /* Escurece levemente no hover. */
+} /* Fecha hover do botão secundário. */
+
+.erro-modal { /* Estiliza mensagem de erro dentro de modais. */
+    color: #a23737; /* Usa vermelho escuro para destacar. */
+    background-color: #fbeaea; /* Usa fundo rosa pálido. */
+    border: 1px solid #e6c2c2; /* Usa borda rosa. */
+    padding: 8px 12px; /* Cria espaço interno. */
+    border-radius: 10px; /* Arredonda os cantos. */
+    margin-top: 12px; /* Cria espaço acima. */
+    font-size: 14px; /* Reduz tamanho do texto. */
+} /* Fecha mensagem de erro do modal. */
+
+.resumo-escolhas { /* Estiliza o bloco de resumo das escolhas. */
+    margin-top: 22px; /* Cria espaço acima. */
+    padding: 16px 18px; /* Cria espaço interno. */
+    background-color: var(--bege-claro); /* Usa fundo bege claro. */
+    border: 1px solid var(--nude); /* Usa borda nude. */
+    border-radius: 14px; /* Arredonda os cantos. */
+} /* Fecha resumo das escolhas. */
+
+.resumo-escolhas h4 { /* Estiliza título do resumo. */
+    color: var(--marrom-escuro); /* Usa marrom escuro. */
+    margin-bottom: 8px; /* Cria espaço abaixo. */
+} /* Fecha título do resumo. */
+
+.resumo-escolhas ul { /* Estiliza lista do resumo. */
+    list-style: none; /* Remove marcadores. */
+    padding: 0; /* Remove padding padrão. */
+    margin: 0; /* Remove margem padrão. */
+} /* Fecha lista do resumo. */
+
+.resumo-escolhas li { /* Estiliza itens do resumo. */
+    padding: 4px 0; /* Cria espaço entre itens. */
+    color: var(--texto-suave); /* Usa texto suave para o conteúdo. */
+} /* Fecha itens do resumo. */
+
+.resumo-escolhas li strong { /* Estiliza rótulos do resumo. */
+    color: var(--marrom-escuro); /* Usa marrom escuro nos rótulos. */
+} /* Fecha rótulo do resumo. */
+
+body.com-modal { /* Trava a rolagem do corpo quando há modal aberto. */
+    overflow: hidden; /* Esconde rolagem do body. */
+} /* Fecha trava do body. */
+
+@media (max-width: 520px) { /* Ajusta modais em telas pequenas. */
+    .modal-caixa { padding: 20px; } /* Reduz espaço interno do modal. */
+    .modal-acoes .botao-form { flex: 1 1 100%; } /* Faz os botões ocuparem a linha inteira. */
+} /* Fecha responsividade dos modais. */
