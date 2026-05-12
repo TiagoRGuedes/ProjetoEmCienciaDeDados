@@ -4,8 +4,8 @@
     <div class="container formulario-area"> <!-- Centraliza e limita a largura do conteúdo. -->
         <div class="agendamento-cabecalho"> <!-- Cria o cabeçalho visual da tela de agendamento. -->
             <p class="subtitulo subtitulo-escuro">Agendamento online</p> <!-- Mostra um subtítulo da página. -->
-            <h2>Escolha seu atendimento</h2> <!-- Mostra o título principal. -->
-            <p>Selecione o serviço, veja as profissionais disponíveis para esse serviço, escolha uma data no calendário e finalize com nome e telefone.</p> <!-- Explica o fluxo novo em uma frase. -->
+            <h2>Vamos começar o seu agendamento</h2> <!-- Mostra o título principal. -->
+            <p>Informe seu nome e telefone para contato. Em seguida vamos escolher serviço, profissional, data e horário em etapas rápidas.</p> <!-- Explica o novo fluxo guiado. -->
             <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
         </div> <!-- Fecha o cabeçalho visual. -->
 
@@ -16,138 +16,261 @@
         {% endif %} {# Finaliza a verificação de erro. #}
 
         <form method="POST" action="{{ url_for('publico.agendar_post') }}" class="form-box agendamento-form" id="form-agendamento"> <!-- Cria o formulário que envia os dados para a rota POST /agendar. -->
+
             <div class="passo-agendamento"> <!-- Cria o primeiro bloco do agendamento. -->
                 <span class="numero-passo">1</span> <!-- Mostra o número do passo. -->
                 <div> <!-- Abre a área de conteúdo do passo. -->
-                    <h3>Escolha o serviço e a profissional</h3> <!-- Mostra o título do primeiro passo unificado. -->
-                    <p>Ao selecionar o serviço, o sistema mostra somente as profissionais disponíveis para esse procedimento.</p> <!-- Explica que os cards aparecem conforme o serviço. -->
+                    <h3>Seus dados de contato</h3> <!-- Mostra o título do primeiro passo. -->
+                    <p>Vamos precisar apenas do seu nome e telefone para confirmar o agendamento.</p> <!-- Explica o que será pedido. -->
                 </div> <!-- Fecha a área de conteúdo do passo. -->
             </div> <!-- Fecha o primeiro bloco. -->
-
-            <label for="servico_id">Serviço:</label> <!-- Identifica o campo de serviço. -->
-            <select id="servico_id" name="servico_id" required> <!-- Cria a lista de serviços obrigatória. -->
-                <option value="">Selecione um serviço</option> <!-- Cria a opção inicial vazia. -->
-                {% for s in servicos %} {# Percorre todos os serviços recebidos do banco. #}
-                <option value="{{ s.id }}" {% if dados and dados.servico_id == s.id|string %}selected{% endif %}>{{ s.nome }} — R$ {{ "%.2f"|format(s.preco) }} · {{ s.duracao_min }} min</option> <!-- Cria uma opção com nome, preço e duração do serviço. -->
-                {% endfor %} {# Finaliza o loop dos serviços. #}
-            </select> <!-- Fecha a lista de serviços. -->
-
-            <div class="bloco-profissionais oculto" id="bloco-profissionais"> <!-- Cria o bloco de profissionais que só aparece após escolher o serviço. -->
-                <h4>Profissionais disponíveis para o serviço escolhido</h4> <!-- Mostra o título do bloco de profissionais. -->
-                <p id="aviso-profissionais" class="mensagem-ajuda">Escolha um serviço para visualizar as profissionais disponíveis.</p> <!-- Mostra uma mensagem de apoio ao usuário. -->
-                <div class="profissionais-grid" id="profissionais-grid"> <!-- Cria a grade visual das profissionais. -->
-                    {% for p in profissionais %} {# Percorre as profissionais cadastradas. #}
-                    <label class="profissional-card {% if dados and dados.profissional_id == p.id|string %}selecionada{% endif %}" data-profissional-id="{{ p.id }}"> <!-- Cria um card clicável de profissional com id no atributo data. -->
-                        <input type="radio" name="profissional_id" value="{{ p.id }}" {% if dados and dados.profissional_id == p.id|string %}checked{% endif %} required> <!-- Cria o radio obrigatório da profissional. -->
-                        <img src="{{ url_for('static', filename='img/' + p.foto) }}" alt="{{ p.nome }}"> <!-- Mostra a foto da profissional ou imagem de apoio. -->
-                        <span class="profissional-info"> <!-- Cria a área textual do card. -->
-                            <strong>{{ p.nome }}</strong> <!-- Mostra o nome da profissional. -->
-                            <small>{{ p.especialidade }}</small> <!-- Mostra a especialidade da profissional. -->
-                        </span> <!-- Fecha a área textual do card. -->
-                    </label> <!-- Fecha o card de profissional. -->
-                    {% endfor %} {# Finaliza o loop das profissionais. #}
-                </div> <!-- Fecha a grade de profissionais. -->
-            </div> <!-- Fecha o bloco de profissionais. -->
-
-            <div class="passo-agendamento"> <!-- Cria o segundo bloco do agendamento. -->
-                <span class="numero-passo">2</span> <!-- Mostra o número do passo. -->
-                <div> <!-- Abre a área do passo. -->
-                    <h3>Escolha a data no calendário</h3> <!-- Mostra o título do segundo passo. -->
-                    <p>O calendário libera os dias conforme a profissional selecionada e mostra horários livres automaticamente.</p> <!-- Explica a função do calendário. -->
-                </div> <!-- Fecha a área do passo. -->
-            </div> <!-- Fecha o segundo bloco. -->
-
-            <input type="hidden" id="data" name="data" value="{{ dados.data if dados else '' }}" required> <!-- Guarda a data selecionada sem mostrar campo digitável para a cliente. -->
-
-            <div class="calendario-card"> <!-- Cria o cartão visual do calendário. -->
-                <div class="calendario-topo"> <!-- Cria o topo do calendário. -->
-                    <button type="button" class="calendario-nav" id="mes-anterior">‹</button> <!-- Botão para voltar um mês. -->
-                    <strong id="calendario-titulo">Carregando...</strong> <!-- Mostra o mês e o ano atual do calendário. -->
-                    <button type="button" class="calendario-nav" id="mes-proximo">›</button> <!-- Botão para avançar um mês. -->
-                </div> <!-- Fecha o topo do calendário. -->
-                <div class="calendario-semana"> <!-- Cria a linha com nomes dos dias da semana. -->
-                    <span>Dom</span> <!-- Mostra domingo. -->
-                    <span>Seg</span> <!-- Mostra segunda. -->
-                    <span>Ter</span> <!-- Mostra terça. -->
-                    <span>Qua</span> <!-- Mostra quarta. -->
-                    <span>Qui</span> <!-- Mostra quinta. -->
-                    <span>Sex</span> <!-- Mostra sexta. -->
-                    <span>Sáb</span> <!-- Mostra sábado. -->
-                </div> <!-- Fecha a linha de semana. -->
-                <div class="calendario-grade" id="calendario-grade"> <!-- Cria a grade onde os dias serão montados pelo JavaScript. -->
-                </div> <!-- Fecha a grade do calendário. -->
-                <div class="calendario-legenda"> <!-- Cria legenda visual do calendário. -->
-                    <span><i class="legenda livre"></i> Disponível</span> <!-- Mostra legenda de dia disponível. -->
-                    <span><i class="legenda lotado"></i> Sem horários</span> <!-- Mostra legenda de dia lotado ou bloqueado. -->
-                    <span><i class="legenda fechado"></i> Fechado</span> <!-- Mostra legenda de dia fora do funcionamento. -->
-                </div> <!-- Fecha a legenda. -->
-            </div> <!-- Fecha o cartão do calendário. -->
-
-            <div class="painel-horarios oculto" id="painel-horarios"> <!-- Cria painel de horários inicialmente escondido. -->
-                <label>Horários disponíveis em <span id="data-escolhida-texto"></span>:</label> <!-- Mostra o dia selecionado para os horários. -->
-                <div class="horarios" id="horarios-grade"> <!-- Cria a grade visual de horários preenchida pelo JavaScript. -->
-                </div> <!-- Fecha a grade de horários. -->
-            </div> <!-- Fecha o painel de horários. -->
-
-            <div class="passo-agendamento"> <!-- Cria o terceiro bloco do agendamento. -->
-                <span class="numero-passo">3</span> <!-- Mostra o número do passo. -->
-                <div> <!-- Abre a área do passo. -->
-                    <h3>Seus dados</h3> <!-- Mostra o título do terceiro passo. -->
-                    <p>Informe apenas nome e telefone para finalizarmos a confirmação.</p> <!-- Explica que não há email no cadastro. -->
-                </div> <!-- Fecha a área do passo. -->
-            </div> <!-- Fecha o terceiro bloco. -->
 
             <label for="nome">Nome completo:</label> <!-- Identifica o campo de nome. -->
             <input type="text" id="nome" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required> <!-- Campo para digitar o nome da cliente. -->
 
-            <label for="telefone">Telefone:</label> <!-- Identifica o campo de telefone. -->
+            <label for="telefone">Telefone para contato:</label> <!-- Identifica o campo de telefone. -->
             <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required> <!-- Campo para digitar o telefone da cliente. -->
 
-            <button type="submit" class="botao-form botao-finalizar">Confirmar agendamento</button> <!-- Botão que envia o formulário para o Flask. -->
+            <div class="resumo-escolhas oculto" id="resumo-escolhas"> <!-- Cria área que resume as escolhas feitas nos modais. -->
+                <h4>Resumo do seu agendamento</h4> <!-- Mostra título do resumo. -->
+                <ul> <!-- Cria lista do resumo. -->
+                    <li><strong>Serviço:</strong> <span id="resumo-servico">—</span></li> <!-- Mostra o serviço escolhido. -->
+                    <li><strong>Profissional:</strong> <span id="resumo-profissional">—</span></li> <!-- Mostra a profissional escolhida. -->
+                    <li><strong>Data:</strong> <span id="resumo-data">—</span></li> <!-- Mostra a data escolhida. -->
+                    <li><strong>Horário:</strong> <span id="resumo-horario">—</span></li> <!-- Mostra o horário escolhido. -->
+                </ul> <!-- Fecha lista do resumo. -->
+            </div> <!-- Fecha área de resumo. -->
+
+            <button type="button" class="botao-form botao-finalizar" id="botao-iniciar-etapas">Continuar para próxima etapa</button> <!-- Botão que dispara o pop-up com a próxima etapa. -->
+
+            <!-- Campos escondidos preenchidos pelos modais. -->
+            <input type="hidden" id="servico_id" name="servico_id" value="{{ dados.servico_id if dados else '' }}" required> <!-- Campo escondido com o id do serviço escolhido. -->
+            <input type="hidden" id="profissional_id" name="profissional_id" value="{{ dados.profissional_id if dados else '' }}" required> <!-- Campo escondido com o id da profissional escolhida. -->
+            <input type="hidden" id="data" name="data" value="{{ dados.data if dados else '' }}" required> <!-- Campo escondido com a data escolhida. -->
+            <input type="hidden" id="horario" name="horario" value="{{ dados.horario if dados else '' }}" required> <!-- Campo escondido com o horário escolhido. -->
         </form> <!-- Fecha o formulário de agendamento. -->
     </div> <!-- Fecha o container do formulário. -->
 </section> <!-- Fecha a seção de agendamento. -->
 
-<script> // Abre o JavaScript que controla serviço, profissionais, calendário e horários.
+<!-- ===================== MODAIS ===================== -->
+
+<div class="modal-fundo oculto" id="modal-servico" aria-hidden="true"> <!-- Cria o pop-up do passo serviço. -->
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-servico"> <!-- Cria a caixa visual do modal. -->
+        <div class="modal-cabecalho"> <!-- Abre o cabeçalho do modal. -->
+            <span class="numero-passo">2</span> <!-- Mostra o número do passo. -->
+            <div> <!-- Abre área textual do cabeçalho. -->
+                <h3 id="titulo-modal-servico">Escolha o serviço</h3> <!-- Mostra o título do modal. -->
+                <p>Selecione o procedimento desejado para liberarmos as profissionais disponíveis.</p> <!-- Explica o passo. -->
+            </div> <!-- Fecha área textual do cabeçalho. -->
+        </div> <!-- Fecha o cabeçalho do modal. -->
+
+        <label for="modal-servico-select">Serviço:</label> <!-- Identifica o campo de serviço. -->
+        <select id="modal-servico-select"> <!-- Cria a lista de serviços do modal. -->
+            <option value="">Selecione um serviço</option> <!-- Cria a opção inicial vazia. -->
+            {% for s in servicos %} {# Percorre todos os serviços recebidos do banco. #}
+            <option value="{{ s.id }}" data-nome="{{ s.nome }}" data-preco="{{ '%.2f'|format(s.preco) }}" data-duracao="{{ s.duracao_min }}" {% if dados and dados.servico_id == s.id|string %}selected{% endif %}>{{ s.nome }} — R$ {{ "%.2f"|format(s.preco) }} · {{ s.duracao_min }} min</option> <!-- Cria uma opção com nome, preço e duração do serviço. -->
+            {% endfor %} {# Finaliza o loop dos serviços. #}
+        </select> <!-- Fecha a lista de serviços. -->
+
+        <p class="erro-modal oculto" id="erro-modal-servico">Selecione um serviço para continuar.</p> <!-- Cria mensagem de erro do modal. -->
+
+        <div class="modal-acoes"> <!-- Cria a barra de botões do modal. -->
+            <button type="button" class="botao-form botao-secundario" data-fechar-modal="modal-servico">Cancelar</button> <!-- Botão para cancelar o pop-up. -->
+            <button type="button" class="botao-form botao-finalizar" id="botao-confirmar-servico">Continuar</button> <!-- Botão que avança para o próximo modal. -->
+        </div> <!-- Fecha a barra de botões. -->
+    </div> <!-- Fecha a caixa do modal. -->
+</div> <!-- Fecha o modal de serviço. -->
+
+<div class="modal-fundo oculto" id="modal-profissional" aria-hidden="true"> <!-- Cria o pop-up do passo profissional. -->
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-profissional"> <!-- Cria a caixa visual do modal. -->
+        <div class="modal-cabecalho"> <!-- Abre o cabeçalho do modal. -->
+            <span class="numero-passo">3</span> <!-- Mostra o número do passo. -->
+            <div> <!-- Abre área textual do cabeçalho. -->
+                <h3 id="titulo-modal-profissional">Escolha a profissional</h3> <!-- Mostra o título do modal. -->
+                <p id="aviso-modal-profissional">Veja quem está disponível para o serviço escolhido.</p> <!-- Explica o passo. -->
+            </div> <!-- Fecha área textual do cabeçalho. -->
+        </div> <!-- Fecha o cabeçalho do modal. -->
+
+        <div class="profissionais-grid" id="modal-profissionais-grid"> <!-- Cria a grade visual das profissionais. -->
+            {% for p in profissionais %} {# Percorre as profissionais cadastradas. #}
+            <label class="profissional-card {% if dados and dados.profissional_id == p.id|string %}selecionada{% endif %}" data-profissional-id="{{ p.id }}" data-nome="{{ p.nome }}"> <!-- Cria um card clicável de profissional com id no atributo data. -->
+                <input type="radio" name="profissional_modal" value="{{ p.id }}" {% if dados and dados.profissional_id == p.id|string %}checked{% endif %}> <!-- Cria o radio da profissional dentro do modal. -->
+                <img src="{{ url_for('static', filename='img/' + p.foto) }}" alt="{{ p.nome }}"> <!-- Mostra a foto da profissional. -->
+                <span class="profissional-info"> <!-- Cria a área textual do card. -->
+                    <strong>{{ p.nome }}</strong> <!-- Mostra o nome da profissional. -->
+                    <small>{{ p.especialidade }}</small> <!-- Mostra a especialidade da profissional. -->
+                </span> <!-- Fecha a área textual do card. -->
+            </label> <!-- Fecha o card de profissional. -->
+            {% endfor %} {# Finaliza o loop das profissionais. #}
+        </div> <!-- Fecha a grade de profissionais. -->
+
+        <p class="erro-modal oculto" id="erro-modal-profissional">Selecione uma profissional para continuar.</p> <!-- Cria mensagem de erro do modal. -->
+
+        <div class="modal-acoes"> <!-- Cria a barra de botões do modal. -->
+            <button type="button" class="botao-form botao-secundario" data-voltar-modal="modal-servico">Voltar</button> <!-- Botão para voltar ao modal anterior. -->
+            <button type="button" class="botao-form botao-finalizar" id="botao-confirmar-profissional">Continuar</button> <!-- Botão que avança para o próximo modal. -->
+        </div> <!-- Fecha a barra de botões. -->
+    </div> <!-- Fecha a caixa do modal. -->
+</div> <!-- Fecha o modal de profissional. -->
+
+<div class="modal-fundo oculto" id="modal-data" aria-hidden="true"> <!-- Cria o pop-up do passo data. -->
+    <div class="modal-caixa modal-caixa-grande" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-data"> <!-- Cria a caixa visual do modal. -->
+        <div class="modal-cabecalho"> <!-- Abre o cabeçalho do modal. -->
+            <span class="numero-passo">4</span> <!-- Mostra o número do passo. -->
+            <div> <!-- Abre área textual do cabeçalho. -->
+                <h3 id="titulo-modal-data">Escolha a data</h3> <!-- Mostra o título do modal. -->
+                <p>Selecione um dia disponível na agenda da profissional escolhida.</p> <!-- Explica o passo. -->
+            </div> <!-- Fecha área textual do cabeçalho. -->
+        </div> <!-- Fecha o cabeçalho do modal. -->
+
+        <div class="calendario-card"> <!-- Cria o cartão visual do calendário. -->
+            <div class="calendario-topo"> <!-- Cria o topo do calendário. -->
+                <button type="button" class="calendario-nav" id="mes-anterior">‹</button> <!-- Botão para voltar um mês. -->
+                <strong id="calendario-titulo">Carregando...</strong> <!-- Mostra o mês e o ano atual do calendário. -->
+                <button type="button" class="calendario-nav" id="mes-proximo">›</button> <!-- Botão para avançar um mês. -->
+            </div> <!-- Fecha o topo do calendário. -->
+            <div class="calendario-semana"> <!-- Cria a linha com nomes dos dias da semana. -->
+                <span>Dom</span> <!-- Mostra domingo. -->
+                <span>Seg</span> <!-- Mostra segunda. -->
+                <span>Ter</span> <!-- Mostra terça. -->
+                <span>Qua</span> <!-- Mostra quarta. -->
+                <span>Qui</span> <!-- Mostra quinta. -->
+                <span>Sex</span> <!-- Mostra sexta. -->
+                <span>Sáb</span> <!-- Mostra sábado. -->
+            </div> <!-- Fecha a linha de semana. -->
+            <div class="calendario-grade" id="calendario-grade"> <!-- Cria a grade onde os dias serão montados pelo JavaScript. -->
+            </div> <!-- Fecha a grade do calendário. -->
+            <div class="calendario-legenda"> <!-- Cria legenda visual do calendário. -->
+                <span><i class="legenda livre"></i> Disponível</span> <!-- Mostra legenda de dia disponível. -->
+                <span><i class="legenda lotado"></i> Sem horários</span> <!-- Mostra legenda de dia lotado ou bloqueado. -->
+                <span><i class="legenda fechado"></i> Fechado</span> <!-- Mostra legenda de dia fora do funcionamento. -->
+            </div> <!-- Fecha a legenda. -->
+        </div> <!-- Fecha o cartão do calendário. -->
+
+        <p class="erro-modal oculto" id="erro-modal-data">Selecione uma data disponível para continuar.</p> <!-- Cria mensagem de erro do modal. -->
+
+        <div class="modal-acoes"> <!-- Cria a barra de botões do modal. -->
+            <button type="button" class="botao-form botao-secundario" data-voltar-modal="modal-profissional">Voltar</button> <!-- Botão para voltar ao modal anterior. -->
+            <button type="button" class="botao-form botao-finalizar" id="botao-confirmar-data">Continuar</button> <!-- Botão que avança para o próximo modal. -->
+        </div> <!-- Fecha a barra de botões. -->
+    </div> <!-- Fecha a caixa do modal. -->
+</div> <!-- Fecha o modal de data. -->
+
+<div class="modal-fundo oculto" id="modal-horario" aria-hidden="true"> <!-- Cria o pop-up do passo horário. -->
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-horario"> <!-- Cria a caixa visual do modal. -->
+        <div class="modal-cabecalho"> <!-- Abre o cabeçalho do modal. -->
+            <span class="numero-passo">5</span> <!-- Mostra o número do passo. -->
+            <div> <!-- Abre área textual do cabeçalho. -->
+                <h3 id="titulo-modal-horario">Escolha o horário</h3> <!-- Mostra o título do modal. -->
+                <p>Horários disponíveis em <span id="data-escolhida-texto">—</span>.</p> <!-- Explica o passo. -->
+            </div> <!-- Fecha área textual do cabeçalho. -->
+        </div> <!-- Fecha o cabeçalho do modal. -->
+
+        <div class="painel-horarios"> <!-- Cria painel de horários. -->
+            <div class="horarios" id="horarios-grade"> <!-- Cria a grade visual de horários preenchida pelo JavaScript. -->
+            </div> <!-- Fecha a grade de horários. -->
+        </div> <!-- Fecha o painel de horários. -->
+
+        <p class="erro-modal oculto" id="erro-modal-horario">Selecione um horário disponível para continuar.</p> <!-- Cria mensagem de erro do modal. -->
+
+        <div class="modal-acoes"> <!-- Cria a barra de botões do modal. -->
+            <button type="button" class="botao-form botao-secundario" data-voltar-modal="modal-data">Voltar</button> <!-- Botão para voltar ao modal anterior. -->
+            <button type="button" class="botao-form botao-finalizar" id="botao-confirmar-horario">Confirmar agendamento</button> <!-- Botão que finaliza o agendamento. -->
+        </div> <!-- Fecha a barra de botões. -->
+    </div> <!-- Fecha a caixa do modal. -->
+</div> <!-- Fecha o modal de horário. -->
+
+<script> // Abre o JavaScript que controla os pop-ups, calendário e horários.
 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']; // Cria nomes dos meses em português.
-const campoServico = document.getElementById('servico_id'); // Busca o campo de seleção de serviço.
-const blocoProfissionais = document.getElementById('bloco-profissionais'); // Busca o bloco que contém os profissionais.
-const avisoProfissionais = document.getElementById('aviso-profissionais'); // Busca o texto de aviso dos profissionais.
 const mapaProfissionaisServicos = {{ profissionais_servicos|tojson }}; // Recebe do Flask o mapa de quais serviços cada profissional atende.
+
+// Campos do formulário escondidos. //
+const campoServico = document.getElementById('servico_id'); // Busca o input hidden de serviço.
+const campoProfissional = document.getElementById('profissional_id'); // Busca o input hidden de profissional.
+const campoData = document.getElementById('data'); // Busca o input hidden de data.
+const campoHorario = document.getElementById('horario'); // Busca o input hidden de horário.
+const campoNome = document.getElementById('nome'); // Busca o campo de nome.
+const campoTelefone = document.getElementById('telefone'); // Busca o campo de telefone.
+
+// Elementos do passo de serviço (modal). //
+const selectServicoModal = document.getElementById('modal-servico-select'); // Busca o select de serviços do modal.
+const erroModalServico = document.getElementById('erro-modal-servico'); // Busca a mensagem de erro do modal de serviço.
+
+// Elementos do passo de profissional (modal). //
+const gradeProfissionaisModal = document.getElementById('modal-profissionais-grid'); // Busca a grade do modal de profissionais.
+const avisoModalProfissional = document.getElementById('aviso-modal-profissional'); // Busca o aviso do modal de profissionais.
+const erroModalProfissional = document.getElementById('erro-modal-profissional'); // Busca a mensagem de erro do modal de profissional.
+
+// Elementos do passo de data (modal). //
 const tituloCalendario = document.getElementById('calendario-titulo'); // Busca o texto do título do calendário.
 const gradeCalendario = document.getElementById('calendario-grade'); // Busca a grade onde os dias serão exibidos.
 const botaoAnterior = document.getElementById('mes-anterior'); // Busca o botão de mês anterior.
 const botaoProximo = document.getElementById('mes-proximo'); // Busca o botão de próximo mês.
-const campoData = document.getElementById('data'); // Busca o campo escondido que guarda a data escolhida.
-const painelHorarios = document.getElementById('painel-horarios'); // Busca o painel que mostra os horários.
+const erroModalData = document.getElementById('erro-modal-data'); // Busca a mensagem de erro do modal de data.
+
+// Elementos do passo de horário (modal). //
 const gradeHorarios = document.getElementById('horarios-grade'); // Busca a grade de horários.
 const textoDataEscolhida = document.getElementById('data-escolhida-texto'); // Busca o texto que mostra a data selecionada.
+const erroModalHorario = document.getElementById('erro-modal-horario'); // Busca a mensagem de erro do modal de horário.
+
+// Elementos do resumo na página principal. //
+const resumoEscolhas = document.getElementById('resumo-escolhas'); // Busca o bloco de resumo das escolhas.
+const resumoServico = document.getElementById('resumo-servico'); // Busca o texto do serviço escolhido.
+const resumoProfissional = document.getElementById('resumo-profissional'); // Busca o texto da profissional escolhida.
+const resumoData = document.getElementById('resumo-data'); // Busca o texto da data escolhida.
+const resumoHorario = document.getElementById('resumo-horario'); // Busca o texto do horário escolhido.
+
+// Botões principais. //
+const botaoIniciar = document.getElementById('botao-iniciar-etapas'); // Busca o botão de iniciar as etapas.
+const formulario = document.getElementById('form-agendamento'); // Busca o formulário principal.
+
 let hoje = new Date(); // Cria uma data com o dia atual do computador.
 let anoAtual = hoje.getFullYear(); // Guarda o ano atual para iniciar o calendário.
 let mesAtual = hoje.getMonth(); // Guarda o mês atual no formato JavaScript, começando em zero.
 let dataSelecionada = campoData.value; // Guarda a data selecionada quando a página carrega.
 
-function servicoSelecionado() { // Cria função para descobrir qual serviço foi selecionado.
-    return campoServico.value; // Retorna o valor atual do select de serviço.
-} // Fecha a função de serviço selecionado.
+function abrirModal(id) { // Cria função para abrir um modal pelo id.
+    document.querySelectorAll('.modal-fundo').forEach(m => m.classList.add('oculto')); // Fecha outros modais antes de abrir o novo.
+    const modal = document.getElementById(id); // Busca o modal pelo id.
+    modal.classList.remove('oculto'); // Mostra o modal.
+    modal.setAttribute('aria-hidden', 'false'); // Marca o modal como visível para leitores de tela.
+    document.body.classList.add('com-modal'); // Marca o body para impedir rolagem.
+} // Fecha a função de abrir modal.
 
-function profissionalSelecionada() { // Cria função para descobrir qual profissional foi marcada.
-    const marcada = document.querySelector('input[name="profissional_id"]:checked'); // Procura o radio de profissional selecionado.
-    return marcada ? marcada.value : ''; // Retorna o id da profissional ou vazio se nenhuma foi escolhida.
-} // Fecha a função de profissional selecionada.
+function fecharModal(id) { // Cria função para fechar um modal pelo id.
+    const modal = document.getElementById(id); // Busca o modal pelo id.
+    modal.classList.add('oculto'); // Esconde o modal.
+    modal.setAttribute('aria-hidden', 'true'); // Marca o modal como invisível para leitores de tela.
+    if (!document.querySelector('.modal-fundo:not(.oculto)')) { // Verifica se nenhum modal está aberto.
+        document.body.classList.remove('com-modal'); // Libera a rolagem do body.
+    } // Fecha verificação.
+} // Fecha a função de fechar modal.
 
-function limparDataEHorario() { // Cria função para limpar data e horário quando serviço ou profissional mudar.
-    dataSelecionada = ''; // Limpa a variável da data selecionada.
-    campoData.value = ''; // Limpa o campo escondido da data.
-    gradeHorarios.innerHTML = ''; // Limpa os horários exibidos anteriormente.
-    painelHorarios.classList.add('oculto'); // Esconde o painel de horários.
-} // Fecha a função de limpeza de agenda.
+function validarContato() { // Cria função para validar nome e telefone antes de avançar.
+    const nomeOk = campoNome.value.trim().length > 0; // Verifica se o nome foi preenchido.
+    const telefoneOk = campoTelefone.value.trim().length > 0; // Verifica se o telefone foi preenchido.
+    if (!nomeOk) { campoNome.focus(); return false; } // Foca no nome se estiver vazio.
+    if (!telefoneOk) { campoTelefone.focus(); return false; } // Foca no telefone se estiver vazio.
+    return true; // Retorna verdadeiro quando os dois campos estão preenchidos.
+} // Fecha a validação de contato.
+
+function atualizarResumo() { // Cria função para atualizar o resumo na página principal.
+    if (campoServico.value || campoProfissional.value || campoData.value || campoHorario.value) { // Verifica se há algo selecionado.
+        resumoEscolhas.classList.remove('oculto'); // Mostra o resumo.
+    } // Fecha verificação.
+    const opcaoServico = selectServicoModal.options[selectServicoModal.selectedIndex]; // Pega a opção selecionada do select.
+    resumoServico.textContent = (campoServico.value && opcaoServico) ? opcaoServico.dataset.nome + ' — R$ ' + opcaoServico.dataset.preco : '—'; // Atualiza texto do serviço.
+    const cardProf = document.querySelector('#modal-profissionais-grid input[name="profissional_modal"]:checked'); // Busca o radio da profissional selecionada.
+    resumoProfissional.textContent = cardProf ? cardProf.closest('.profissional-card').dataset.nome : '—'; // Atualiza texto da profissional.
+    resumoData.textContent = campoData.value ? formatarDataBrasil(campoData.value) : '—'; // Atualiza texto da data.
+    resumoHorario.textContent = campoHorario.value || '—'; // Atualiza texto do horário.
+} // Fecha a função de atualizar resumo.
 
 function atualizarProfissionaisDisponiveis(limparSelecao) { // Cria função que mostra somente profissionais que atendem o serviço selecionado.
-    const servicoId = servicoSelecionado(); // Pega o serviço selecionado.
+    const servicoId = campoServico.value; // Pega o serviço selecionado a partir do hidden.
     let quantidadeVisivel = 0; // Cria contador de profissionais disponíveis.
-    document.querySelectorAll('.profissional-card').forEach(card => { // Percorre todos os cards de profissionais.
-        const input = card.querySelector('input[name="profissional_id"]'); // Busca o radio dentro do card.
+    gradeProfissionaisModal.querySelectorAll('.profissional-card').forEach(card => { // Percorre todos os cards de profissionais.
+        const input = card.querySelector('input[name="profissional_modal"]'); // Busca o radio dentro do card.
         const profissionalId = input.value; // Pega o id da profissional do radio.
         const servicosDaProfissional = mapaProfissionaisServicos[profissionalId] || []; // Busca quais serviços essa profissional atende.
         const atendeServico = servicoId !== '' && servicosDaProfissional.includes(servicoId); // Verifica se a profissional atende o serviço selecionado.
@@ -155,22 +278,21 @@ function atualizarProfissionaisDisponiveis(limparSelecao) { // Cria função que
             card.classList.remove('oculto'); // Mostra o card da profissional.
             input.disabled = false; // Habilita o radio da profissional.
             quantidadeVisivel++; // Soma uma profissional disponível.
-        } else { // Entra aqui se a profissional não atende o serviço ou se nenhum serviço foi escolhido.
+        } else { // Entra aqui se a profissional não atende o serviço.
             card.classList.add('oculto'); // Esconde o card da profissional.
             input.disabled = true; // Desabilita o radio para não enviar profissional errada.
-            input.checked = false; // Desmarca o radio caso ele estivesse marcado.
-            card.classList.remove('selecionada'); // Remove destaque visual do card.
+            if (limparSelecao) { // Limpa seleção apenas quando o serviço mudou.
+                input.checked = false; // Desmarca o radio.
+                card.classList.remove('selecionada'); // Remove destaque visual.
+            } // Fecha limpeza condicional.
         } // Fecha a verificação de disponibilidade da profissional.
     }); // Fecha o loop dos cards.
-    if (servicoId === '') { // Verifica se ainda não existe serviço escolhido.
-        blocoProfissionais.classList.add('oculto'); // Esconde o bloco de profissionais.
-        avisoProfissionais.textContent = 'Escolha um serviço para visualizar as profissionais disponíveis.'; // Atualiza o aviso inicial.
-    } else { // Entra aqui quando existe serviço escolhido.
-        blocoProfissionais.classList.remove('oculto'); // Mostra o bloco de profissionais.
-        avisoProfissionais.textContent = quantidadeVisivel > 0 ? 'Selecione uma profissional para carregar o calendário dela.' : 'Nenhuma profissional disponível para este serviço.'; // Mostra aviso conforme a quantidade de profissionais.
-    } // Fecha a verificação do serviço.
+    avisoModalProfissional.textContent = quantidadeVisivel > 0 ? 'Veja quem está disponível para o serviço escolhido.' : 'Nenhuma profissional disponível para este serviço.'; // Atualiza o aviso do modal.
     if (limparSelecao) { // Verifica se a troca de serviço deve limpar a agenda.
-        limparDataEHorario(); // Limpa data e horário antigos porque o serviço mudou.
+        campoProfissional.value = ''; // Limpa o hidden de profissional.
+        campoData.value = ''; // Limpa o hidden de data.
+        campoHorario.value = ''; // Limpa o hidden de horário.
+        dataSelecionada = ''; // Limpa data selecionada na memória.
     } // Fecha a limpeza opcional.
 } // Fecha a função que filtra profissionais.
 
@@ -180,20 +302,14 @@ function formatarDataBrasil(dataISO) { // Cria função para mostrar a data no f
 } // Fecha a função de formatação de data.
 
 async function carregarCalendario() { // Cria função assíncrona para carregar os dias disponíveis do mês.
-    const servicoId = servicoSelecionado(); // Pega o serviço selecionado.
-    const profissionalId = profissionalSelecionada(); // Pega a profissional selecionada.
+    const servicoId = campoServico.value; // Pega o serviço selecionado.
+    const profissionalId = campoProfissional.value; // Pega a profissional selecionada.
     tituloCalendario.textContent = `${meses[mesAtual]} de ${anoAtual}`; // Atualiza o título com mês e ano.
     gradeCalendario.innerHTML = ''; // Limpa a grade antes de redesenhar.
-    if (!servicoId) { // Verifica se nenhum serviço foi escolhido.
-        gradeCalendario.innerHTML = '<div class="calendario-aviso">Escolha um serviço para visualizar profissionais e calendário.</div>'; // Mostra aviso para escolher serviço.
-        painelHorarios.classList.add('oculto'); // Esconde horários enquanto falta serviço.
+    if (!servicoId || !profissionalId) { // Verifica se faltam dados essenciais.
+        gradeCalendario.innerHTML = '<div class="calendario-aviso">Escolha um serviço e uma profissional antes.</div>'; // Mostra aviso.
         return; // Para a função.
-    } // Fecha a verificação de serviço.
-    if (!profissionalId) { // Verifica se nenhuma profissional foi escolhida.
-        gradeCalendario.innerHTML = '<div class="calendario-aviso">Escolha uma profissional disponível para ver o calendário.</div>'; // Mostra aviso para escolher profissional.
-        painelHorarios.classList.add('oculto'); // Esconde horários enquanto falta profissional.
-        return; // Para a função.
-    } // Fecha a verificação de profissional.
+    } // Fecha a verificação.
     const resposta = await fetch(`/disponibilidade-mes?ano=${anoAtual}&mes=${mesAtual + 1}&profissional_id=${profissionalId}`); // Chama o Flask para buscar disponibilidade do mês.
     const disponibilidade = await resposta.json(); // Converte a resposta JSON em objeto.
     const primeiroDia = new Date(anoAtual, mesAtual, 1).getDay(); // Descobre em qual dia da semana o mês começa.
@@ -227,32 +343,100 @@ async function carregarCalendario() { // Cria função assíncrona para carregar
     } // Fecha o loop dos dias.
 } // Fecha a função de carregar calendário.
 
-async function selecionarData(dataISO) { // Cria função para escolher uma data e abrir horários.
+function selecionarData(dataISO) { // Cria função para escolher uma data dentro do modal de calendário.
     dataSelecionada = dataISO; // Guarda a data selecionada na variável.
-    campoData.value = dataISO; // Salva a data no input escondido para enviar ao Flask.
-    await carregarCalendario(); // Recarrega o calendário para destacar o dia escolhido.
-    await carregarHorarios(); // Carrega os horários disponíveis da data selecionada.
+    campoData.value = dataISO; // Salva a data no input escondido.
+    campoHorario.value = ''; // Limpa horário porque a data mudou.
+    erroModalData.classList.add('oculto'); // Esconde mensagem de erro do modal.
+    carregarCalendario(); // Recarrega o calendário para destacar o dia escolhido.
 } // Fecha a função de selecionar data.
 
 async function carregarHorarios() { // Cria função para buscar horários de uma data.
-    const profissionalId = profissionalSelecionada(); // Pega a profissional selecionada.
+    const profissionalId = campoProfissional.value; // Pega a profissional selecionada.
     gradeHorarios.innerHTML = ''; // Limpa horários anteriores.
     if (!profissionalId || !dataSelecionada) { // Verifica se falta profissional ou data.
-        painelHorarios.classList.add('oculto'); // Esconde painel de horários.
         return; // Para a função.
     } // Fecha verificação de dados mínimos.
     const resposta = await fetch(`/horarios-disponiveis?data=${dataSelecionada}&profissional_id=${profissionalId}`); // Busca horários no Flask.
     const dados = await resposta.json(); // Converte resposta em JSON.
     textoDataEscolhida.textContent = formatarDataBrasil(dataSelecionada); // Mostra a data escolhida em formato brasileiro.
-    painelHorarios.classList.remove('oculto'); // Mostra o painel de horários.
     dados.horarios.forEach(item => { // Percorre cada horário recebido.
         const label = document.createElement('label'); // Cria o bloco visual do horário.
         label.className = item.disponivel ? 'horario disponivel' : 'horario bloqueado'; // Define classe conforme disponibilidade.
         const disabled = item.disponivel ? '' : 'disabled'; // Define disabled se estiver indisponível.
-        label.innerHTML = `<input type="radio" name="horario" value="${item.horario}" ${disabled}> ${item.horario}<br><span>${item.disponivel ? 'Disponível' : 'Indisponível'}</span>`; // Monta o radio do horário.
+        const checked = (campoHorario.value === item.horario) ? 'checked' : ''; // Marca o horário caso já tenha sido escolhido.
+        label.innerHTML = `<input type="radio" name="horario_modal" value="${item.horario}" ${disabled} ${checked}> ${item.horario}<br><span>${item.disponivel ? 'Disponível' : 'Indisponível'}</span>`; // Monta o radio do horário.
         gradeHorarios.appendChild(label); // Adiciona o horário na grade.
     }); // Fecha o loop dos horários.
+    gradeHorarios.querySelectorAll('input[name="horario_modal"]').forEach(radio => { // Adiciona evento para cada radio de horário.
+        radio.addEventListener('change', () => { // Trata mudança no horário selecionado.
+            campoHorario.value = radio.value; // Salva o horário escolhido no campo hidden.
+            erroModalHorario.classList.add('oculto'); // Esconde mensagem de erro do modal.
+        }); // Fecha o evento.
+    }); // Fecha o loop dos radios.
 } // Fecha a função de carregar horários.
+
+// =================== EVENTOS DE NAVEGAÇÃO ENTRE MODAIS =================== //
+
+botaoIniciar.addEventListener('click', () => { // Cria ação do botão de iniciar as etapas em pop-up.
+    if (!validarContato()) { return; } // Não avança se nome ou telefone faltarem.
+    abrirModal('modal-servico'); // Abre o pop-up de seleção de serviço.
+}); // Fecha ação do botão de iniciar.
+
+document.querySelectorAll('[data-fechar-modal]').forEach(botao => { // Percorre botões que fecham modais.
+    botao.addEventListener('click', () => { // Adiciona ação de clique.
+        fecharModal(botao.dataset.fecharModal); // Fecha o modal indicado.
+    }); // Fecha o evento.
+}); // Fecha o loop.
+
+document.querySelectorAll('[data-voltar-modal]').forEach(botao => { // Percorre botões de voltar entre modais.
+    botao.addEventListener('click', () => { // Adiciona ação de clique.
+        abrirModal(botao.dataset.voltarModal); // Abre o modal anterior (também fecha o atual).
+    }); // Fecha o evento.
+}); // Fecha o loop.
+
+document.querySelectorAll('.modal-fundo').forEach(modal => { // Percorre todos os modais.
+    modal.addEventListener('click', (ev) => { // Adiciona evento de clique no fundo do modal.
+        if (ev.target === modal) { fecharModal(modal.id); } // Fecha o modal quando clica no fundo escuro.
+    }); // Fecha o evento.
+}); // Fecha o loop.
+
+selectServicoModal.addEventListener('change', () => { // Cria evento quando o serviço muda no modal.
+    erroModalServico.classList.add('oculto'); // Esconde mensagem de erro.
+}); // Fecha evento de mudança do serviço.
+
+document.getElementById('botao-confirmar-servico').addEventListener('click', () => { // Cria ação do botão de confirmar serviço.
+    const servicoId = selectServicoModal.value; // Pega o serviço escolhido no modal.
+    if (!servicoId) { erroModalServico.classList.remove('oculto'); return; } // Mostra erro se não há serviço.
+    const servicoAnterior = campoServico.value; // Guarda o serviço anterior para detectar troca.
+    campoServico.value = servicoId; // Salva o serviço no hidden.
+    atualizarProfissionaisDisponiveis(servicoAnterior !== servicoId); // Atualiza profissionais disponíveis e limpa seleção se trocou.
+    atualizarResumo(); // Atualiza o resumo da página principal.
+    abrirModal('modal-profissional'); // Abre o modal de profissional.
+}); // Fecha ação do botão de confirmar serviço.
+
+gradeProfissionaisModal.addEventListener('change', (ev) => { // Cria evento quando uma profissional é selecionada.
+    if (ev.target.name === 'profissional_modal') { // Confirma que foi um radio de profissional.
+        gradeProfissionaisModal.querySelectorAll('.profissional-card').forEach(card => card.classList.remove('selecionada')); // Remove destaque anterior.
+        ev.target.closest('.profissional-card').classList.add('selecionada'); // Destaca o card escolhido.
+        erroModalProfissional.classList.add('oculto'); // Esconde mensagem de erro.
+    } // Fecha condição do nome do radio.
+}); // Fecha evento da grade de profissionais.
+
+document.getElementById('botao-confirmar-profissional').addEventListener('click', () => { // Cria ação do botão de confirmar profissional.
+    const marcada = gradeProfissionaisModal.querySelector('input[name="profissional_modal"]:checked'); // Busca a profissional escolhida.
+    if (!marcada || marcada.disabled) { erroModalProfissional.classList.remove('oculto'); return; } // Mostra erro se nenhuma profissional escolhida.
+    const profissionalAnterior = campoProfissional.value; // Guarda profissional anterior para detectar troca.
+    campoProfissional.value = marcada.value; // Salva a profissional no hidden.
+    if (profissionalAnterior !== marcada.value) { // Verifica se trocou de profissional.
+        campoData.value = ''; // Limpa a data porque mudou de profissional.
+        campoHorario.value = ''; // Limpa o horário porque mudou de profissional.
+        dataSelecionada = ''; // Limpa memória da data.
+    } // Fecha verificação de troca.
+    atualizarResumo(); // Atualiza o resumo da página principal.
+    abrirModal('modal-data'); // Abre o modal do calendário.
+    carregarCalendario(); // Carrega o calendário da profissional escolhida.
+}); // Fecha ação do botão de confirmar profissional.
 
 botaoAnterior.addEventListener('click', () => { // Cria ação do botão de mês anterior.
     mesAtual--; // Diminui um mês.
@@ -266,22 +450,39 @@ botaoProximo.addEventListener('click', () => { // Cria ação do botão de próx
     carregarCalendario(); // Recarrega o calendário.
 }); // Fecha ação do próximo mês.
 
-campoServico.addEventListener('change', () => { // Cria ação quando o serviço muda.
-    atualizarProfissionaisDisponiveis(true); // Filtra profissionais e limpa agenda antiga.
-    carregarCalendario(); // Recarrega o calendário conforme a nova escolha.
-}); // Fecha ação de mudança de serviço.
+document.getElementById('botao-confirmar-data').addEventListener('click', () => { // Cria ação do botão de confirmar data.
+    if (!campoData.value) { erroModalData.classList.remove('oculto'); return; } // Mostra erro se não há data.
+    atualizarResumo(); // Atualiza o resumo da página principal.
+    abrirModal('modal-horario'); // Abre o modal de horário.
+    carregarHorarios(); // Carrega os horários disponíveis para a data.
+}); // Fecha ação do botão de confirmar data.
 
-document.querySelectorAll('input[name="profissional_id"]').forEach(campo => { // Percorre os radios de profissionais.
-    campo.addEventListener('change', () => { // Cria ação quando a profissional muda.
-        limparDataEHorario(); // Limpa a agenda anterior porque a profissional mudou.
-        document.querySelectorAll('.profissional-card').forEach(card => card.classList.remove('selecionada')); // Remove destaque de todos os cards.
-        campo.closest('.profissional-card').classList.add('selecionada'); // Destaca o card selecionado.
-        carregarCalendario(); // Recarrega calendário da nova profissional.
-    }); // Fecha evento de mudança.
-}); // Fecha loop das profissionais.
+document.getElementById('botao-confirmar-horario').addEventListener('click', () => { // Cria ação do botão final.
+    if (!campoHorario.value) { erroModalHorario.classList.remove('oculto'); return; } // Mostra erro se não há horário.
+    atualizarResumo(); // Atualiza o resumo antes de enviar.
+    fecharModal('modal-horario'); // Fecha o último modal.
+    formulario.submit(); // Envia o formulário para o Flask.
+}); // Fecha ação do botão final.
 
-atualizarProfissionaisDisponiveis(false); // Aplica a filtragem inicial caso a página volte com serviço preenchido.
-carregarCalendario(); // Carrega o calendário quando a página abre.
-if (dataSelecionada) { carregarHorarios(); } // Recarrega horários se a página voltou com uma data preenchida.
+document.addEventListener('keydown', (ev) => { // Cria evento global de teclado.
+    if (ev.key === 'Escape') { // Verifica se a tecla pressionada é Esc.
+        document.querySelectorAll('.modal-fundo:not(.oculto)').forEach(m => fecharModal(m.id)); // Fecha qualquer modal aberto.
+    } // Fecha verificação de Esc.
+}); // Fecha evento de teclado.
+
+formulario.addEventListener('submit', (ev) => { // Cria evento de envio do formulário para tratar Enter ou submit direto.
+    if (!validarContato() || !campoServico.value || !campoProfissional.value || !campoData.value || !campoHorario.value) { // Verifica se faltam dados em algum passo.
+        ev.preventDefault(); // Impede o envio enquanto faltarem dados.
+        if (!validarContato()) { return; } // Avisa para preencher nome/telefone primeiro.
+        if (!campoServico.value) { abrirModal('modal-servico'); return; } // Abre o passo de serviço quando falta.
+        if (!campoProfissional.value) { abrirModal('modal-profissional'); return; } // Abre o passo de profissional quando falta.
+        if (!campoData.value) { abrirModal('modal-data'); carregarCalendario(); return; } // Abre o passo de data quando falta.
+        abrirModal('modal-horario'); carregarHorarios(); // Caso contrário, abre o passo de horário.
+    } // Fecha verificação de envio.
+}); // Fecha evento de envio do formulário.
+
+// Inicialização: se a página voltou com dados (erro do servidor), atualiza estados visuais. //
+atualizarProfissionaisDisponiveis(false); // Filtra profissionais conforme serviço já salvo.
+atualizarResumo(); // Atualiza o resumo inicial.
 </script> <!-- Fecha o JavaScript. -->
 {% endblock %} {# Finaliza o conteúdo da página. #}
