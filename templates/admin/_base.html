@@ -11,6 +11,7 @@
     <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Refúgio da Preta · Admin</a> <!-- Link principal para o dashboard. -->
     <div class="navbar-links"> <!-- Cria a área dos links do menu admin. -->
       <a href="{{ url_for('admin.dashboard') }}" class="navbar-link {% if request.endpoint and (request.endpoint == 'admin.dashboard' or request.endpoint.startswith('admin.agendamento')) %}active{% endif %}">Agendamentos</a> <!-- Link para agendamentos, ativo também na edição. -->
+      <a href="{{ url_for('admin.agenda') }}" class="navbar-link {% if request.endpoint == 'admin.agenda' %}active{% endif %}">Agenda</a> <!-- Link para a agenda visual da profissional. -->
       <a href="{{ url_for('admin.profissionais') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.profissional') %}active{% endif %}">Profissionais</a> <!-- Link para a área de profissionais, novidade do model atual. -->
       <a href="{{ url_for('admin.servicos') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a> <!-- Link para serviços com classe active quando estiver nas rotas de serviço. -->
       <a href="{{ url_for('admin.bloqueios') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Link para folgas, feriados e horários bloqueados. -->
