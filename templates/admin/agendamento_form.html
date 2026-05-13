@@ -1,91 +1,91 @@
-{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
-{% block title %}Editar agendamento{% endblock %} {# Define o título da aba. #}
-{% block content %} {# Começa o conteúdo da página. #}
+{% extends 'admin/_base.html' %}
+{% block title %}Editar agendamento{% endblock %}
+{% block content %}
 
-<div class="page-header"> <!-- Cria o cabeçalho da página. -->
-  <h1 class="page-title">Editar / remarcar agendamento</h1> <!-- Mostra o título da página. -->
-  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a> <!-- Atalho para voltar sem salvar. -->
-</div> <!-- Fecha o cabeçalho. -->
+<div class="page-header">
+  <h1 class="page-title">Editar / remarcar agendamento</h1>
+  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a>
+</div>
 
-<div class="card" style="max-width: 720px;"> <!-- Cria um cartão para o formulário. -->
-  <form method="POST" class="form-grid"> <!-- Cria formulário que envia alterações via POST. -->
-    <div class="form-group"> <!-- Agrupa o serviço. -->
-      <label class="form-label" for="servico_id">Serviço</label> <!-- Rótulo do serviço. -->
-      <select class="form-select" id="servico_id" name="servico_id" required> <!-- Lista de serviços. -->
-        {% for s in servicos %} <!-- Percorre serviços. -->
-        <option value="{{ s.id }}" data-duracao="{{ s.duracao_min }}" data-preco="{{ s.preco }}" {% if agendamento.servico_id == s.id %}selected{% endif %}>{{ s.nome }} — R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }} · {{ s.duracao_min }} min</option> <!-- Opção de serviço com preço e duração. -->
-        {% endfor %} <!-- Fecha loop de serviços. -->
-      </select> <!-- Fecha select de serviço. -->
-    </div> <!-- Fecha grupo do serviço. -->
+<div class="card" style="max-width: 720px;">
+  <form method="POST" class="form-grid">
+    <div class="form-group">
+      <label class="form-label" for="servico_id">Serviço</label>
+      <select class="form-select" id="servico_id" name="servico_id" required>
+        {% for s in servicos %}
+        <option value="{{ s.id }}" data-duracao="{{ s.duracao_min }}" data-preco="{{ s.preco }}" {% if agendamento.servico_id == s.id %}selected{% endif %}>{{ s.nome }} — R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }} · {{ s.duracao_min }} min</option>
+        {% endfor %}
+      </select>
+    </div>
 
-    <div class="form-group"> <!-- Agrupa a profissional. -->
-      <label class="form-label" for="profissional_id">Profissional</label> <!-- Rótulo da profissional. -->
-      <select class="form-select" id="profissional_id" name="profissional_id" required> <!-- Lista de profissionais. -->
-        {% for p in profissionais %} <!-- Percorre profissionais. -->
-        <option value="{{ p.id }}" {% if agendamento.profissional_id == p.id %}selected{% endif %} {% if not p.ativo %}data-inativa="1"{% endif %}>{{ p.nome }}{% if not p.ativo %} (inativa){% endif %}</option> <!-- Opção de profissional, marcando inativas para aviso visual. -->
-        {% endfor %} <!-- Fecha loop de profissionais. -->
-      </select> <!-- Fecha select de profissional. -->
-      <span class="form-help">A profissional precisa atender ao serviço escolhido. Os vínculos são gerenciados em <a href="{{ url_for('admin.profissionais') }}">Profissionais</a>.</span> <!-- Ajuda. -->
-    </div> <!-- Fecha grupo da profissional. -->
+    <div class="form-group">
+      <label class="form-label" for="profissional_id">Profissional</label>
+      <select class="form-select" id="profissional_id" name="profissional_id" required>
+        {% for p in profissionais %}
+        <option value="{{ p.id }}" {% if agendamento.profissional_id == p.id %}selected{% endif %} {% if not p.ativo %}data-inativa="1"{% endif %}>{{ p.nome }}{% if not p.ativo %} (inativa){% endif %}</option>
+        {% endfor %}
+      </select>
+      <span class="form-help">A profissional precisa atender ao serviço escolhido. Os vínculos são gerenciados em <a href="{{ url_for('admin.profissionais') }}">Profissionais</a>.</span>
+    </div>
 
-    <div class="form-group"> <!-- Agrupa a data. -->
-      <label class="form-label" for="data">Data</label> <!-- Rótulo da data. -->
-      <input class="form-input" type="date" id="data" name="data" value="{{ agendamento.data }}" required> <!-- Campo de data para remarcar. -->
-      <span class="form-help">A esmalteria atende de terça a sábado. Para alterar a disponibilidade após mudar a data, salve e abra novamente para recalcular os horários.</span> <!-- Ajuda explicando o fluxo. -->
-    </div> <!-- Fecha grupo da data. -->
+    <div class="form-group">
+      <label class="form-label" for="data">Data</label>
+      <input class="form-input" type="date" id="data" name="data" value="{{ agendamento.data }}" required>
+      <span class="form-help">A esmalteria atende de terça a sábado. Para alterar a disponibilidade após mudar a data, salve e abra novamente para recalcular os horários.</span>
+    </div>
 
-    <div class="form-group"> <!-- Agrupa o horário. -->
-      <label class="form-label" for="horario">Horário</label> <!-- Rótulo do horário. -->
-      <select class="form-select" id="horario" name="horario" required> <!-- Lista de horários filtrados por disponibilidade. -->
-        {% for h in lista_horarios %} <!-- Percorre cada horário calculado pelo backend. -->
-        <option value="{{ h.horario }}" {% if agendamento.horario == h.horario %}selected{% endif %} {% if not h.disponivel and agendamento.horario != h.horario %}disabled{% endif %}> <!-- Desabilita horários ocupados, exceto o próprio. -->
-          {{ h.horario }} {% if not h.disponivel and agendamento.horario != h.horario %}— indisponível{% endif %} <!-- Mostra o aviso ao lado do horário ocupado. -->
-        </option> <!-- Fecha a opção. -->
-        {% endfor %} <!-- Encerra o loop de horários. -->
-      </select> <!-- Fecha select de horários. -->
-      <span class="form-help">Horários ocupados aparecem desabilitados. O horário atual da reserva fica disponível para manter a remarcação no mesmo slot.</span> <!-- Ajuda. -->
-    </div> <!-- Fecha grupo de horário. -->
+    <div class="form-group">
+      <label class="form-label" for="horario">Horário</label>
+      <select class="form-select" id="horario" name="horario" required>
+        {% for h in lista_horarios %}
+        <option value="{{ h.horario }}" {% if agendamento.horario == h.horario %}selected{% endif %} {% if not h.disponivel and agendamento.horario != h.horario %}disabled{% endif %}>
+          {{ h.horario }} {% if not h.disponivel and agendamento.horario != h.horario %}— indisponível{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+      <span class="form-help">Horários ocupados aparecem desabilitados. O horário atual da reserva fica disponível para manter a remarcação no mesmo slot.</span>
+    </div>
 
-    <div class="form-group"> <!-- Agrupa status. -->
-      <label class="form-label" for="status">Status</label> <!-- Rótulo do status. -->
-      <select class="form-select" id="status" name="status" required> <!-- Lista de status. -->
-        <option value="pendente" {% if agendamento.status == 'pendente' %}selected{% endif %}>Pendente</option> <!-- Opção pendente. -->
-        <option value="confirmado" {% if agendamento.status == 'confirmado' %}selected{% endif %}>Confirmado</option> <!-- Opção confirmado. -->
-        <option value="cancelado" {% if agendamento.status == 'cancelado' %}selected{% endif %}>Cancelado</option> <!-- Opção cancelado, que libera o horário no site. -->
-      </select> <!-- Fecha select de status. -->
-      <span class="form-help">Ao cancelar, o horário volta a aparecer disponível para outras clientes automaticamente.</span> <!-- Ajuda. -->
-    </div> <!-- Fecha grupo status. -->
+    <div class="form-group">
+      <label class="form-label" for="status">Status</label>
+      <select class="form-select" id="status" name="status" required>
+        <option value="pendente" {% if agendamento.status == 'pendente' %}selected{% endif %}>Pendente</option>
+        <option value="confirmado" {% if agendamento.status == 'confirmado' %}selected{% endif %}>Confirmado</option>
+        <option value="cancelado" {% if agendamento.status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+      </select>
+      <span class="form-help">Ao cancelar, o horário volta a aparecer disponível para outras clientes automaticamente.</span>
+    </div>
 
-    <div class="form-actions"> <!-- Cria área dos botões. -->
-      <button type="submit" class="btn btn-primary">Salvar alterações</button> <!-- Botão para salvar remarcação. -->
-      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancelar</a> <!-- Link para voltar sem salvar. -->
-    </div> <!-- Fecha ações. -->
-  </form> <!-- Fecha formulário. -->
-</div> <!-- Fecha cartão. -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Salvar alterações</button>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
 
-<script> /* Adiciona uma melhoria leve: filtra opções da profissional conforme o serviço escolhido. */
-(function () { /* Cria uma IIFE para isolar o escopo. */
-  const vinculos = {{ profissionais_servicos|tojson }}; /* Converte o mapa de vínculos para JSON acessível no JS. */
-  const servicoSelect = document.getElementById('servico_id'); /* Pega o select de serviço. */
-  const profSelect = document.getElementById('profissional_id'); /* Pega o select de profissional. */
-  if (!servicoSelect || !profSelect) return; /* Sai se algum select não estiver na tela. */
-  function aplicarFiltro() { /* Atualiza opções da profissional conforme o serviço. */
-    const servicoId = servicoSelect.value; /* Lê o serviço atual. */
-    Array.from(profSelect.options).forEach(function (op) { /* Percorre cada opção da profissional. */
-      if (!op.value) { op.hidden = false; return; } /* Mantém placeholders visíveis. */
-      let permitido = false; /* Marca permissão inicial. */
-      Object.keys(vinculos).forEach(function (pid) { /* Procura pelo id da profissional. */
-        if (String(pid) === String(op.value) && vinculos[pid].indexOf(String(servicoId)) !== -1) { /* Verifica se atende o serviço. */
-          permitido = true; /* Marca como permitido. */
-        } /* Fecha o if. */
-      }); /* Encerra o loop dos vínculos. */
-      op.hidden = !permitido; /* Esconde opções não permitidas. */
-      op.disabled = !permitido; /* Bloqueia seleção quando não permitido. */
-    }); /* Encerra o forEach das opções. */
-  } /* Encerra a função. */
-  servicoSelect.addEventListener('change', aplicarFiltro); /* Atualiza ao trocar o serviço. */
-  aplicarFiltro(); /* Aplica o filtro inicial ao abrir a tela. */
-})(); /* Executa a IIFE. */
-</script> <!-- Encerra o script auxiliar. -->
+<script>
+(function () {
+  const vinculos = {{ profissionais_servicos|tojson }};
+  const servicoSelect = document.getElementById('servico_id');
+  const profSelect = document.getElementById('profissional_id');
+  if (!servicoSelect || !profSelect) return;
+  function aplicarFiltro() {
+    const servicoId = servicoSelect.value;
+    Array.from(profSelect.options).forEach(function (op) {
+      if (!op.value) { op.hidden = false; return; }
+      let permitido = false;
+      Object.keys(vinculos).forEach(function (pid) {
+        if (String(pid) === String(op.value) && vinculos[pid].indexOf(String(servicoId)) !== -1) {
+          permitido = true;
+        }
+      });
+      op.hidden = !permitido;
+      op.disabled = !permitido;
+    });
+  }
+  servicoSelect.addEventListener('change', aplicarFiltro);
+  aplicarFiltro();
+})();
+</script>
 
-{% endblock %} {# Finaliza o conteúdo. #}
+{% endblock %}

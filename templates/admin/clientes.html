@@ -1,62 +1,62 @@
-{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
-{% block title %}Clientes{% endblock %} {# Define o título da aba como Clientes. #}
-{% block content %} {# Começa o conteúdo principal. #}
+{% extends 'admin/_base.html' %}
+{% block title %}Clientes{% endblock %}
+{% block content %}
 
-<div class="page-header"> <!-- Cria o cabeçalho da página. -->
-  <h1 class="page-title"> <!-- Cria o título principal. -->
-    Clientes <!-- Texto do título. -->
-    <span class="page-counter">{{ clientes|length }} cadastrada{{ '' if clientes|length == 1 else 's' }}</span> <!-- Mostra a contagem. -->
-  </h1> <!-- Fecha o título. -->
-</div> <!-- Fecha o cabeçalho. -->
+<div class="page-header">
+  <h1 class="page-title">
+    Clientes
+    <span class="page-counter">{{ clientes|length }} cadastrada{{ '' if clientes|length == 1 else 's' }}</span>
+  </h1>
+</div>
 
-<form method="GET" class="filters"> <!-- Cria o formulário de busca via GET. -->
-  <div class="form-group"> <!-- Agrupa o campo de busca. -->
-    <label class="form-label" for="q">Buscar por nome ou telefone</label> <!-- Rótulo do campo. -->
-    <input class="form-input" id="q" name="q" type="text" value="{{ busca }}" placeholder="Ex: Mariana ou 11 99999-0000"> <!-- Campo de busca. -->
-  </div> <!-- Fecha o grupo. -->
-  <div class="filter-actions"> <!-- Cria a área dos botões. -->
-    <button type="submit" class="btn btn-primary">Buscar</button> <!-- Botão de busca. -->
-    <a href="{{ url_for('admin.clientes') }}" class="btn btn-secondary">Limpar</a> <!-- Link para limpar o filtro. -->
-  </div> <!-- Fecha a área dos botões. -->
-</form> <!-- Fecha o formulário. -->
+<form method="GET" class="filters">
+  <div class="form-group">
+    <label class="form-label" for="q">Buscar por nome ou telefone</label>
+    <input class="form-input" id="q" name="q" type="text" value="{{ busca }}" placeholder="Ex: Mariana ou 11 99999-0000">
+  </div>
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    <a href="{{ url_for('admin.clientes') }}" class="btn btn-secondary">Limpar</a>
+  </div>
+</form>
 
-{% if clientes %} {# Verifica se há clientes para listar. #}
-<div class="table-wrapper"> <!-- Cria a área da tabela. -->
-  <table class="table"> <!-- Cria a tabela. -->
-    <thead> <!-- Abre o cabeçalho da tabela. -->
-      <tr> <!-- Cria a linha de cabeçalho. -->
-        <th>Cliente</th> <!-- Coluna do nome. -->
-        <th>Telefone</th> <!-- Coluna do telefone. -->
-        <th>Agendamentos</th> <!-- Coluna com totais. -->
-        <th>Último atendimento</th> <!-- Coluna com a última data registrada. -->
-        <th>Ações</th> <!-- Coluna de ações. -->
-      </tr> <!-- Fecha a linha. -->
-    </thead> <!-- Fecha o cabeçalho. -->
-    <tbody> <!-- Abre o corpo da tabela. -->
-      {% for c in clientes %} {# Percorre cada cliente. #}
-      <tr> <!-- Cria uma linha por cliente. -->
-        <td><strong>{{ c.nome }}</strong></td> <!-- Nome em destaque. -->
-        <td>{{ c.telefone }}</td> <!-- Telefone. -->
-        <td> <!-- Mostra um resumo dos agendamentos. -->
-          {{ c.total_agendamentos or 0 }} no total <!-- Total geral. -->
-          <div style="font-size:0.82rem;color:var(--texto-suave);"> <!-- Detalhe por status. -->
-            {{ c.total_confirmados or 0 }} confirmados · {{ c.total_cancelados or 0 }} cancelados <!-- Quebra confirmados e cancelados. -->
-          </div> <!-- Fecha o detalhe. -->
-        </td> <!-- Fecha a célula. -->
-        <td>{{ c.ultimo_atendimento or '—' }}</td> <!-- Última data registrada ou traço. -->
-        <td class="actions"> <!-- Abre a célula de ações. -->
-          <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.cliente_detalhe', id=c.id) }}">Ver histórico</a> <!-- Link para o histórico. -->
-        </td> <!-- Fecha a célula de ações. -->
-      </tr> <!-- Fecha a linha. -->
-      {% endfor %} {# Finaliza o loop. #}
-    </tbody> <!-- Fecha o corpo. -->
-  </table> <!-- Fecha a tabela. -->
-</div> <!-- Fecha o wrapper. -->
-{% else %} <!-- Caso não haja clientes para mostrar. -->
-<div class="card empty-state"> <!-- Cria o cartão vazio. -->
-  <p><strong>Nenhuma cliente encontrada.</strong></p> <!-- Mensagem principal. -->
-  <p>{% if busca %}Tente uma busca diferente ou{% else %}As clientes aparecem aqui assim que{% endif %} algum agendamento for registrado.</p> <!-- Explicação contextual. -->
-</div> <!-- Fecha o cartão. -->
-{% endif %} {# Finaliza a verificação. #}
+{% if clientes %}
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Telefone</th>
+        <th>Agendamentos</th>
+        <th>Último atendimento</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td><strong>{{ c.nome }}</strong></td>
+        <td>{{ c.telefone }}</td>
+        <td>
+          {{ c.total_agendamentos or 0 }} no total
+          <div style="font-size:0.82rem;color:var(--texto-suave);">
+            {{ c.total_confirmados or 0 }} confirmados · {{ c.total_cancelados or 0 }} cancelados
+          </div>
+        </td>
+        <td>{{ c.ultimo_atendimento or '—' }}</td>
+        <td class="actions">
+          <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.cliente_detalhe', id=c.id) }}">Ver histórico</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p><strong>Nenhuma cliente encontrada.</strong></p>
+  <p>{% if busca %}Tente uma busca diferente ou{% else %}As clientes aparecem aqui assim que{% endif %} algum agendamento for registrado.</p>
+</div>
+{% endif %}
 
-{% endblock %} {# Finaliza o conteúdo. #}
+{% endblock %}

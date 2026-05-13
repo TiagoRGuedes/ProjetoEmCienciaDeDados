@@ -1,12 +1,12 @@
-{% extends "base.html" %} {# Usa o layout base do site. #}
-{% block conteudo %} {# Começa o conteúdo da confirmação. #}
-<section class="secao confirmado"> <!-- Cria a seção de confirmação. -->
-    <div class="container"> <!-- Centraliza o conteúdo. -->
-        <h2>Solicitação enviada com sucesso</h2> <!-- Mostra a mensagem principal. -->
-        <p>Seu pedido foi registrado como pendente e será confirmado pela equipe do {{ empresa.nome }}.</p> <!-- Explica que a confirmação será feita depois. -->
-        <p><strong>Contato:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone da empresa. -->
-        <a class="botao" href="{{ url_for('publico.index') }}">Voltar ao início</a> <!-- Botão para voltar à página inicial. -->
-        <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a> <!-- Botão para fazer outro agendamento. -->
-    </div> <!-- Fecha o container. -->
-</section> <!-- Fecha a seção de confirmação. -->
-{% endblock %} {# Finaliza o conteúdo. #}
+{% extends "base.html" %}
+{% block conteudo %}
+<section class="secao confirmado">
+    <div class="container">
+        <h2>Solicitação enviada com sucesso</h2>
+        <p>Seu pedido foi registrado como pendente e será confirmado pela equipe do {{ empresa.nome }}.</p>
+        <p><strong>Contato:</strong> {{ empresa.telefone }}</p>
+        <a class="botao" href="{{ url_for('publico.index') }}">Voltar ao início</a>
+        <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a>
+    </div>
+</section>
+{% endblock %}
