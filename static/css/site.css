@@ -1,171 +1,155 @@
-:root { /* Cria variáveis de cores e medidas para reutilizar no site inteiro. */
-    --marrom-principal: #6f4f3f; /* Define o marrom principal do site. */
-    --marrom-escuro: #4b3329; /* Define um marrom mais escuro para títulos e rodapé. */
-    --marrom-medio: #8a6a58; /* Define um marrom médio para detalhes. */
-    --bege-principal: #efe0d1; /* Define o bege principal do fundo. */
-    --bege-claro: #f8f0e8; /* Define um bege bem claro para áreas suaves. */
-    --bege-card: #fffaf5; /* Define um bege quase branco para cartões. */
-    --nude: #d9bca8; /* Define o nude usado em bordas e detalhes. */
-    --rosa-detalhe: #c9879a; /* Define o rosa apenas como detalhe visual. */
-    --rosa-claro: #f3dbe2; /* Define rosa claro para pequenos destaques. */
-    --texto-base: #3f2d25; /* Define a cor principal dos textos. */
-    --texto-suave: #6f5a4f; /* Define a cor de textos secundários. */
-    --branco: #ffffff; /* Define branco para áreas limpas. */
-    --verde-disponivel: #edf6ea; /* Define fundo verde claro para horários disponíveis. */
-    --verde-borda: #8ab77f; /* Define borda verde para horários disponíveis. */
-    --vermelho-bloqueado: #f6dddd; /* Define fundo vermelho claro para horários bloqueados. */
-    --vermelho-borda: #cc8d8d; /* Define borda vermelha suave para horários bloqueados. */
-} /* Fecha o bloco de variáveis. */
+:root { /* Cria variáveis visuais para o site público. */
+    --marrom-principal: #6f4f3f; /* Define o marrom principal. */
+    --marrom-escuro: #4b3329; /* Define o marrom escuro. */
+    --marrom-medio: #8a6a58; /* Define o marrom médio. */
+    --bege-principal: #efe0d1; /* Define o bege principal. */
+    --bege-claro: #f8f0e8; /* Define o bege claro. */
+    --bege-card: #fffaf5; /* Define o fundo dos cartões. */
+    --nude: #d9bca8; /* Define o nude para bordas. */
+    --rosa-detalhe: #c9879a; /* Define rosa discreto para detalhes. */
+    --texto-base: #3f2d25; /* Define a cor principal do texto. */
+    --texto-suave: #6f5a4f; /* Define a cor dos textos secundários. */
+    --branco: #ffffff; /* Define branco. */
+    --verde-disponivel: #edf6ea; /* Define verde claro para disponível. */
+    --verde-borda: #8ab77f; /* Define borda verde. */
+    --vermelho-bloqueado: #f6dddd; /* Define vermelho claro para bloqueado. */
+    --vermelho-borda: #cc8d8d; /* Define borda vermelha. */
+} /* Fecha as variáveis. */
+* { margin: 0; padding: 0; box-sizing: border-box; } /* Remove padrões e organiza cálculo de tamanho. */
+html { scroll-behavior: smooth; scroll-padding-top: 115px; } /* Suaviza rolagem e evita que o topo cubra seções. */
+body { font-family: Arial, Helvetica, sans-serif; background: var(--bege-principal); color: var(--texto-base); line-height: 1.6; } /* Estiliza o corpo do site. */
+a { color: inherit; text-decoration: none; } /* Remove sublinhado dos links. */
+.container { width: 90%; max-width: 1180px; margin: 0 auto; } /* Centraliza o conteúdo. */
+.topo { background: var(--marrom-escuro); color: var(--branco); padding: 16px 0; box-shadow: 0 4px 18px rgba(63,45,37,.28); position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--nude); } /* Cria topo sólido sem transparência. */
+.topo-conteudo { display: flex; justify-content: space-between; align-items: center; gap: 20px; } /* Organiza topo. */
+.marca-subtitulo { font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--bege-principal); } /* Estiliza subtítulo da marca. */
+.marca h1 { font-size: 30px; color: var(--branco); } /* Estiliza nome da marca. */
+nav { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; } /* Organiza links do menu. */
+nav a { font-weight: bold; font-size: 15px; color: var(--bege-claro); padding: 8px 10px; border-radius: 8px; transition: .2s; } /* Estiliza links. */
+nav a:hover, .nav-destaque { background: var(--marrom-medio); color: var(--branco); } /* Destaca hover e agendamento. */
+.hero { background: linear-gradient(135deg, var(--marrom-escuro), var(--marrom-principal)); color: var(--branco); padding: 88px 0; } /* Cria abertura elegante. */
+.hero-conteudo { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: center; } /* Divide hero em texto e cartão. */
+.subtitulo { text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 12px; color: var(--nude); } /* Estiliza subtítulos. */
+.subtitulo-escuro { color: var(--marrom-medio); text-align: center; } /* Estiliza subtítulos em fundos claros. */
+.hero-texto h2 { font-size: 48px; margin-bottom: 16px; } /* Estiliza título principal. */
+.hero-texto p { margin-bottom: 16px; max-width: 650px; color: #fff4ec; } /* Estiliza texto do hero. */
+.hero-botoes { display: flex; gap: 12px; flex-wrap: wrap; } /* Organiza botões do hero. */
+.hero-card { background: rgba(255,250,245,.12); border: 1px solid rgba(239,224,209,.45); border-radius: 18px; padding: 28px; box-shadow: 0 8px 18px rgba(0,0,0,.18); } /* Estiliza cartão lateral. */
+.hero-card h3 { margin-bottom: 12px; font-size: 24px; color: var(--bege-claro); } /* Estiliza título do cartão. */
+.hero-card p { margin-bottom: 8px; color: #fff7f0; } /* Estiliza textos do cartão. */
+.botao, .botao-form, button[type="submit"] { background: var(--marrom-principal); color: var(--branco); padding: 12px 22px; border-radius: 10px; border: none; display: inline-block; font-weight: bold; cursor: pointer; transition: .2s; } /* Estiliza apenas botões principais e botões de envio. */
+.botao:hover, .botao-form:hover, button[type="submit"]:hover { background: var(--marrom-escuro); } /* Escurece apenas botões principais no hover. */
+.botao-secundario { background: var(--bege-claro); color: var(--marrom-escuro); padding: 12px 22px; border-radius: 10px; font-weight: bold; display: inline-block; border: 1px solid var(--nude); transition: .2s; } /* Estiliza botão secundário. */
+.botao-secundario:hover { background: var(--nude); } /* Estiliza hover do botão secundário. */
+.secao { padding: 72px 0; } /* Cria espaçamento padrão das seções. */
+.secao h2 { text-align: center; color: var(--marrom-escuro); font-size: 34px; margin-bottom: 10px; } /* Estiliza títulos das seções. */
+.texto-central { text-align: center; margin-bottom: 32px; color: var(--texto-suave); } /* Estiliza textos centralizados. */
+.chamada-agendamento { background: var(--bege-claro); border-top: 1px solid var(--nude); border-bottom: 1px solid var(--nude); } /* Destaca seção de agendamento. */
+.chamada-final-conteudo { text-align: center; } /* Centraliza chamada. */
+.botao-destaque { display: inline-block; background: var(--marrom-principal); color: var(--branco); padding: 16px 40px; border-radius: 12px; font-weight: bold; margin-top: 8px; } /* Cria botão grande de agendamento. */
+.cards-servicos { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; } /* Organiza cards de serviço. */
+.card-servico { background: var(--bege-card); border: 1px solid var(--nude); border-radius: 16px; padding: 22px; box-shadow: 0 6px 14px rgba(63,45,37,.08); } /* Estiliza card de serviço. */
+.card-servico h3 { color: var(--marrom-principal); margin-bottom: 10px; } /* Estiliza título de serviço. */
+.galeria-fundo { background: var(--bege-claro); } /* Define fundo da galeria. */
+.galeria { display: grid; gap: 20px; } /* Organiza galeria. */
+.galeria-tres-colunas { grid-template-columns: repeat(3, 1fr); } /* Cria três colunas na galeria. */
+.foto-card { background: var(--bege-card); border-radius: 16px; overflow: hidden; text-align: center; border: 1px solid var(--nude); box-shadow: 0 6px 14px rgba(63,45,37,.10); } /* Estiliza card de foto. */
+.foto-card img { width: 100%; height: 360px; object-fit: cover; display: block; } /* Padroniza imagens. */
+.foto-card p { padding: 14px; font-weight: bold; color: var(--marrom-escuro); } /* Estiliza legenda. */
+.dona-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; align-items: center; } /* Organiza seção da responsável. */
+.dona-foto img { width: 100%; border-radius: 18px; border: 4px solid var(--nude); box-shadow: 0 8px 18px rgba(63,45,37,.12); } /* Estiliza foto da responsável. */
+.dona-texto { background: var(--bege-card); padding: 28px; border-radius: 18px; border: 1px solid var(--nude); } /* Estiliza texto da responsável. */
+.dona-texto h2 { text-align: left; } /* Alinha título da responsável. */
+.formulario-area { max-width: 940px; } /* Define largura da área de formulário. */
+.form-box { background: var(--bege-card); padding: 28px; border-radius: 18px; border: 1px solid var(--nude); box-shadow: 0 6px 14px rgba(63,45,37,.08); } /* Estiliza caixa de formulário. */
+.agendamento-box { background: linear-gradient(180deg, #fffaf5 0%, #f8eee4 100%); } /* Dá acabamento mais formal ao formulário de agendamento. */
+.campos-duplos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } /* Organiza nome e telefone lado a lado em telas maiores. */
+.etapa-formulario { display: grid; grid-template-columns: 54px 1fr; gap: 18px; padding: 22px 0; border-bottom: 1px solid #ead6c6; } /* Divide o formulário em etapas. */
+.etapa-formulario:last-of-type { border-bottom: none; } /* Remove borda da última etapa. */
+.etapa-numero { width: 42px; height: 42px; border-radius: 50%; background: var(--marrom-principal); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; } /* Estiliza número da etapa. */
+.etapa-conteudo h3 { color: var(--marrom-escuro); margin-bottom: 4px; } /* Estiliza título da etapa. */
+.etapa-conteudo p { color: var(--texto-suave); margin-bottom: 12px; } /* Estiliza descrição da etapa. */
+label { display: block; margin-top: 14px; font-weight: bold; color: var(--marrom-escuro); } /* Estiliza rótulos. */
+input, select { width: 100%; padding: 12px; border: 1px solid var(--nude); border-radius: 10px; margin-top: 5px; background: var(--branco); color: var(--texto-base); } /* Estiliza campos. */
+input:focus, select:focus { outline: none; border-color: var(--rosa-detalhe); box-shadow: 0 0 0 3px rgba(201,135,154,.20); } /* Estiliza foco dos campos. */
+.profissionais-area, .profissionais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 14px; } /* Organiza cards de profissionais (suporta os dois nomes de classe). */
+.profissional-card { display: flex; align-items: center; gap: 12px; background: #fffdf9; color: var(--texto-base); border: 1px solid var(--nude); border-radius: 14px; padding: 12px; text-align: left; cursor: pointer; transition: .2s; } /* Estiliza card clicável de profissional. */
+.profissional-card:hover { border-color: var(--marrom-medio); background: #fff7ef; } /* Mostra interação ao passar o mouse no card. */
+.profissional-radio { width: auto; margin: 0; accent-color: var(--marrom-principal); } /* Ajusta o botão de seleção da profissional. */
+.profissional-card input { width: auto; margin: 0; accent-color: var(--marrom-principal); } /* Ajusta inputs dentro do card. */
+.profissional-card img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--nude); } /* Estiliza foto da profissional. */
+.profissional-card small { display: block; color: var(--texto-suave); margin-top: 2px; } /* Estiliza especialidade. */
+.profissional-info { display: flex; flex-direction: column; } /* Mantém compat com a área textual do card. */
+.profissional-info small { color: var(--texto-suave); font-weight: normal; } /* Estiliza especialidade nos cards. */
+.profissional-card.selecionado, .profissional-card.selecionada { border-color: var(--marrom-principal); background: #f7eadf; box-shadow: 0 0 0 3px rgba(111,79,63,.18); } /* Destaca profissional escolhida (suporta os dois nomes de classe). */
+.aviso-selecao { grid-column: 1 / -1; background: #fff7ef; border: 1px dashed var(--nude); border-radius: 12px; padding: 14px; color: var(--texto-suave); text-align: center; } /* Estiliza avisos do formulário. */
+.horarios { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 10px; } /* Organiza horários. */
+.horario { text-align: center; border-radius: 12px; padding: 12px; border: 1px solid var(--nude); background: var(--branco); cursor: pointer; } /* Estiliza cada horário e deixa claro que é clicável quando disponível. */
+.horario input { width: auto; margin-right: 5px; } /* Ajusta rádio do horário. */
+.disponivel { background: var(--verde-disponivel); border-color: var(--verde-borda); } /* Estiliza horário disponível. */
+.bloqueado { background: var(--vermelho-bloqueado); border-color: var(--vermelho-borda); color: #777; cursor: not-allowed; } /* Estiliza horário bloqueado e indica que não pode ser selecionado. */
+.agendamento-resumo { background: #fff7ef; border: 1px solid var(--nude); border-radius: 12px; padding: 14px; color: var(--texto-suave); margin-top: 18px; text-align: center; } /* Cria resumo formal antes do envio. */
+.mensagem-erro { background: #f6dddd; border: 1px solid var(--vermelho-borda); color: #7a2a2a; padding: 15px; border-radius: 12px; margin-bottom: 20px; } /* Estiliza erros. */
+.botao-finalizar { width: 100%; margin-top: 22px; font-size: 16px; padding: 15px; } /* Destaca botão final. */
+.confirmado { text-align: center; min-height: 420px; } /* Estiliza confirmação. */
+.rodape { background: var(--marrom-escuro); color: var(--branco); padding: 40px 0; } /* Estiliza rodapé. */
+.rodape-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; } /* Organiza rodapé. */
+.link-rodape { color: #f2d8cd; text-decoration: underline; } /* Estiliza link do rodapé. */
+.link-admin-discreto { color: #ccb6a8; font-size: 13px; text-decoration: underline; opacity: .75; } /* Deixa acesso administrativo discreto. */
+@media (max-width: 820px) { .topo-conteudo { display: block; text-align: center; } nav { justify-content: center; margin-top: 14px; } .hero-conteudo, .dona-grid, .rodape-grid, .etapa-formulario, .campos-duplos { grid-template-columns: 1fr; } .hero-texto h2 { font-size: 38px; } .galeria-tres-colunas, .cards-servicos, .horarios, .profissionais-area, .profissionais-grid { grid-template-columns: 1fr; } } /* Cria responsividade para celular. */
+.oculto { display: none !important; } /* Esconde elementos que só aparecem depois das escolhas obrigatórias. */
+.calendario-box, .calendario-card { background: #fffdf9; border: 1px solid var(--nude); border-radius: 18px; padding: 18px; margin-top: 14px; box-shadow: 0 6px 16px rgba(63,45,37,.08); } /* Cria a caixa principal do calendário (suporta os dois nomes de classe). */
+.calendario-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; } /* Organiza título do mês e botões de navegação. */
+.calendario-topo strong { color: var(--marrom-escuro); font-size: 20px; text-transform: capitalize; } /* Estiliza o título do mês. */
+.calendario-nav { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--nude); background: var(--bege-claro); color: var(--marrom-escuro); font-size: 24px; font-weight: bold; cursor: pointer; padding: 0; } /* Estiliza botões de mês anterior e próximo. */
+.calendario-nav:hover { background: var(--nude); } /* Mostra interação nos botões do calendário. */
+.calendario-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; } /* Cria a linha dos dias da semana. */
+.calendario-semana span { text-align: center; font-size: 12px; font-weight: bold; color: var(--marrom-medio); text-transform: uppercase; } /* Estiliza os nomes dos dias da semana. */
+.calendario-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; } /* Organiza os dias do mês em sete colunas. */
+.dia-vazio { min-height: 74px; } /* Reserva espaço antes do primeiro dia do mês. */
+.dia-calendario { min-height: 74px; border-radius: 14px; border: 1px solid var(--nude); background: #fffaf5; color: var(--texto-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: .2s; padding: 6px; } /* Estiliza cada dia do calendário. */
+.dia-calendario strong { font-size: 18px; line-height: 1; } /* Destaca o número do dia. */
+.dia-calendario small { font-size: 10px; color: var(--texto-suave); line-height: 1.1; text-align: center; } /* Mostra o status do dia. */
+.dia-disponivel, .dia-calendario.livre { background: #eef6ea; border-color: var(--verde-borda); } /* Mostra dias com horário disponível (suporta os dois nomes). */
+.dia-disponivel:hover, .dia-calendario.livre:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63,45,37,.12); } /* Dá destaque ao passar o mouse em dia disponível. */
+.dia-indisponivel, .dia-calendario.lotado { background: #f3e7de; color: #8a7468; cursor: not-allowed; opacity: .72; } /* Mostra dias sem atendimento, passados, feriados ou completos. */
+.dia-calendario.fechado { background: #eee4da; color: #9a8a80; cursor: not-allowed; opacity: .72; } /* Estiliza dia fora do funcionamento. */
+.dia-selecionado, .dia-calendario.selecionado { background: var(--marrom-principal); border-color: var(--marrom-escuro); color: var(--branco); box-shadow: 0 0 0 3px rgba(111,79,63,.22); } /* Destaca a data selecionada. */
+.dia-selecionado small, .dia-calendario.selecionado small { color: var(--bege-claro); } /* Ajusta a legenda do dia selecionado. */
+.calendario-legenda { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; color: var(--texto-suave); font-size: 13px; } /* Organiza a legenda do calendário. */
+.calendario-legenda span { display: inline-flex; align-items: center; gap: 6px; } /* Alinha cada item da legenda. */
+.calendario-legenda i, .legenda { width: 12px; height: 12px; border-radius: 50%; display: inline-block; } /* Cria os círculos coloridos da legenda. */
+.legenda-disponivel, .legenda.livre { background: var(--verde-borda); } /* Define cor da legenda disponível. */
+.legenda-indisponivel, .legenda.lotado { background: #c9aa96; } /* Define cor da legenda indisponível. */
+.legenda-selecionado { background: var(--marrom-principal); } /* Define cor da legenda selecionada. */
+.legenda.fechado { background: #d1c4ba; } /* Cor da legenda de dia fechado (compat). */
+.label-horarios { margin-top: 20px; } /* Cria espaço antes da área de horários. */
+.painel-horarios { margin-top: 20px; padding: 18px; background: var(--bege-claro); border: 1px solid var(--nude); border-radius: 16px; } /* Painel de horários usado pelos pop-ups. */
+@media (max-width: 820px) { .calendario-grade, .calendario-semana { gap: 5px; } .dia-calendario { min-height: 58px; border-radius: 10px; } .dia-calendario strong { font-size: 15px; } .dia-calendario small { display: none; } } /* Ajusta calendário para telas pequenas. */
 
-* { /* Seleciona todos os elementos da página. */
-    margin: 0; /* Remove margens padrão do navegador. */
-    padding: 0; /* Remove espaçamentos padrão do navegador. */
-    box-sizing: border-box; /* Faz largura e altura incluírem padding e borda. */
-} /* Fecha a regra geral. */
-
-html { /* Estiliza o documento principal. */
-    scroll-behavior: smooth; /* Faz a rolagem até seções ficar suave. */
-    scroll-padding-top: 115px; /* Evita que o menu fixo cubra títulos. */
-} /* Fecha a regra do html. */
-
-body { /* Estiliza o corpo inteiro do site. */
-    font-family: Arial, Helvetica, sans-serif; /* Define uma fonte simples e legível. */
-    background-color: var(--bege-principal); /* Define o fundo geral bege. */
-    color: var(--texto-base); /* Define a cor padrão do texto. */
-    line-height: 1.6; /* Melhora a leitura aumentando o espaçamento. */
-} /* Fecha a regra do body. */
-
-a { color: inherit; text-decoration: none; }
-.container { width: 90%; max-width: 1180px; margin: 0 auto; }
-.topo { background-color: var(--marrom-escuro); color: var(--branco); padding: 16px 0; box-shadow: 0 4px 18px rgba(63, 45, 37, 0.28); position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--nude); }
-.topo-conteudo { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.marca-subtitulo { font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--bege-principal); }
-.marca h1 { font-size: 30px; color: var(--branco); }
-nav { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-nav a { font-weight: bold; font-size: 15px; color: var(--bege-claro); padding: 8px 10px; border-radius: 8px; transition: 0.2s; }
-nav a:hover { background-color: var(--marrom-medio); color: var(--branco); }
-.hero { background: linear-gradient(135deg, var(--marrom-escuro), var(--marrom-principal)); color: var(--branco); padding: 88px 0; }
-.hero-conteudo { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: center; }
-.subtitulo { text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 12px; color: var(--nude); }
-.subtitulo-escuro { color: var(--marrom-medio); }
-.hero-texto h2 { font-size: 48px; margin-bottom: 16px; }
-.hero-texto p { margin-bottom: 16px; max-width: 650px; color: #fff4ec; }
-.hero-botoes { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-card { background-color: rgba(255, 250, 245, 0.12); border: 1px solid rgba(239, 224, 209, 0.45); border-radius: 18px; padding: 28px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18); }
-.hero-card h3 { margin-bottom: 12px; font-size: 24px; color: var(--bege-claro); }
-.hero-card p { margin-bottom: 8px; color: #fff7f0; }
-.botao, .botao-form, button { background-color: var(--marrom-principal); color: var(--branco); padding: 12px 22px; border-radius: 10px; border: none; display: inline-block; font-weight: bold; cursor: pointer; transition: 0.2s; }
-.botao:hover, .botao-form:hover, button:hover { background-color: var(--marrom-escuro); }
-.botao-secundario { background-color: var(--bege-claro); color: var(--marrom-escuro); padding: 12px 22px; border-radius: 10px; font-weight: bold; display: inline-block; border: 1px solid var(--nude); transition: 0.2s; }
-.botao-secundario:hover { background-color: var(--nude); }
-.secao { padding: 72px 0; }
-.secao h2 { text-align: center; color: var(--marrom-escuro); font-size: 34px; margin-bottom: 10px; }
-.texto-central { text-align: center; margin-bottom: 32px; color: var(--texto-suave); }
-.cards-servicos { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; }
-.card-servico { background-color: var(--bege-card); border: 1px solid var(--nude); border-radius: 16px; padding: 22px; box-shadow: 0 6px 14px rgba(63, 45, 37, 0.08); }
-.card-servico h3 { color: var(--marrom-principal); margin-bottom: 10px; }
-.galeria-fundo { background-color: var(--bege-claro); }
-.galeria { display: grid; gap: 20px; }
-.galeria-tres-colunas { grid-template-columns: repeat(3, 1fr); }
-.foto-card { background-color: var(--bege-card); border-radius: 16px; overflow: hidden; text-align: center; border: 1px solid var(--nude); box-shadow: 0 6px 14px rgba(63, 45, 37, 0.10); }
-.foto-card img { width: 100%; height: 360px; object-fit: cover; display: block; }
-.foto-card p { padding: 14px; font-weight: bold; color: var(--marrom-escuro); }
-.dona-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; align-items: center; }
-.dona-foto img { width: 100%; border-radius: 18px; border: 4px solid var(--nude); box-shadow: 0 8px 18px rgba(63, 45, 37, 0.12); }
-.dona-texto { background-color: var(--bege-card); padding: 28px; border-radius: 18px; border: 1px solid var(--nude); }
-.dona-texto h2 { text-align: left; }
-.formulario-area { max-width: 900px; }
-.agendamento-cabecalho { text-align: center; margin-bottom: 28px; }
-.form-box { background-color: var(--bege-card); padding: 28px; border-radius: 18px; border: 1px solid var(--nude); box-shadow: 0 6px 14px rgba(63, 45, 37, 0.08); }
-.passo-agendamento { display: flex; align-items: center; gap: 14px; padding: 18px 0 8px; border-top: 1px solid #ead8cb; margin-top: 20px; }
-.passo-agendamento:first-child { border-top: none; margin-top: 0; }
-.numero-passo { width: 36px; height: 36px; border-radius: 50%; background-color: var(--marrom-principal); color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: bold; }
-.passo-agendamento h3 { color: var(--marrom-escuro); margin-bottom: 2px; }
-.passo-agendamento p { color: var(--texto-suave); font-size: 14px; }
-label { display: block; margin-top: 14px; font-weight: bold; color: var(--marrom-escuro); }
-input, select { width: 100%; padding: 12px; border: 1px solid var(--nude); border-radius: 10px; margin-top: 5px; background-color: var(--branco); color: var(--texto-base); }
-input:focus, select:focus { outline: none; border-color: var(--rosa-detalhe); box-shadow: 0 0 0 3px rgba(201, 135, 154, 0.20); }
-.bloco-profissionais { margin-top: 18px; padding: 18px; border: 1px solid var(--nude); border-radius: 16px; background-color: #fff8f2; }
-.bloco-profissionais h4 { color: var(--marrom-escuro); margin-bottom: 6px; }
-.mensagem-ajuda { color: var(--texto-suave); font-size: 14px; margin-bottom: 12px; }
-.profissionais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 12px; }
-.profissional-card { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--nude); border-radius: 16px; background-color: var(--branco); cursor: pointer; transition: 0.2s; }
-.profissional-card.selecionada { border-color: var(--marrom-principal); background-color: #f3e4d6; box-shadow: 0 6px 16px rgba(63, 45, 37, 0.14); }
-.profissional-card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(63, 45, 37, 0.10); }
-.profissional-card input { width: auto; margin: 0; }
-.profissional-card img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2px solid var(--nude); }
-.profissional-info { display: flex; flex-direction: column; }
-.profissional-info small { color: var(--texto-suave); font-weight: normal; }
-.horarios { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 10px; }
-.horario { text-align: center; border-radius: 12px; padding: 12px; border: 1px solid var(--nude); background-color: var(--branco); }
-.horario input { width: auto; margin-right: 5px; }
-.disponivel { background-color: var(--verde-disponivel); border-color: var(--verde-borda); }
-.bloqueado { background-color: var(--vermelho-bloqueado); border-color: var(--vermelho-borda); color: #777; }
-.mensagem-erro { background-color: #f6dddd; border: 1px solid var(--vermelho-borda); color: #7a2a2a; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-.confirmado { text-align: center; min-height: 420px; }
-.rodape { background-color: var(--marrom-escuro); color: var(--branco); padding: 40px 0; }
-.rodape-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
-.link-rodape { color: var(--rosa-claro); text-decoration: underline; }
-.chamada-final-conteudo { text-align: center; }
-.botao-destaque { display: inline-block; background-color: var(--marrom-principal); color: var(--branco); padding: 16px 40px; border-radius: 12px; font-weight: bold; text-decoration: none; border: none; cursor: pointer; margin-top: 8px; }
-.botao-destaque:hover { background-color: var(--marrom-escuro); }
-.botao-finalizar { width: 100%; margin-top: 24px; font-size: 16px; }
-@media (max-width: 820px) {
-    .topo-conteudo { display: block; text-align: center; }
-    nav { justify-content: center; margin-top: 14px; }
-    nav a { margin: 4px; }
-    .hero-conteudo, .dona-grid, .rodape-grid { grid-template-columns: 1fr; }
-    .hero-texto h2 { font-size: 38px; }
-    .galeria-tres-colunas, .cards-servicos, .horarios, .profissionais-grid { grid-template-columns: 1fr; }
-}
-.oculto { display: none !important; }
-.calendario-card { background-color: var(--branco); border: 1px solid var(--nude); border-radius: 18px; padding: 18px; margin-top: 14px; box-shadow: 0 6px 14px rgba(63, 45, 37, 0.08); }
-.calendario-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.calendario-topo strong { color: var(--marrom-escuro); font-size: 20px; }
-.calendario-nav { width: 42px; height: 42px; border-radius: 50%; padding: 0; font-size: 26px; background-color: var(--marrom-principal); }
-.calendario-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; color: var(--texto-suave); font-size: 13px; font-weight: bold; text-align: center; }
-.calendario-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-.dia-vazio { min-height: 74px; }
-.dia-calendario { min-height: 74px; padding: 8px; border-radius: 14px; border: 1px solid var(--nude); background-color: var(--bege-card); color: var(--texto-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
-.dia-calendario strong { font-size: 18px; }
-.dia-calendario small { font-size: 11px; line-height: 1.2; }
-.dia-calendario.livre { background-color: var(--verde-disponivel); border-color: var(--verde-borda); }
-.dia-calendario.livre:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63, 45, 37, 0.12); }
-.dia-calendario.lotado { background-color: var(--vermelho-bloqueado); border-color: var(--vermelho-borda); color: #777; cursor: not-allowed; }
-.dia-calendario.fechado { background-color: #eee4da; color: #9a8a80; cursor: not-allowed; }
-.dia-calendario.selecionado { outline: 3px solid var(--marrom-principal); background-color: var(--nude); }
-.calendario-aviso { grid-column: 1 / -1; text-align: center; padding: 24px; background-color: var(--bege-claro); border-radius: 14px; color: var(--texto-suave); }
-.calendario-legenda { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 13px; color: var(--texto-suave); }
-.legenda { width: 13px; height: 13px; border-radius: 4px; display: inline-block; margin-right: 5px; vertical-align: middle; }
-.legenda.livre { background-color: var(--verde-disponivel); border: 1px solid var(--verde-borda); }
-.legenda.lotado { background-color: var(--vermelho-bloqueado); border: 1px solid var(--vermelho-borda); }
-.legenda.fechado { background-color: #eee4da; border: 1px solid #d1c4ba; }
-.painel-horarios { margin-top: 20px; padding: 18px; background-color: var(--bege-claro); border: 1px solid var(--nude); border-radius: 16px; }
-@media (max-width: 820px) {
-    .calendario-grade, .calendario-semana { grid-template-columns: repeat(7, 1fr); gap: 4px; }
-    .dia-calendario { min-height: 58px; padding: 5px; }
-    .dia-calendario strong { font-size: 15px; }
-    .dia-calendario small { display: none; }
-}
-
-.modal-fundo { position: fixed; inset: 0; background-color: rgba(45, 26, 18, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; overflow-y: auto; }
-.modal-caixa { background-color: var(--bege-card); border: 1px solid var(--nude); border-radius: 18px; padding: 26px; width: 100%; max-width: 520px; box-shadow: 0 12px 28px rgba(63, 45, 37, 0.25); max-height: 90vh; overflow-y: auto; }
-.modal-caixa-grande { max-width: 680px; }
-.modal-cabecalho { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
-.modal-cabecalho h3 { color: var(--marrom-escuro); margin-bottom: 2px; }
-.modal-cabecalho p { color: var(--texto-suave); font-size: 14px; margin: 0; }
-.modal-acoes { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
-.modal-acoes .botao-form { flex: 1 1 160px; margin-top: 0; }
-.botao-secundario { background-color: var(--bege-claro); color: var(--marrom-escuro); border: 1px solid var(--nude); }
-.botao-secundario:hover { background-color: var(--nude); }
-.erro-modal { color: #a23737; background-color: #fbeaea; border: 1px solid #e6c2c2; padding: 8px 12px; border-radius: 10px; margin-top: 12px; font-size: 14px; }
-.resumo-escolhas { margin-top: 22px; padding: 16px 18px; background-color: var(--bege-claro); border: 1px solid var(--nude); border-radius: 14px; }
-.resumo-escolhas h4 { color: var(--marrom-escuro); margin-bottom: 8px; }
-.resumo-escolhas ul { list-style: none; padding: 0; margin: 0; }
-.resumo-escolhas li { padding: 4px 0; color: var(--texto-suave); }
-.resumo-escolhas li strong { color: var(--marrom-escuro); }
-body.com-modal { overflow: hidden; }
-@media (max-width: 520px) {
-    .modal-caixa { padding: 20px; }
-    .modal-acoes .botao-form { flex: 1 1 100%; }
-}
+/* ===================== POP-UPS DO AGENDAMENTO ===================== */
+.modal-fundo { position: fixed; inset: 0; background-color: rgba(45, 26, 18, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; overflow-y: auto; } /* Fundo escuro do pop-up. */
+.modal-caixa { background-color: var(--bege-card); border: 1px solid var(--nude); border-radius: 18px; padding: 26px; width: 100%; max-width: 520px; box-shadow: 0 12px 28px rgba(63, 45, 37, 0.25); max-height: 90vh; overflow-y: auto; } /* Caixa branca do pop-up. */
+.modal-caixa-grande { max-width: 680px; } /* Modal mais largo para o calendário. */
+.modal-cabecalho { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; } /* Cabeçalho de cada modal. */
+.modal-cabecalho h3 { color: var(--marrom-escuro); margin-bottom: 2px; } /* Título do modal. */
+.modal-cabecalho p { color: var(--texto-suave); font-size: 14px; margin: 0; } /* Texto do modal. */
+.modal-acoes { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; } /* Barra de botões do modal. */
+.modal-acoes .botao-form { flex: 1 1 160px; margin-top: 0; } /* Botões do modal ocupam espaço igual. */
+.erro-modal { color: #a23737; background-color: #fbeaea; border: 1px solid #e6c2c2; padding: 8px 12px; border-radius: 10px; margin-top: 12px; font-size: 14px; } /* Mensagem de erro dentro do modal. */
+.resumo-escolhas { margin-top: 22px; padding: 16px 18px; background-color: var(--bege-claro); border: 1px solid var(--nude); border-radius: 14px; } /* Resumo das escolhas na página principal. */
+.resumo-escolhas h4 { color: var(--marrom-escuro); margin-bottom: 8px; } /* Título do resumo. */
+.resumo-escolhas ul { list-style: none; padding: 0; margin: 0; } /* Lista do resumo. */
+.resumo-escolhas li { padding: 4px 0; color: var(--texto-suave); } /* Itens do resumo. */
+.resumo-escolhas li strong { color: var(--marrom-escuro); } /* Rótulos do resumo. */
+body.com-modal { overflow: hidden; } /* Trava a rolagem quando há modal aberto. */
+.passo-agendamento { display: flex; align-items: center; gap: 14px; padding: 18px 0 8px; border-top: 1px solid #ead8cb; margin-top: 20px; } /* Estilo legado: passo numerado na página de agendamento. */
+.passo-agendamento:first-child { border-top: none; margin-top: 0; } /* Remove borda do primeiro passo. */
+.passo-agendamento h3 { color: var(--marrom-escuro); margin-bottom: 2px; } /* Título do passo. */
+.passo-agendamento p { color: var(--texto-suave); font-size: 14px; } /* Texto do passo. */
+.numero-passo { width: 36px; height: 36px; border-radius: 50%; background-color: var(--marrom-principal); color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; } /* Círculo numerado dos passos. */
+.bloco-profissionais { margin-top: 18px; padding: 18px; border: 1px solid var(--nude); border-radius: 16px; background-color: #fff8f2; } /* Bloco que segura a grade de profissionais. */
+.bloco-profissionais h4 { color: var(--marrom-escuro); margin-bottom: 6px; } /* Título do bloco de profissionais. */
+.mensagem-ajuda { color: var(--texto-suave); font-size: 14px; margin-bottom: 12px; } /* Mensagens de orientação. */
+.calendario-aviso { grid-column: 1 / -1; text-align: center; padding: 24px; background-color: var(--bege-claro); border-radius: 14px; color: var(--texto-suave); } /* Aviso dentro da grade do calendário. */
+@media (max-width: 520px) { .modal-caixa { padding: 20px; } .modal-acoes .botao-form { flex: 1 1 100%; } } /* Ajusta modais em telas pequenas. */
