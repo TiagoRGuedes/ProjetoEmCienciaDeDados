@@ -435,23 +435,52 @@ input:focus, select:focus { /* Estiliza campos focados. */
 
 .horarios { /* Organiza horários no formulário. */
     display: grid; /* Usa grade. */
-    grid-template-columns: repeat(5, 1fr); /* Cria cinco colunas. */
-    gap: 12px; /* Cria espaço entre horários. */
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); /* Cria colunas que se ajustam à largura do modal sem estourar. */
+    gap: 10px; /* Cria espaço entre horários. */
     margin-top: 10px; /* Cria espaço acima. */
 } /* Fecha horários. */
 
 .horario { /* Estiliza cada opção de horário. */
+    display: flex; /* Usa flexbox para alinhar radio, hora e status. */
+    flex-direction: column; /* Empilha os elementos verticalmente. */
+    align-items: center; /* Centraliza horizontalmente. */
+    justify-content: center; /* Centraliza verticalmente. */
+    gap: 4px; /* Pequeno espaço entre radio e textos. */
     text-align: center; /* Centraliza conteúdo. */
     border-radius: 12px; /* Arredonda cantos. */
-    padding: 12px; /* Cria espaço interno. */
+    padding: 10px 8px; /* Cria espaço interno equilibrado. */
     border: 1px solid var(--nude); /* Usa borda nude. */
     background-color: var(--branco); /* Usa fundo branco. */
+    font-size: 14px; /* Reduz um pouco a fonte para caber melhor no modal. */
+    line-height: 1.3; /* Compacta o texto. */
+    cursor: pointer; /* Mostra que o card é clicável. */
+    min-width: 0; /* Permite encolher dentro do grid sem estourar. */
 } /* Fecha horário. */
+
+.horario:hover { /* Adiciona feedback ao passar o mouse no horário disponível. */
+    border-color: var(--marrom-medio); /* Destaca a borda. */
+} /* Fecha hover. */
+
+.horario.bloqueado:hover { /* Remove o destaque quando o horário está bloqueado. */
+    border-color: var(--vermelho-borda); /* Mantém a borda original. */
+} /* Fecha hover bloqueado. */
 
 .horario input { /* Estiliza radio do horário. */
     width: auto; /* Evita ocupar largura toda. */
-    margin-right: 5px; /* Cria espaço entre radio e texto. */
+    margin: 0; /* Remove margem extra. */
+    accent-color: var(--marrom-principal); /* Pinta o radio com a cor do tema. */
 } /* Fecha radio do horário. */
+
+.horario span { /* Estiliza o texto "Disponível"/"Indisponível" dentro do card. */
+    font-size: 11px; /* Reduz o tamanho do status. */
+    color: var(--texto-suave); /* Usa cor suave para o status. */
+    text-transform: uppercase; /* Deixa em maiúsculas para diferenciar da hora. */
+    letter-spacing: .5px; /* Separa um pouco as letras. */
+} /* Fecha texto do status. */
+
+.horario br { /* Esconde quebra de linha que vinha do HTML antigo, agora usamos flex. */
+    display: none; /* Remove a quebra de linha indesejada. */
+} /* Fecha regra do br. */
 
 .disponivel { /* Estiliza horário disponível. */
     background-color: var(--verde-disponivel); /* Usa fundo verde claro. */
@@ -528,7 +557,7 @@ input:focus, select:focus { /* Estiliza campos focados. */
     nav a { margin: 4px; } /* Reduz espaçamento dos links. */
     .hero-conteudo, .dona-grid, .rodape-grid { grid-template-columns: 1fr; } /* Coloca seções em uma coluna. */
     .hero-texto h2 { font-size: 38px; } /* Reduz título do hero. */
-    .galeria-tres-colunas, .cards-servicos, .horarios, .profissionais-grid { grid-template-columns: 1fr; } /* Coloca grades em uma coluna. */
+    .galeria-tres-colunas, .cards-servicos, .profissionais-grid { grid-template-columns: 1fr; } /* Coloca grades em uma coluna. */
 } /* Fecha o bloco responsivo. */
 
 .oculto { /* Cria uma classe utilitária para esconder elementos da tela. */
