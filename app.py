@@ -448,6 +448,80 @@ def logout():
     # Volta para a tela de login.
 
 
+@admin.route('/agenda')
+# Cria a rota da agenda do admin com fluxo de pop-ups (profissional, calendário, lista de horários).
+def agenda():
+    # Define a função que mostra a agenda das profissionais.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login quando não há sessão.
+    profissionais = buscar_profissionais(False)
+    # Busca todas as profissionais (inclusive inativas) para o admin escolher.
+    return render_template('admin/agenda.html', profissionais=profissionais, empresa=EMPRESA)
+    # Renderiza a página de agenda do admin.
+
+
+@admin.route('/agenda/dia')
+# Cria a rota JSON que devolve os horários do dia com dados completos do agendamento.
+def agenda_dia():
+    # Define a função usada pelo JavaScript da agenda para listar horários do dia.
+    if not esta_logado():
+        # Bloqueia consultas sem login válido.
+        return jsonify({'erro': 'nao_autenticado'}), 401
+        # Devolve 401 quando o admin não está autenticado.
+    data_texto = request.args.get('data', '').strip()
+    # Recebe a data escolhida no calendário.
+    profissional_id = request.args.get('profissional_id', '').strip()
+    # Recebe o id da profissional escolhida.
+    if not data_texto or not profissional_id:
+        # Garante que ambos os parâmetros foram informados.
+        return jsonify({'data': data_texto, 'horarios': []})
+        # Retorna lista vazia quando algo importante está faltando.
+    aberto = dia_funciona(data_texto)
+    # Verifica se o dia escolhido tem funcionamento.
+    db = get_db()
+    # Abre a conexão com o banco.
+    sql = '''SELECT a.id, a.horario, a.status,
+                    c.nome AS cliente_nome, c.telefone,
+                    s.nome AS servico_nome, s.preco, s.duracao_min
+             FROM agendamentos a
+             JOIN clientes c ON c.id = a.cliente_id
+             JOIN servicos s ON s.id = a.servico_id
+             WHERE a.data = ? AND a.profissional_id = ? AND a.status != ?'''
+    # Busca agendamentos do dia para a profissional, ignorando cancelados.
+    linhas = db.execute(sql, (data_texto, profissional_id, 'cancelado')).fetchall()
+    # Executa a consulta e guarda as linhas encontradas.
+    ocupados = {linha['horario']: linha for linha in linhas}
+    # Cria um dicionário pelo horário para localizar o agendamento de cada slot.
+    bloqueios = buscar_bloqueios(data_texto, profissional_id)
+    # Carrega bloqueios manuais para mostrar slots marcados como folga.
+    resposta = []
+    # Cria lista para devolver no formato JSON.
+    for horario in HORARIOS:
+        # Percorre todos os horários padrão do dia.
+        ocupado = ocupados.get(horario)
+        # Pega o agendamento daquele horário, se existir.
+        slot = {'horario': horario, 'aberto': aberto, 'bloqueado': horario in bloqueios, 'agendamento': None}
+        # Cria o slot base com informações de funcionamento e bloqueio.
+        if ocupado:
+            # Verifica se há agendamento naquele horário.
+            slot['agendamento'] = {
+                'id': ocupado['id'],
+                'cliente_nome': ocupado['cliente_nome'],
+                'telefone': ocupado['telefone'],
+                'servico_nome': ocupado['servico_nome'],
+                'preco': float(ocupado['preco']),
+                'duracao_min': ocupado['duracao_min'],
+                'status': ocupado['status'],
+            }
+            # Adiciona os dados completos do agendamento ao slot.
+        resposta.append(slot)
+        # Inclui o slot na resposta.
+    return jsonify({'data': data_texto, 'aberto': aberto, 'horarios': resposta})
+    # Retorna a agenda do dia em JSON.
+
+
 @admin.route('/dashboard')
 # Cria a rota do dashboard administrativo.
 def dashboard():

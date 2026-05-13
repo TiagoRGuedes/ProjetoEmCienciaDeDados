@@ -1,0 +1,335 @@
+{% extends "admin/_base.html" %} {# Usa o layout administrativo padrão. #}
+{% block title %}Agenda das profissionais{% endblock %} {# Define o título da aba. #}
+{% block content %} {# Inicia o conteúdo do painel administrativo. #}
+<section class="painel-secao"> <!-- Cria a seção principal da agenda. -->
+    <div class="painel-cabecalho"> <!-- Cabeçalho da página. -->
+        <h2>Agenda das profissionais</h2> <!-- Título da seção. -->
+        <p>Escolha uma profissional e uma data para ver os horários do dia com cliente, telefone e serviço.</p> <!-- Texto de apoio explicando o fluxo. -->
+    </div> <!-- Fecha o cabeçalho. -->
+
+    <div class="card-admin"> <!-- Cria o cartão principal. -->
+        <div class="resumo-escolhas-admin" id="resumo-escolhas-admin"> <!-- Mostra resumo das escolhas atuais. -->
+            <div class="resumo-item"> <!-- Item de profissional. -->
+                <span class="resumo-label">Profissional</span> <!-- Rótulo. -->
+                <strong id="resumo-profissional">—</strong> <!-- Nome da profissional escolhida. -->
+            </div> <!-- Fecha item profissional. -->
+            <div class="resumo-item"> <!-- Item de data. -->
+                <span class="resumo-label">Data</span> <!-- Rótulo. -->
+                <strong id="resumo-data">—</strong> <!-- Data escolhida. -->
+            </div> <!-- Fecha item data. -->
+        </div> <!-- Fecha resumo. -->
+
+        <div class="acoes-agenda"> <!-- Área dos botões principais. -->
+            <button type="button" class="botao-form" id="botao-iniciar-agenda">Escolher profissional e data</button> <!-- Botão que dispara o fluxo de pop-ups. -->
+            <button type="button" class="botao-form botao-secundario oculto" id="botao-trocar-data">Trocar data</button> <!-- Botão para abrir só o calendário novamente. -->
+        </div> <!-- Fecha botões. -->
+
+        <div class="painel-horarios-admin oculto" id="painel-horarios-admin"> <!-- Área que mostra a lista de horários do dia. -->
+            <h3>Horários em <span id="texto-data-escolhida">—</span></h3> <!-- Título com a data formatada. -->
+            <p class="texto-suave" id="texto-resumo-agenda">Selecione uma profissional e uma data para ver os atendimentos.</p> <!-- Texto explicativo. -->
+            <ul class="lista-horarios-admin" id="lista-horarios-admin"></ul> <!-- Lista onde os horários serão montados pelo JS. -->
+        </div> <!-- Fecha a área de horários. -->
+    </div> <!-- Fecha o cartão principal. -->
+</section> <!-- Fecha a seção. -->
+
+<!-- ===================== MODAIS ===================== -->
+
+<div class="modal-fundo oculto" id="modal-profissional-admin" aria-hidden="true"> <!-- Pop-up de escolha de profissional. -->
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-profissional-admin"> <!-- Caixa do modal. -->
+        <div class="modal-cabecalho"> <!-- Cabeçalho do modal. -->
+            <span class="numero-passo">1</span> <!-- Número do passo. -->
+            <div> <!-- Área textual. -->
+                <h3 id="titulo-modal-profissional-admin">Escolha a profissional</h3> <!-- Título do modal. -->
+                <p>Selecione a profissional para abrir a agenda dela.</p> <!-- Texto de apoio. -->
+            </div> <!-- Fecha área textual. -->
+        </div> <!-- Fecha cabeçalho. -->
+
+        <div class="profissionais-grid" id="grid-profissionais-admin"> <!-- Grade de profissionais. -->
+            {% for p in profissionais %} {# Percorre profissionais do banco. #}
+            <label class="profissional-card" data-profissional-id="{{ p.id }}" data-nome="{{ p.nome }}"> <!-- Card clicável. -->
+                <input type="radio" name="profissional_admin" value="{{ p.id }}"> <!-- Radio com o id da profissional. -->
+                <img src="{{ url_for('static', filename='img/' + p.foto) }}" alt="{{ p.nome }}"> <!-- Foto da profissional. -->
+                <span class="profissional-info"> <!-- Área textual do card. -->
+                    <strong>{{ p.nome }}</strong> <!-- Nome da profissional. -->
+                    <small>{{ p.especialidade }}{% if not p.ativo %} · inativa{% endif %}</small> <!-- Especialidade e estado. -->
+                </span> <!-- Fecha área textual. -->
+            </label> <!-- Fecha card. -->
+            {% endfor %} {# Finaliza o loop. #}
+        </div> <!-- Fecha grade. -->
+
+        <p class="erro-modal oculto" id="erro-modal-profissional-admin">Selecione uma profissional para continuar.</p> <!-- Mensagem de erro. -->
+
+        <div class="modal-acoes"> <!-- Barra de botões. -->
+            <button type="button" class="botao-form botao-secundario" data-fechar-modal="modal-profissional-admin">Cancelar</button> <!-- Botão cancelar. -->
+            <button type="button" class="botao-form" id="botao-confirmar-profissional-admin">Continuar</button> <!-- Botão continuar. -->
+        </div> <!-- Fecha botões. -->
+    </div> <!-- Fecha caixa. -->
+</div> <!-- Fecha modal profissional. -->
+
+<div class="modal-fundo oculto" id="modal-data-admin" aria-hidden="true"> <!-- Pop-up do calendário. -->
+    <div class="modal-caixa modal-caixa-grande" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-data-admin"> <!-- Caixa maior para caber o calendário. -->
+        <div class="modal-cabecalho"> <!-- Cabeçalho do modal. -->
+            <span class="numero-passo">2</span> <!-- Número do passo. -->
+            <div> <!-- Área textual. -->
+                <h3 id="titulo-modal-data-admin">Escolha a data</h3> <!-- Título. -->
+                <p>Clique em um dia para ver os horários e os agendamentos da profissional.</p> <!-- Texto de apoio. -->
+            </div> <!-- Fecha área textual. -->
+        </div> <!-- Fecha cabeçalho. -->
+
+        <div class="calendario-card"> <!-- Cartão do calendário. -->
+            <div class="calendario-topo"> <!-- Topo com navegação. -->
+                <button type="button" class="calendario-nav" id="mes-anterior-admin">‹</button> <!-- Voltar mês. -->
+                <strong id="calendario-titulo-admin">Carregando...</strong> <!-- Mês atual. -->
+                <button type="button" class="calendario-nav" id="mes-proximo-admin">›</button> <!-- Avançar mês. -->
+            </div> <!-- Fecha topo. -->
+            <div class="calendario-semana"> <!-- Linha dos dias da semana. -->
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div> <!-- Fecha linha. -->
+            <div class="calendario-grade" id="calendario-grade-admin"></div> <!-- Grade dos dias. -->
+            <div class="calendario-legenda"> <!-- Legenda. -->
+                <span><i class="legenda livre"></i> Tem agendamentos</span> <!-- Dias com agendamentos. -->
+                <span><i class="legenda lotado"></i> Sem agendamentos</span> <!-- Dias sem agendamentos. -->
+                <span><i class="legenda fechado"></i> Fechado</span> <!-- Dia fora do funcionamento. -->
+            </div> <!-- Fecha legenda. -->
+        </div> <!-- Fecha cartão. -->
+
+        <div class="modal-acoes"> <!-- Barra de botões. -->
+            <button type="button" class="botao-form botao-secundario" data-voltar-modal="modal-profissional-admin">Voltar</button> <!-- Voltar passo. -->
+            <button type="button" class="botao-form botao-secundario" data-fechar-modal="modal-data-admin">Fechar</button> <!-- Fechar modal. -->
+        </div> <!-- Fecha botões. -->
+    </div> <!-- Fecha caixa. -->
+</div> <!-- Fecha modal data. -->
+
+<script> // Abre o JavaScript que controla os pop-ups da agenda do admin.
+const mesesAdmin = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']; // Nome dos meses em português.
+const diasSemanaAdmin = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado']; // Nome dos dias da semana.
+
+// Elementos principais. //
+const botaoIniciarAgenda = document.getElementById('botao-iniciar-agenda'); // Botão de iniciar o fluxo.
+const botaoTrocarData = document.getElementById('botao-trocar-data'); // Botão para abrir só o calendário novamente.
+const gradeProfissionaisAdmin = document.getElementById('grid-profissionais-admin'); // Grade de profissionais.
+const erroModalProfissionalAdmin = document.getElementById('erro-modal-profissional-admin'); // Mensagem de erro do modal de profissional.
+
+// Calendário do admin. //
+const tituloCalendarioAdmin = document.getElementById('calendario-titulo-admin'); // Título do mês.
+const gradeCalendarioAdmin = document.getElementById('calendario-grade-admin'); // Grade dos dias.
+const botaoMesAnteriorAdmin = document.getElementById('mes-anterior-admin'); // Botão mês anterior.
+const botaoMesProximoAdmin = document.getElementById('mes-proximo-admin'); // Botão mês próximo.
+
+// Resumo e lista de horários. //
+const resumoProfissional = document.getElementById('resumo-profissional'); // Texto do resumo (profissional).
+const resumoData = document.getElementById('resumo-data'); // Texto do resumo (data).
+const painelHorariosAdmin = document.getElementById('painel-horarios-admin'); // Área dos horários.
+const listaHorariosAdmin = document.getElementById('lista-horarios-admin'); // Lista UL onde montamos os horários.
+const textoDataEscolhida = document.getElementById('texto-data-escolhida'); // Texto da data formatada.
+const textoResumoAgenda = document.getElementById('texto-resumo-agenda'); // Texto resumo dentro do painel.
+
+let profissionalSelecionada = { id: '', nome: '' }; // Guarda profissional escolhida.
+let dataSelecionada = ''; // Guarda data escolhida (formato AAAA-MM-DD).
+let hojeAdmin = new Date(); // Pega a data de hoje.
+let anoAdmin = hojeAdmin.getFullYear(); // Ano atual exibido no calendário.
+let mesAdmin = hojeAdmin.getMonth(); // Mês atual exibido no calendário (0..11).
+
+function abrirModalAdmin(id) { // Função para abrir um modal.
+    document.querySelectorAll('.modal-fundo').forEach(m => m.classList.add('oculto')); // Fecha outros modais antes.
+    const modal = document.getElementById(id); // Busca o modal pelo id.
+    modal.classList.remove('oculto'); // Mostra o modal.
+    modal.setAttribute('aria-hidden', 'false'); // Marca como visível para leitores de tela.
+    document.body.classList.add('com-modal'); // Trava a rolagem do body.
+}
+
+function fecharModalAdmin(id) { // Função para fechar um modal.
+    const modal = document.getElementById(id); // Busca o modal.
+    modal.classList.add('oculto'); // Esconde o modal.
+    modal.setAttribute('aria-hidden', 'true'); // Marca como invisível.
+    if (!document.querySelector('.modal-fundo:not(.oculto)')) { // Verifica se nenhum modal está aberto.
+        document.body.classList.remove('com-modal'); // Libera a rolagem.
+    }
+}
+
+function formatarDataBR(dataISO) { // Converte AAAA-MM-DD em DD/MM/AAAA.
+    if (!dataISO) return '—';
+    const partes = dataISO.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function diaSemanaTexto(dataISO) { // Retorna o nome do dia da semana.
+    const [a, m, d] = dataISO.split('-').map(Number);
+    const data = new Date(a, m - 1, d);
+    return diasSemanaAdmin[data.getDay()];
+}
+
+function atualizarResumoAdmin() { // Atualiza os textos de resumo.
+    resumoProfissional.textContent = profissionalSelecionada.nome || '—';
+    resumoData.textContent = dataSelecionada ? formatarDataBR(dataSelecionada) : '—';
+    botaoTrocarData.classList.toggle('oculto', !profissionalSelecionada.id);
+}
+
+async function carregarCalendarioAdmin() { // Carrega o calendário do admin para a profissional escolhida.
+    tituloCalendarioAdmin.textContent = `${mesesAdmin[mesAdmin]} de ${anoAdmin}`; // Atualiza o título do mês.
+    gradeCalendarioAdmin.innerHTML = ''; // Limpa a grade.
+    if (!profissionalSelecionada.id) { // Sem profissional não dá para mostrar.
+        gradeCalendarioAdmin.innerHTML = '<div class="calendario-aviso">Selecione uma profissional antes.</div>';
+        return;
+    }
+    const resposta = await fetch(`/disponibilidade-mes?ano=${anoAdmin}&mes=${mesAdmin + 1}&profissional_id=${profissionalSelecionada.id}`);
+    const dados = await resposta.json();
+    const primeiroDia = new Date(anoAdmin, mesAdmin, 1).getDay();
+    const ultimoDia = new Date(anoAdmin, mesAdmin + 1, 0).getDate();
+    for (let vazio = 0; vazio < primeiroDia; vazio++) {
+        const espaco = document.createElement('div');
+        espaco.className = 'dia-vazio';
+        gradeCalendarioAdmin.appendChild(espaco);
+    }
+    for (let dia = 1; dia <= ultimoDia; dia++) { // Percorre os dias do mês.
+        const dataISO = `${anoAdmin}-${String(mesAdmin + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        const info = dados[dataISO];
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = 'dia-calendario';
+        const totalHorarios = info ? info.total : 10;
+        const livres = info ? info.livres : 0;
+        const ocupados = info && info.aberto ? Math.max(totalHorarios - livres, 0) : 0;
+        const aberto = info && info.aberto;
+        const status = aberto ? (ocupados > 0 ? `${ocupados} agend.` : 'Sem agend.') : 'Fechado';
+        botao.innerHTML = `<strong>${dia}</strong><small>${status}</small>`;
+        if (!aberto) {
+            botao.classList.add('fechado');
+            botao.disabled = true;
+        } else if (ocupados > 0) {
+            botao.classList.add('livre'); // Reaproveita a cor verde para indicar "tem agendamentos".
+        } else {
+            botao.classList.add('lotado'); // Reaproveita a cor vermelha clara para indicar "sem agendamentos".
+        }
+        if (aberto) {
+            botao.addEventListener('click', () => selecionarDataAdmin(dataISO));
+        }
+        if (dataISO === dataSelecionada) {
+            botao.classList.add('selecionado');
+        }
+        gradeCalendarioAdmin.appendChild(botao);
+    }
+}
+
+async function selecionarDataAdmin(dataISO) { // Carrega os horários do dia escolhido.
+    dataSelecionada = dataISO;
+    atualizarResumoAdmin();
+    await carregarCalendarioAdmin();
+    await carregarHorariosDia();
+    fecharModalAdmin('modal-data-admin');
+    painelHorariosAdmin.classList.remove('oculto');
+}
+
+async function carregarHorariosDia() { // Busca os horários do dia com dados completos.
+    listaHorariosAdmin.innerHTML = '<li class="horario-linha texto-suave">Carregando agenda...</li>';
+    textoDataEscolhida.textContent = formatarDataBR(dataSelecionada);
+    const resposta = await fetch(`{{ url_for('admin.agenda_dia') }}?data=${dataSelecionada}&profissional_id=${profissionalSelecionada.id}`);
+    if (resposta.status === 401) {
+        listaHorariosAdmin.innerHTML = '<li class="horario-linha texto-suave">Sessão expirada. Faça login novamente.</li>';
+        return;
+    }
+    const dados = await resposta.json();
+    listaHorariosAdmin.innerHTML = ''; // Limpa antes de montar.
+    if (!dados.aberto) { // Dia fechado.
+        textoResumoAgenda.textContent = `${diaSemanaTexto(dataSelecionada)} — dia fora do funcionamento.`;
+        listaHorariosAdmin.innerHTML = '<li class="horario-linha texto-suave">A loja não atende neste dia.</li>';
+        return;
+    }
+    const totalAgendados = (dados.horarios || []).filter(s => s.agendamento).length;
+    textoResumoAgenda.textContent = `${diaSemanaTexto(dataSelecionada)} — ${totalAgendados} agendamento(s) para ${profissionalSelecionada.nome}.`;
+    dados.horarios.forEach(slot => { // Monta cada slot.
+        const item = document.createElement('li');
+        item.className = 'horario-linha';
+        const hora = `<span class="horario-hora">${slot.horario}</span>`;
+        if (slot.agendamento) {
+            const ag = slot.agendamento;
+            const precoFormatado = ag.preco.toFixed(2).replace('.', ',');
+            const statusBadge = `<span class="status-badge status-${ag.status}">${ag.status}</span>`;
+            const urlEditar = `{{ url_for('admin.agendamento_editar', id=0) }}`.replace(/0$/, ag.id);
+            item.classList.add('horario-ocupado');
+            item.innerHTML = `${hora}
+                <div class="horario-detalhe">
+                    <div class="horario-cliente"><strong>${ag.cliente_nome}</strong> · <span>${ag.telefone}</span></div>
+                    <div class="horario-servico">${ag.servico_nome} · R$ ${precoFormatado} · ${ag.duracao_min} min</div>
+                </div>
+                <div class="horario-acoes">${statusBadge}<a class="link-detalhe" href="${urlEditar}">editar</a></div>`;
+        } else if (slot.bloqueado) {
+            item.classList.add('horario-bloqueado');
+            item.innerHTML = `${hora}
+                <div class="horario-detalhe"><div class="horario-cliente texto-suave">Horário bloqueado pelo admin</div></div>
+                <div class="horario-acoes"><span class="status-badge status-bloqueado">bloqueio</span></div>`;
+        } else {
+            item.classList.add('horario-livre');
+            item.innerHTML = `${hora}
+                <div class="horario-detalhe"><div class="horario-cliente texto-suave">Disponível</div></div>
+                <div class="horario-acoes"><span class="status-badge status-livre">livre</span></div>`;
+        }
+        listaHorariosAdmin.appendChild(item);
+    });
+}
+
+// ============== EVENTOS ============== //
+
+botaoIniciarAgenda.addEventListener('click', () => abrirModalAdmin('modal-profissional-admin'));
+
+botaoTrocarData.addEventListener('click', () => {
+    if (!profissionalSelecionada.id) {
+        abrirModalAdmin('modal-profissional-admin');
+        return;
+    }
+    abrirModalAdmin('modal-data-admin');
+    carregarCalendarioAdmin();
+});
+
+document.querySelectorAll('[data-fechar-modal]').forEach(b => {
+    b.addEventListener('click', () => fecharModalAdmin(b.dataset.fecharModal));
+});
+
+document.querySelectorAll('[data-voltar-modal]').forEach(b => {
+    b.addEventListener('click', () => abrirModalAdmin(b.dataset.voltarModal));
+});
+
+document.querySelectorAll('.modal-fundo').forEach(modal => {
+    modal.addEventListener('click', ev => { if (ev.target === modal) fecharModalAdmin(modal.id); });
+});
+
+gradeProfissionaisAdmin.addEventListener('change', ev => {
+    if (ev.target.name === 'profissional_admin') {
+        gradeProfissionaisAdmin.querySelectorAll('.profissional-card').forEach(c => c.classList.remove('selecionada'));
+        ev.target.closest('.profissional-card').classList.add('selecionada');
+        erroModalProfissionalAdmin.classList.add('oculto');
+    }
+});
+
+document.getElementById('botao-confirmar-profissional-admin').addEventListener('click', () => {
+    const marcada = gradeProfissionaisAdmin.querySelector('input[name="profissional_admin"]:checked');
+    if (!marcada) { erroModalProfissionalAdmin.classList.remove('oculto'); return; }
+    const card = marcada.closest('.profissional-card');
+    profissionalSelecionada = { id: marcada.value, nome: card.dataset.nome };
+    // Reseta a data quando troca de profissional.
+    if (dataSelecionada) {
+        dataSelecionada = '';
+        painelHorariosAdmin.classList.add('oculto');
+    }
+    atualizarResumoAdmin();
+    abrirModalAdmin('modal-data-admin');
+    carregarCalendarioAdmin();
+});
+
+botaoMesAnteriorAdmin.addEventListener('click', () => {
+    mesAdmin--; if (mesAdmin < 0) { mesAdmin = 11; anoAdmin--; }
+    carregarCalendarioAdmin();
+});
+
+botaoMesProximoAdmin.addEventListener('click', () => {
+    mesAdmin++; if (mesAdmin > 11) { mesAdmin = 0; anoAdmin++; }
+    carregarCalendarioAdmin();
+});
+
+document.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape') {
+        document.querySelectorAll('.modal-fundo:not(.oculto)').forEach(m => fecharModalAdmin(m.id));
+    }
+});
+</script> {# Fecha o JavaScript. #}
+{% endblock %} {# Finaliza o conteúdo. #}

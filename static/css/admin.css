@@ -125,3 +125,96 @@ h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); } /* Estiliza tít
   .filter-actions { margin-left: 0; width: 100%; } /* Ajusta botões de filtro no celular. */
   .kpi-value { font-size: 1.4rem; } /* Reduz valor do KPI em telas pequenas. */
 } /* Fecha regras responsivas. */
+
+/* ===================== AGENDA DO ADMIN ===================== */
+.painel-secao { margin-top: 20px; } /* Espaço acima do conteúdo da agenda. */
+.painel-cabecalho { margin-bottom: 16px; } /* Espaço abaixo do cabeçalho da agenda. */
+.painel-cabecalho h2 { color: var(--marrom-escuro); margin-bottom: 4px; } /* Título da página. */
+.painel-cabecalho p { color: var(--texto-suave); } /* Texto de apoio. */
+.card-admin { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; } /* Cartão branco para abrigar a agenda. */
+.resumo-escolhas-admin { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; } /* Linha com profissional e data escolhidas. */
+.resumo-item { background: var(--bege-claro); border: 1px solid var(--nude); border-radius: var(--radius-sm); padding: 10px 12px; } /* Caixa de cada item de resumo. */
+.resumo-label { display: block; font-size: 12px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: .6px; } /* Rótulo do resumo. */
+.resumo-item strong { color: var(--marrom-escuro); font-size: 1.05rem; } /* Conteúdo do resumo. */
+.acoes-agenda { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; } /* Linha de botões de ação. */
+.painel-horarios-admin { border-top: 1px solid var(--nude); padding-top: 18px; margin-top: 8px; } /* Separa visualmente a lista do resumo. */
+.painel-horarios-admin h3 { color: var(--marrom-escuro); margin-bottom: 6px; } /* Título da lista do dia. */
+.lista-horarios-admin { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 10px; } /* Lista vertical de horários. */
+.horario-linha { display: grid; grid-template-columns: 80px 1fr auto; gap: 14px; align-items: center; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--nude); background: var(--branco); } /* Linha individual do horário. */
+.horario-hora { font-weight: bold; color: var(--marrom-escuro); font-size: 1.05rem; } /* Hora destacada. */
+.horario-detalhe { display: flex; flex-direction: column; gap: 2px; } /* Coluna de cliente/serviço. */
+.horario-cliente { color: var(--texto-base); } /* Nome do cliente. */
+.horario-cliente strong { color: var(--marrom-escuro); } /* Destaca o nome do cliente. */
+.horario-servico { color: var(--texto-suave); font-size: 0.92rem; } /* Linha com serviço, preço e duração. */
+.horario-acoes { display: flex; align-items: center; gap: 10px; } /* Coluna direita: badge e link. */
+.horario-ocupado { background: #fff7ef; border-color: #e1c6ad; } /* Linha de horário ocupado. */
+.horario-livre { background: #f4faf1; border-color: #bcd9b2; } /* Linha de horário livre. */
+.horario-bloqueado { background: #f6dddd; border-color: #cc8d8d; } /* Linha de horário bloqueado. */
+.status-badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; font-weight: bold; } /* Etiqueta de status. */
+.status-pendente { background: #fff1cf; color: #8a6700; border: 1px solid #e0c66a; } /* Pendente. */
+.status-confirmado { background: #e3f4dc; color: #36661f; border: 1px solid #87b773; } /* Confirmado. */
+.status-cancelado { background: #f6dddd; color: #7a2a2a; border: 1px solid #cc8d8d; } /* Cancelado. */
+.status-livre { background: var(--bege-claro); color: var(--marrom-escuro); border: 1px solid var(--nude); } /* Livre. */
+.status-bloqueado { background: #f6dddd; color: #7a2a2a; border: 1px solid #cc8d8d; } /* Bloqueio manual. */
+.link-detalhe { color: var(--marrom-principal); text-decoration: underline; font-size: 13px; } /* Link de "editar". */
+.link-detalhe:hover { color: var(--marrom-escuro); } /* Hover do link. */
+.texto-suave { color: var(--texto-suave); } /* Auxiliar para texto secundário. */
+
+/* Modais e calendário do admin (compatibilidade com o CSS público do agendamento). */
+.modal-fundo { position: fixed; inset: 0; background-color: rgba(45, 26, 18, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; overflow-y: auto; } /* Fundo escuro. */
+.modal-caixa { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 520px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; } /* Caixa do modal. */
+.modal-caixa-grande { max-width: 680px; } /* Variação maior. */
+.modal-cabecalho { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; } /* Cabeçalho do modal. */
+.modal-cabecalho h3 { color: var(--marrom-escuro); margin: 0; } /* Título. */
+.modal-cabecalho p { color: var(--texto-suave); font-size: 14px; margin: 0; } /* Texto. */
+.modal-acoes { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; } /* Barra de ações. */
+.modal-acoes .botao-form { flex: 1 1 160px; } /* Botões com tamanho igual. */
+.numero-passo { width: 36px; height: 36px; border-radius: 50%; background-color: var(--marrom-principal); color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; } /* Círculo numerado. */
+.erro-modal { color: #a23737; background: #fbeaea; border: 1px solid #e6c2c2; padding: 8px 12px; border-radius: 10px; margin-top: 12px; font-size: 14px; } /* Mensagem de erro no modal. */
+.oculto { display: none !important; } /* Util para esconder. */
+body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
+.botao-form { background: var(--marrom-principal); color: var(--branco); border: none; border-radius: 10px; padding: 12px 22px; font-weight: bold; cursor: pointer; transition: .2s; } /* Botão principal padrão (compat). */
+.botao-form:hover { background: var(--marrom-escuro); } /* Hover. */
+.botao-secundario { background: var(--bege-claro); color: var(--marrom-escuro); border: 1px solid var(--nude); padding: 12px 22px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: .2s; } /* Botão secundário. */
+.botao-secundario:hover { background: var(--nude); } /* Hover. */
+
+.profissionais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; } /* Grade de profissionais no modal. */
+.profissional-card { display: flex; align-items: center; gap: 12px; background: #fffdf9; color: var(--texto-base); border: 1px solid var(--nude); border-radius: 14px; padding: 12px; cursor: pointer; transition: .2s; } /* Card de profissional. */
+.profissional-card:hover { border-color: var(--marrom-medio); background: #fff7ef; } /* Hover. */
+.profissional-card input { width: auto; margin: 0; accent-color: var(--marrom-principal); } /* Radio. */
+.profissional-card img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--nude); } /* Foto. */
+.profissional-card.selecionada { border-color: var(--marrom-principal); background: #f7eadf; box-shadow: 0 0 0 3px rgba(111,79,63,.18); } /* Selecionada. */
+.profissional-info { display: flex; flex-direction: column; } /* Texto do card. */
+.profissional-info small { color: var(--texto-suave); font-weight: normal; } /* Especialidade. */
+
+.calendario-card { background: #fffdf9; border: 1px solid var(--nude); border-radius: 18px; padding: 18px; margin-top: 8px; box-shadow: var(--shadow); } /* Cartão do calendário. */
+.calendario-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; } /* Topo do calendário. */
+.calendario-topo strong { color: var(--marrom-escuro); font-size: 20px; } /* Título do mês. */
+.calendario-nav { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--nude); background: var(--bege-claro); color: var(--marrom-escuro); font-size: 24px; font-weight: bold; cursor: pointer; padding: 0; } /* Botões mês. */
+.calendario-nav:hover { background: var(--nude); } /* Hover. */
+.calendario-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; } /* Linha dos dias da semana. */
+.calendario-semana span { text-align: center; font-size: 12px; font-weight: bold; color: var(--marrom-medio); text-transform: uppercase; } /* Texto dos dias da semana. */
+.calendario-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; } /* Grade dos dias. */
+.dia-vazio { min-height: 74px; } /* Espaço antes do dia 1. */
+.dia-calendario { min-height: 74px; border-radius: 14px; border: 1px solid var(--nude); background: #fffaf5; color: var(--texto-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: .2s; padding: 6px; } /* Cada dia. */
+.dia-calendario strong { font-size: 18px; line-height: 1; } /* Número do dia. */
+.dia-calendario small { font-size: 10px; color: var(--texto-suave); line-height: 1.1; text-align: center; } /* Status. */
+.dia-calendario.livre { background: #eef6ea; border-color: #8ab77f; } /* Dias com agendamentos. */
+.dia-calendario.livre:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63,45,37,.12); } /* Hover dos dias com agendamento. */
+.dia-calendario.lotado { background: #f4faf1; border-color: #d9bca8; } /* Dias sem agendamentos (cinza-claro). */
+.dia-calendario.lotado:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63,45,37,.10); } /* Hover dos dias livres. */
+.dia-calendario.fechado { background: #eee4da; color: #9a8a80; cursor: not-allowed; opacity: .72; } /* Dia fechado. */
+.dia-calendario.selecionado { background: var(--marrom-principal); border-color: var(--marrom-escuro); color: var(--branco); box-shadow: 0 0 0 3px rgba(111,79,63,.22); } /* Dia selecionado. */
+.calendario-legenda { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; color: var(--texto-suave); font-size: 13px; } /* Legenda. */
+.calendario-legenda span { display: inline-flex; align-items: center; gap: 6px; } /* Itens da legenda. */
+.legenda { width: 12px; height: 12px; border-radius: 50%; display: inline-block; } /* Bolinha de legenda. */
+.legenda.livre { background: #8ab77f; } /* Verde para "tem agendamentos". */
+.legenda.lotado { background: #d9bca8; } /* Bege para "sem agendamentos". */
+.legenda.fechado { background: #d1c4ba; } /* Cinza para fechado. */
+.calendario-aviso { grid-column: 1 / -1; text-align: center; padding: 24px; background: var(--bege-claro); border-radius: 14px; color: var(--texto-suave); } /* Aviso interno do calendário. */
+
+@media (max-width: 768px) {
+  .horario-linha { grid-template-columns: 70px 1fr; }
+  .horario-acoes { grid-column: 1 / -1; justify-content: flex-end; }
+  .dia-calendario small { display: none; }
+}
