@@ -63,6 +63,18 @@
   </div> <!-- Fecha área de ações. -->
 </form> <!-- Fecha formulário de filtros. -->
 
+{% if tem_completos_para_arquivar %} {# Verifica se existem atendimentos confirmados com data passada. #}
+<div class="card-aviso-historico"> <!-- Cria a caixa de aviso com botão em massa. -->
+  <div class="card-aviso-historico-texto"> <!-- Coluna textual do aviso. -->
+    <strong>Existem atendimentos confirmados com data passada.</strong> <!-- Título do aviso. -->
+    <p>Mova-os para o histórico para limpar o dashboard.</p> <!-- Explicação curta. -->
+  </div> <!-- Fecha coluna textual. -->
+  <form method="POST" action="{{ url_for('admin.agendamentos_arquivar_completos') }}" onsubmit="return confirm('Mover todos os atendimentos confirmados passados para o histórico?');"> <!-- Formulário de arquivamento em massa, com confirmação. -->
+    <button type="submit" class="btn btn-primary">Mover todos completos para histórico</button> <!-- Botão de ação em massa. -->
+  </form> <!-- Fecha formulário em massa. -->
+</div> <!-- Fecha a caixa de aviso. -->
+{% endif %} {# Fecha condição do aviso. #}
+
 {% if agendamentos %} {# Verifica se existem agendamentos para listar. #}
 <div class="table-wrapper"> <!-- Cria área com rolagem horizontal. -->
   <table class="table"> <!-- Cria a tabela. -->
@@ -108,6 +120,11 @@
             <button type="submit" class="btn btn-sm btn-secondary">Pendente</button> <!-- Botão pendente. -->
           </form> <!-- Fecha formulário. -->
           {% endif %} <!-- Fecha condição. -->
+          {% if a.status == 'confirmado' and a.data < hoje %} <!-- Mostra opção de arquivar só quando o atendimento foi confirmado e já passou. -->
+          <form method="POST" action="{{ url_for('admin.agendamento_arquivar', id=a.id) }}"> <!-- Formulário de arquivamento individual. -->
+            <button type="submit" class="btn btn-sm btn-secondary">Mover p/ histórico</button> <!-- Botão de arquivar individual. -->
+          </form> <!-- Fecha formulário. -->
+          {% endif %} <!-- Fecha condição de arquivar. -->
         </td> <!-- Fecha ações. -->
       </tr> <!-- Fecha linha do agendamento. -->
       {% endfor %} {# Finaliza loop. #}

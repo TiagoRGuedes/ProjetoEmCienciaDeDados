@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     -- Guarda o horário do atendimento.
     status TEXT NOT NULL,
     -- Guarda o status do agendamento.
+    arquivado INTEGER NOT NULL DEFAULT 0,
+    -- Marca como 1 quando o atendimento foi movido para o histórico (limpa o dashboard).
     FOREIGN KEY (cliente_id) REFERENCES clientes(id),
     -- Liga o agendamento ao cliente.
     FOREIGN KEY (servico_id) REFERENCES servicos(id),

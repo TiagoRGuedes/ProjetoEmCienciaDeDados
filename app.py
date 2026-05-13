@@ -545,8 +545,8 @@ def dashboard():
              JOIN servicos s ON s.id = a.servico_id
              JOIN profissionais p ON p.id = a.profissional_id'''
     # Monta a consulta principal juntando agendamentos, clientes, serviços e profissionais.
-    where = []
-    # Cria uma lista vazia de filtros SQL.
+    where = ['a.arquivado = 0']
+    # O dashboard sempre esconde agendamentos arquivados (eles vivem em /admin/historico).
     params = []
     # Cria a lista de parâmetros da consulta.
     if filtro_status in ('pendente', 'confirmado', 'cancelado'):
@@ -567,10 +567,8 @@ def dashboard():
         # Adiciona condição de profissional.
         params.append(filtro_profissional)
         # Adiciona profissional nos parâmetros.
-    if where:
-        # Verifica se existe algum filtro.
-        sql += ' WHERE ' + ' AND '.join(where)
-        # Junta os filtros na consulta SQL.
+    sql += ' WHERE ' + ' AND '.join(where)
+    # Junta os filtros na consulta SQL (sempre há pelo menos o filtro de arquivado).
     sql += ' ORDER BY a.data, a.horario'
     # Ordena a agenda por data e horário.
     db = get_db()
@@ -581,8 +579,16 @@ def dashboard():
     # Busca profissionais para o filtro.
     kpis = calcular_kpis_dashboard(db)
     # Calcula indicadores rápidos para o admin acompanhar a operação.
-    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=EMPRESA, kpis=kpis)
-    # Renderiza o dashboard com KPIs e lista filtrada.
+    hoje_iso = date.today().isoformat()
+    # Captura a data de hoje para liberar o botão "mover para histórico" só nos atendimentos passados.
+    tem_completos_para_arquivar = db.execute(
+        # Verifica se existe algum confirmado com data anterior a hoje ainda no dashboard.
+        "SELECT COUNT(*) AS n FROM agendamentos WHERE arquivado = 0 AND status = 'confirmado' AND data < ?",
+        (hoje_iso,)
+    ).fetchone()['n'] > 0
+    # Guarda como booleano para o template decidir mostrar o aviso/botão em massa.
+    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=EMPRESA, kpis=kpis, hoje=hoje_iso, tem_completos_para_arquivar=tem_completos_para_arquivar)
+    # Renderiza o dashboard com KPIs, lista filtrada e dados auxiliares para o botão de histórico.
 
 
 def calcular_kpis_dashboard(db):
@@ -594,29 +600,29 @@ def calcular_kpis_dashboard(db):
     fim_semana = (date.today() + timedelta(days=6 - date.today().weekday())).isoformat()
     # Calcula o domingo da semana corrente como fim da janela.
     total_hoje = db.execute(
-        # Conta quantos agendamentos não cancelados estão marcados para hoje.
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status != 'cancelado'",
+        # Conta quantos agendamentos não cancelados estão marcados para hoje (ignora arquivados).
+        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status != 'cancelado' AND arquivado = 0",
         (hoje,)
     ).fetchone()['n']
     # Salva o número de atendimentos do dia para o KPI.
     confirmados_hoje = db.execute(
-        # Conta apenas os agendamentos de hoje já confirmados.
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status = 'confirmado'",
+        # Conta apenas os agendamentos de hoje já confirmados (ignora arquivados).
+        "SELECT COUNT(*) AS n FROM agendamentos WHERE data = ? AND status = 'confirmado' AND arquivado = 0",
         (hoje,)
     ).fetchone()['n']
     # Salva o número de confirmados.
     pendentes = db.execute(
-        # Conta quantos agendamentos futuros ainda estão pendentes (precisam de confirmação).
-        "SELECT COUNT(*) AS n FROM agendamentos WHERE status = 'pendente' AND data >= ?",
+        # Conta quantos agendamentos futuros ainda estão pendentes (ignora arquivados).
+        "SELECT COUNT(*) AS n FROM agendamentos WHERE status = 'pendente' AND data >= ? AND arquivado = 0",
         (hoje,)
     ).fetchone()['n']
     # Salva pendentes para o KPI.
     receita_semana = db.execute(
-        # Soma a receita estimada da semana, considerando apenas agendamentos não cancelados.
+        # Soma a receita estimada da semana, considerando apenas agendamentos não cancelados e não arquivados.
         """SELECT COALESCE(SUM(s.preco), 0) AS total
            FROM agendamentos a
            JOIN servicos s ON s.id = a.servico_id
-           WHERE a.data BETWEEN ? AND ? AND a.status != 'cancelado'""",
+           WHERE a.data BETWEEN ? AND ? AND a.status != 'cancelado' AND a.arquivado = 0""",
         (inicio_semana, fim_semana)
     ).fetchone()['total']
     # Salva a soma da receita prevista na semana.
@@ -1349,6 +1355,199 @@ def cliente_detalhe(id):
     # Carrega o histórico.
     return render_template('admin/cliente_detalhe.html', cliente=cliente, agendamentos=agendamentos, empresa=EMPRESA)
     # Renderiza a página de detalhe.
+
+
+@admin.route('/agendamento/<int:id>/arquivar', methods=['POST'])
+# Cria a rota que move um único atendimento confirmado e já passado para o histórico.
+def agendamento_arquivar(id):
+    # Define a função de arquivamento individual.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre a conexão com o banco.
+    hoje = date.today().isoformat()
+    # Pega a data de hoje para validar que o atendimento já passou.
+    cur = db.execute(
+        # Faz UPDATE protegido: só arquiva quem é confirmado, com data passada e ainda não arquivado.
+        """UPDATE agendamentos
+              SET arquivado = 1
+            WHERE id = ?
+              AND status = 'confirmado'
+              AND data < ?
+              AND arquivado = 0""",
+        (id, hoje)
+    )
+    # Executa o UPDATE com a regra de negócio embutida.
+    db.commit()
+    # Confirma a mudança no banco.
+    if cur.rowcount:
+        # Verifica se uma linha foi efetivamente arquivada.
+        flash('Atendimento movido para o histórico.', 'success')
+        # Mostra mensagem de sucesso.
+    else:
+        # Entra aqui quando nenhuma linha bateu na condição.
+        flash('Esse atendimento não pode ser arquivado (precisa estar confirmado e com data passada).', 'error')
+        # Avisa o admin que a regra não permite arquivar.
+    return redirect(url_for('admin.dashboard'))
+    # Volta para o dashboard.
+
+
+@admin.route('/agendamentos/arquivar-completos', methods=['POST'])
+# Cria a rota que arquiva em massa todos os atendimentos confirmados e já passados.
+def agendamentos_arquivar_completos():
+    # Define a função de arquivamento em massa.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    hoje = date.today().isoformat()
+    # Captura a data de hoje para o filtro.
+    cur = db.execute(
+        # Arquiva todos os confirmados com data passada que ainda estão no dashboard.
+        """UPDATE agendamentos
+              SET arquivado = 1
+            WHERE status = 'confirmado'
+              AND data < ?
+              AND arquivado = 0""",
+        (hoje,)
+    )
+    # Executa o UPDATE em massa.
+    db.commit()
+    # Salva no banco.
+    if cur.rowcount:
+        # Verifica se algum atendimento foi arquivado.
+        flash(f'{cur.rowcount} atendimento(s) movido(s) para o histórico.', 'success')
+        # Mostra a contagem para o admin.
+    else:
+        # Entra aqui quando não havia nada para arquivar.
+        flash('Nenhum atendimento completo para arquivar.', 'info')
+        # Informa que não havia trabalho a fazer.
+    return redirect(url_for('admin.dashboard'))
+    # Volta para o dashboard.
+
+
+@admin.route('/historico')
+# Cria a rota da página de Histórico (lista atendimentos arquivados).
+def historico():
+    # Define a função que lista o histórico.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    filtro_data_inicio = request.args.get('data_inicio', '').strip()
+    # Recebe filtro opcional de data inicial.
+    filtro_data_fim = request.args.get('data_fim', '').strip()
+    # Recebe filtro opcional de data final.
+    filtro_profissional = request.args.get('profissional_id', '').strip()
+    # Recebe filtro opcional de profissional.
+    filtro_q = request.args.get('q', '').strip()
+    # Recebe busca opcional por nome ou telefone do cliente.
+    try:
+        # Tenta converter o número da página para inteiro.
+        pagina = max(1, int(request.args.get('pagina', '1')))
+        # Garante que a página é pelo menos 1.
+    except ValueError:
+        # Entra aqui se a página veio em formato inválido.
+        pagina = 1
+        # Volta para a primeira página por segurança.
+    por_pagina = 20
+    # Define o tamanho da página.
+    where = ['a.arquivado = 1']
+    # O histórico só mostra arquivados.
+    params = []
+    # Lista de parâmetros da consulta.
+    if filtro_data_inicio:
+        # Aplica o filtro de data inicial se informado.
+        where.append('a.data >= ?')
+        # Adiciona condição de data mínima.
+        params.append(filtro_data_inicio)
+        # Envia o valor para a consulta.
+    if filtro_data_fim:
+        # Aplica o filtro de data final se informado.
+        where.append('a.data <= ?')
+        # Adiciona condição de data máxima.
+        params.append(filtro_data_fim)
+        # Envia o valor para a consulta.
+    if filtro_profissional:
+        # Aplica o filtro de profissional se informado.
+        where.append('a.profissional_id = ?')
+        # Adiciona condição de profissional.
+        params.append(filtro_profissional)
+        # Envia o id da profissional.
+    if filtro_q:
+        # Aplica busca textual por cliente.
+        where.append('(c.nome LIKE ? OR c.telefone LIKE ?)')
+        # Procura no nome ou no telefone.
+        like = f'%{filtro_q}%'
+        # Monta o padrão LIKE.
+        params.extend([like, like])
+        # Adiciona dois valores (um para nome, outro para telefone).
+    where_sql = ' WHERE ' + ' AND '.join(where)
+    # Junta a cláusula WHERE final.
+    db = get_db()
+    # Abre o banco.
+    total = db.execute(
+        # Conta o total de registros arquivados que batem nos filtros para calcular paginação.
+        f"""SELECT COUNT(*) AS n
+              FROM agendamentos a
+              JOIN clientes c ON c.id = a.cliente_id
+            {where_sql}""",
+        params
+    ).fetchone()['n']
+    # Total de itens compatíveis com os filtros.
+    offset = (pagina - 1) * por_pagina
+    # Calcula o offset da página atual.
+    rows = db.execute(
+        # Busca a página atual com todos os dados que o template precisa.
+        f"""SELECT a.id, a.data, a.horario, a.status,
+                   c.nome AS cliente_nome, c.telefone,
+                   s.nome AS servico_nome, s.preco, s.duracao_min,
+                   p.nome AS profissional_nome
+              FROM agendamentos a
+              JOIN clientes c ON c.id = a.cliente_id
+              JOIN servicos s ON s.id = a.servico_id
+              JOIN profissionais p ON p.id = a.profissional_id
+            {where_sql}
+            ORDER BY a.data DESC, a.horario DESC
+            LIMIT ? OFFSET ?""",
+        params + [por_pagina, offset]
+    ).fetchall()
+    # Lista paginada de atendimentos arquivados.
+    total_paginas = max(1, (total + por_pagina - 1) // por_pagina)
+    # Calcula o número total de páginas (mínimo 1).
+    profissionais = buscar_profissionais(False)
+    # Lista profissionais (ativas e inativas) para o select de filtro.
+    return render_template('admin/historico.html',
+                           agendamentos=rows, profissionais=profissionais,
+                           filtro_data_inicio=filtro_data_inicio, filtro_data_fim=filtro_data_fim,
+                           filtro_profissional=filtro_profissional, filtro_q=filtro_q,
+                           pagina=pagina, total_paginas=total_paginas, total=total,
+                           empresa=EMPRESA)
+    # Renderiza a página de Histórico.
+
+
+@admin.route('/agendamento/<int:id>/restaurar', methods=['POST'])
+# Cria a rota que devolve um atendimento arquivado para o dashboard.
+def agendamento_restaurar(id):
+    # Define a função de restauração.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    db.execute('UPDATE agendamentos SET arquivado = 0 WHERE id = ?', (id,))
+    # Marca o atendimento como não-arquivado para reaparecer no dashboard.
+    db.commit()
+    # Salva a alteração.
+    flash('Atendimento restaurado para o dashboard.', 'success')
+    # Confirma para o admin.
+    return redirect(url_for('admin.historico'))
+    # Volta para a tela de histórico.
 
 
 app.register_blueprint(publico)

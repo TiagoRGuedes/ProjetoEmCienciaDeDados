@@ -125,6 +125,12 @@ def init_db():
         # Adiciona a coluna para permitir agenda separada por profissional.
         db.commit()
         # Salva a alteração estrutural do banco.
+    if 'arquivado' not in colunas_agendamentos:
+        # Verifica se a coluna arquivado ainda não existe em banco antigo.
+        db.execute('ALTER TABLE agendamentos ADD COLUMN arquivado INTEGER NOT NULL DEFAULT 0')
+        # Adiciona a coluna para suportar a área de Histórico (limpeza do dashboard).
+        db.commit()
+        # Salva a alteração estrutural do banco.
 
     total_servicos = db.execute('SELECT COUNT(*) FROM servicos').fetchone()[0]
     # Conta quantos serviços existem no banco.

@@ -1,0 +1,95 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Histórico{% endblock %} {# Define o título da aba como Histórico. #}
+{% block content %} {# Começa o conteúdo principal desta página. #}
+
+<div class="page-header"> <!-- Cria o cabeçalho da página. -->
+  <h1 class="page-title"> <!-- Cria o título principal. -->
+    Histórico de atendimentos <!-- Texto do título. -->
+    <span class="page-counter">{{ total }} arquivado{{ '' if total == 1 else 's' }}</span> <!-- Mostra a contagem total de arquivados que batem nos filtros. -->
+  </h1> <!-- Fecha o título. -->
+</div> <!-- Fecha o cabeçalho. -->
+
+<form class="filters" method="GET" action="{{ url_for('admin.historico') }}"> <!-- Formulário de filtros do histórico. -->
+  <div class="form-group"> <!-- Agrupa filtro de data inicial. -->
+    <label class="form-label" for="filtro-data-inicio">A partir de</label> <!-- Rótulo. -->
+    <input class="form-input" type="date" id="filtro-data-inicio" name="data_inicio" value="{{ filtro_data_inicio }}"> <!-- Campo de data inicial. -->
+  </div> <!-- Fecha grupo. -->
+  <div class="form-group"> <!-- Agrupa filtro de data final. -->
+    <label class="form-label" for="filtro-data-fim">Até</label> <!-- Rótulo. -->
+    <input class="form-input" type="date" id="filtro-data-fim" name="data_fim" value="{{ filtro_data_fim }}"> <!-- Campo de data final. -->
+  </div> <!-- Fecha grupo. -->
+  <div class="form-group"> <!-- Agrupa filtro de profissional. -->
+    <label class="form-label" for="filtro-profissional">Profissional</label> <!-- Rótulo. -->
+    <select class="form-select" name="profissional_id" id="filtro-profissional"> <!-- Seleção de profissional. -->
+      <option value="">Todas</option> <!-- Opção todas. -->
+      {% for p in profissionais %} {# Percorre profissionais. #}
+      <option value="{{ p.id }}" {% if filtro_profissional == p.id|string %}selected{% endif %}>{{ p.nome }}</option> <!-- Opção da profissional. -->
+      {% endfor %} {# Fecha loop. #}
+    </select> <!-- Fecha seleção. -->
+  </div> <!-- Fecha grupo. -->
+  <div class="form-group"> <!-- Agrupa busca textual. -->
+    <label class="form-label" for="filtro-q">Cliente</label> <!-- Rótulo. -->
+    <input class="form-input" type="text" id="filtro-q" name="q" value="{{ filtro_q }}" placeholder="Nome ou telefone"> <!-- Campo de busca livre. -->
+  </div> <!-- Fecha grupo. -->
+  <div class="filter-actions"> <!-- Cria área de ações dos filtros. -->
+    <button type="submit" class="btn btn-primary">Filtrar</button> <!-- Botão filtrar. -->
+    <a href="{{ url_for('admin.historico') }}" class="btn btn-secondary">Limpar</a> <!-- Link para limpar filtros. -->
+  </div> <!-- Fecha ações. -->
+</form> <!-- Fecha formulário. -->
+
+{% if agendamentos %} {# Verifica se existem arquivados para listar. #}
+<div class="table-wrapper"> <!-- Área da tabela com rolagem horizontal. -->
+  <table class="table"> <!-- Cria a tabela. -->
+    <thead> <!-- Abre o cabeçalho. -->
+      <tr> <!-- Linha de cabeçalho. -->
+        <th>Cliente</th> <!-- Coluna do cliente. -->
+        <th>Contato</th> <!-- Coluna do contato. -->
+        <th>Profissional</th> <!-- Coluna da profissional. -->
+        <th>Serviço</th> <!-- Coluna do serviço. -->
+        <th>Data</th> <!-- Coluna da data. -->
+        <th>Horário</th> <!-- Coluna do horário. -->
+        <th>Status</th> <!-- Coluna do status. -->
+        <th>Ações</th> <!-- Coluna de ações. -->
+      </tr> <!-- Fecha linha. -->
+    </thead> <!-- Fecha cabeçalho. -->
+    <tbody> <!-- Abre corpo. -->
+      {% for a in agendamentos %} {# Percorre cada arquivado. #}
+      <tr> <!-- Linha do atendimento. -->
+        <td><strong>{{ a.cliente_nome }}</strong></td> <!-- Nome do cliente. -->
+        <td>{{ a.telefone }}</td> <!-- Telefone. -->
+        <td>{{ a.profissional_nome }}</td> <!-- Profissional. -->
+        <td>{{ a.servico_nome }}<div style="font-size:0.85rem;color:var(--cinza-500);">R$ {{ '%.2f'|format(a.preco)|replace('.', ',') }} · {{ a.duracao_min }} min</div></td> <!-- Serviço, preço e duração. -->
+        <td>{{ a.data }}</td> <!-- Data. -->
+        <td>{{ a.horario }}</td> <!-- Horário. -->
+        <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td> <!-- Status com cor. -->
+        <td class="actions"> <!-- Coluna de ações. -->
+          <form method="POST" action="{{ url_for('admin.agendamento_restaurar', id=a.id) }}"> <!-- Formulário para restaurar. -->
+            <button type="submit" class="btn btn-sm btn-secondary">Restaurar</button> <!-- Botão de restaurar para o dashboard. -->
+          </form> <!-- Fecha formulário. -->
+        </td> <!-- Fecha ações. -->
+      </tr> <!-- Fecha linha. -->
+      {% endfor %} {# Fecha loop. #}
+    </tbody> <!-- Fecha corpo. -->
+  </table> <!-- Fecha tabela. -->
+</div> <!-- Fecha área da tabela. -->
+
+{% if total_paginas > 1 %} {# Mostra paginação só quando faz sentido. #}
+<div class="paginacao-historico"> <!-- Linha da paginação. -->
+  {% if pagina > 1 %} {# Botão anterior só se não estiver na primeira. #}
+  <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.historico', pagina=pagina-1, data_inicio=filtro_data_inicio, data_fim=filtro_data_fim, profissional_id=filtro_profissional, q=filtro_q) }}">Anterior</a> <!-- Link para a página anterior preservando filtros. -->
+  {% endif %} <!-- Fecha condição. -->
+  <span class="paginacao-info">Página {{ pagina }} de {{ total_paginas }}</span> <!-- Mostra a posição atual. -->
+  {% if pagina < total_paginas %} {# Botão próximo só se houver mais páginas. #}
+  <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.historico', pagina=pagina+1, data_inicio=filtro_data_inicio, data_fim=filtro_data_fim, profissional_id=filtro_profissional, q=filtro_q) }}">Próxima</a> <!-- Link para a próxima página preservando filtros. -->
+  {% endif %} <!-- Fecha condição. -->
+</div> <!-- Fecha paginação. -->
+{% endif %} <!-- Fecha bloco da paginação. -->
+
+{% else %} <!-- Caso não tenha arquivados visíveis. -->
+<div class="card"> <!-- Caixa de estado vazio. -->
+  <p><strong>Nenhum atendimento arquivado para os filtros selecionados.</strong></p> <!-- Mensagem principal. -->
+  <p>Use o botão "Mover p/ histórico" no dashboard quando um atendimento confirmado já tiver acontecido.</p> <!-- Texto explicativo. -->
+</div> <!-- Fecha estado vazio. -->
+{% endif %} {# Fecha verificação de agendamentos. #}
+
+{% endblock %} {# Finaliza o conteúdo. #}

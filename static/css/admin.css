@@ -218,3 +218,10 @@ body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
   .horario-acoes { grid-column: 1 / -1; justify-content: flex-end; }
   .dia-calendario small { display: none; }
 }
+
+/* ============ AVISO DE HISTÓRICO E PAGINAÇÃO ============ */
+.card-aviso-historico { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 18px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; } /* Cartão horizontal com aviso de atendimentos completos. */
+.card-aviso-historico-texto strong { color: var(--marrom-escuro); display: block; } /* Destaca a frase principal do aviso. */
+.card-aviso-historico-texto p { color: var(--texto-suave); font-size: 0.9rem; margin-top: 4px; } /* Texto secundário do aviso. */
+.paginacao-historico { display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 16px; } /* Linha da paginação do histórico. */
+.paginacao-info { color: var(--texto-suave); font-size: 0.9rem; } /* Estilo do texto "Página X de Y". */
