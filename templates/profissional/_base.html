@@ -1,0 +1,94 @@
+<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
+<html lang="pt-BR"> <!-- Define português do Brasil como idioma. -->
+<head> <!-- Início do head. -->
+  <meta charset="UTF-8"> <!-- Suporta acentos. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Layout adaptativo. -->
+  <title>{% block title %}Área da Profissional{% endblock %} — Refúgio da Preta</title> <!-- Título da aba. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Reaproveita os estilos do admin. -->
+  <style>
+    /* Aplica as preferências visuais globais também nesta área. */
+    :root {
+      --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
+      --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
+      --config-cor-fundo: {{ config_visual.cor_fundo or '#efe0d1' }};
+      --config-cor-destaque: {{ config_visual.cor_destaque or '#6f4f3f' }};
+    }
+    body { font-family: var(--config-fonte); background: var(--config-cor-fundo); color: var(--config-cor-texto); }
+    .btn-primary, .btn-success { background: var(--config-cor-destaque); border-color: var(--config-cor-destaque); }
+    .topbar { background: var(--config-cor-destaque); }
+    .page-title, .table thead th, .form-label { color: var(--config-cor-texto); }
+  </style>
+</head>
+<body>
+
+  <header class="topbar"> <!-- Topo simples só com marca e logout. -->
+    {% if profissional %}
+      <button id="botao-menu" class="botao-menu" aria-label="Abrir menu" aria-controls="sidebar-profissional" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    {% endif %}
+    <a href="{% if profissional %}{{ url_for('profissional.agenda_profissional') }}{% else %}{{ url_for('profissional.login_profissional') }}{% endif %}" class="topbar-brand">
+      Refúgio da Preta · Profissional{% if profissional %} ({{ profissional.nome }}){% endif %}
+    </a>
+  </header>
+
+  {% if profissional %}
+  <aside id="sidebar-profissional" class="sidebar" aria-hidden="true">
+    <div class="sidebar-cabecalho">
+      <strong>Olá, {{ profissional.nome.split()[0] }}</strong>
+      <button id="botao-fechar-menu" class="botao-fechar-menu" aria-label="Fechar menu">×</button>
+    </div>
+    <nav class="sidebar-links">
+      <a href="{{ url_for('profissional.agenda_profissional') }}" class="sidebar-link {% if request.endpoint == 'profissional.agenda_profissional' %}active{% endif %}">Minha agenda</a>
+      <a href="{{ url_for('profissional.bloqueios_profissional') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('profissional.bloqueios') %}active{% endif %}">Indisponibilidades</a>
+      <a href="{{ url_for('publico.index') }}" class="sidebar-link">Ver site público</a>
+      <a href="{{ url_for('profissional.logout_profissional') }}" class="sidebar-link sidebar-link-sair">Sair</a>
+    </nav>
+  </aside>
+  <div id="backdrop-sidebar" class="sidebar-backdrop" aria-hidden="true"></div>
+  {% endif %}
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for category, msg in messages %}
+            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if profissional %}
+  <script>
+    (function () {
+      const sidebar = document.getElementById('sidebar-profissional');
+      const backdrop = document.getElementById('backdrop-sidebar');
+      const botaoMenu = document.getElementById('botao-menu');
+      const botaoFechar = document.getElementById('botao-fechar-menu');
+      function abrir() {
+        sidebar.classList.add('aberta');
+        backdrop.classList.add('visivel');
+        sidebar.setAttribute('aria-hidden', 'false');
+        botaoMenu.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('sidebar-aberta');
+      }
+      function fechar() {
+        sidebar.classList.remove('aberta');
+        backdrop.classList.remove('visivel');
+        sidebar.setAttribute('aria-hidden', 'true');
+        botaoMenu.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('sidebar-aberta');
+      }
+      botaoMenu.addEventListener('click', abrir);
+      botaoFechar.addEventListener('click', fechar);
+      backdrop.addEventListener('click', fechar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+    })();
+  </script>
+  {% endif %}
+</body>
+</html>

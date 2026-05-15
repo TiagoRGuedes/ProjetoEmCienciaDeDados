@@ -132,6 +132,34 @@ def init_db():
         db.commit()
         # Salva a alteração estrutural do banco.
 
+    colunas_profissionais = _colunas_da_tabela(db, 'profissionais')
+    # Busca as colunas atuais da tabela profissionais.
+    if 'senha' not in colunas_profissionais:
+        # Verifica se a coluna senha ainda não existe em banco antigo.
+        db.execute('ALTER TABLE profissionais ADD COLUMN senha TEXT')
+        # Adiciona a coluna para suportar o login da área restrita das profissionais.
+        db.commit()
+        # Salva a alteração estrutural do banco.
+
+    configuracoes_iniciais = [
+        # Define os valores padrão das preferências visuais.
+        ('fonte', 'Arial, Helvetica, sans-serif'),
+        # Família tipográfica usada em todo o site.
+        ('cor_texto', '#3f2d25'),
+        # Cor principal do texto.
+        ('cor_fundo', '#efe0d1'),
+        # Cor de fundo geral do site.
+        ('cor_destaque', '#6f4f3f'),
+        # Cor dos botões e elementos de destaque.
+    ]
+    # Lista padrão a ser inserida se a tabela estiver vazia.
+    for chave, valor in configuracoes_iniciais:
+        # Percorre cada par chave/valor padrão.
+        db.execute('INSERT OR IGNORE INTO configuracoes (chave, valor) VALUES (?, ?)', (chave, valor))
+        # Insere somente se a chave ainda não existir.
+    db.commit()
+    # Salva as configurações padrão.
+
     total_servicos = db.execute('SELECT COUNT(*) FROM servicos').fetchone()[0]
     # Conta quantos serviços existem no banco.
     if total_servicos == 0:

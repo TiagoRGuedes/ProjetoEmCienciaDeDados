@@ -22,6 +22,23 @@ publico = Blueprint('publico', __name__)
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 # Cria o grupo de rotas administrativas, todas começando com /admin.
 
+profissional = Blueprint('profissional', __name__, url_prefix='/profissional')
+# Cria o grupo de rotas restritas para as profissionais não-admin.
+
+
+@app.context_processor
+def injetar_configuracoes():
+    # Disponibiliza as configurações visuais para qualquer template renderizado.
+    try:
+        # Protege contra falhas em rotas que rodam antes do banco existir.
+        return {'config_visual': carregar_configuracoes_visuais()}
+        # Devolve o dicionário com fonte e cores para o template usar.
+    except Exception:
+        # Em caso de erro (banco indisponível), devolve um dicionário vazio.
+        return {'config_visual': {}}
+        # Templates ficam usando os defaults do próprio CSS.
+
+
 EMPRESA = {
     # Cria um dicionário com as informações fixas da empresa.
     'nome': 'Refúgio da Preta',
@@ -62,6 +79,35 @@ def esta_logado():
     # Cria uma função simples para verificar se o administrador está logado.
     return session.get('logado') is True
     # Retorna True quando a sessão possui a chave logado marcada como verdadeira.
+
+
+def profissional_logada_id():
+    # Retorna o id da profissional logada na área restrita, ou None se não houver sessão.
+    return session.get('profissional_id')
+    # A chave profissional_id só é setada pela rota /profissional/login.
+
+
+def buscar_profissional_logada():
+    # Carrega os dados completos da profissional atualmente logada.
+    pid = profissional_logada_id()
+    # Pega o id da sessão.
+    if not pid:
+        # Sem id, não há profissional logada.
+        return None
+    db = get_db()
+    # Abre o banco.
+    return db.execute('SELECT * FROM profissionais WHERE id = ?', (pid,)).fetchone()
+    # Retorna a linha da profissional ou None se ela tiver sido removida.
+
+
+def carregar_configuracoes_visuais():
+    # Lê todas as preferências visuais salvas no banco como dicionário.
+    db = get_db()
+    # Abre o banco.
+    linhas = db.execute('SELECT chave, valor FROM configuracoes').fetchall()
+    # Busca todas as preferências cadastradas.
+    return {linha['chave']: linha['valor'] for linha in linhas}
+    # Converte para dicionário simples para o template usar.
 
 
 def buscar_servicos():
@@ -1068,6 +1114,8 @@ def _parse_profissional_form():
     # Lê o nome do arquivo de foto (já presente em static/img).
     ativo = 1 if request.form.get('ativo') == 'on' else 0
     # Converte o checkbox em 0 ou 1 para o banco.
+    senha = request.form.get('senha', '').strip()
+    # Lê a senha opcional para o login da profissional na área restrita.
     erro = None
     # Inicializa a variável de erro.
     if len(nome) < 2:
@@ -1082,8 +1130,8 @@ def _parse_profissional_form():
         # Verifica se a foto foi informada.
         erro = 'Informe o nome do arquivo da foto (ex: pamela_francisco.png).'
         # Define mensagem padrão sobre a foto.
-    return nome, especialidade, foto, ativo, erro
-    # Retorna os dados normalizados e o erro de validação.
+    return nome, especialidade, foto, ativo, senha, erro
+    # Retorna os dados normalizados, a senha e o erro de validação.
 
 
 @admin.route('/profissionais/nova', methods=['GET', 'POST'])
@@ -1100,8 +1148,8 @@ def profissional_nova():
     # Lista os serviços para permitir escolher quais a profissional atende.
     if request.method == 'POST':
         # Verifica envio do formulário.
-        nome, especialidade, foto, ativo, erro = _parse_profissional_form()
-        # Lê e valida os dados do formulário.
+        nome, especialidade, foto, ativo, senha, erro = _parse_profissional_form()
+        # Lê e valida os dados do formulário, incluindo a senha opcional.
         ids_servicos = request.form.getlist('servicos_ids')
         # Lê quais serviços foram marcados para essa profissional.
         if erro:
@@ -1110,10 +1158,10 @@ def profissional_nova():
             # Reabre o formulário com erro mantendo o que foi digitado.
         cursor = db.execute(
             # Insere a profissional no banco.
-            'INSERT INTO profissionais (nome, especialidade, foto, ativo) VALUES (?, ?, ?, ?)',
+            'INSERT INTO profissionais (nome, especialidade, foto, ativo, senha) VALUES (?, ?, ?, ?, ?)',
             # Usa parâmetros para evitar injeção de SQL.
-            (nome, especialidade, foto, ativo)
-            # Envia os dados.
+            (nome, especialidade, foto, ativo, senha or None)
+            # Envia os dados; senha vazia vira NULL para indicar "sem login".
         )
         # Finaliza o insert principal.
         novo_id = cursor.lastrowid
@@ -1168,22 +1216,34 @@ def profissional_editar(id):
     # Fecha o set de serviços vinculados.
     if request.method == 'POST':
         # Verifica envio do formulário.
-        nome, especialidade, foto, ativo, erro = _parse_profissional_form()
-        # Lê e valida os dados.
+        nome, especialidade, foto, ativo, senha, erro = _parse_profissional_form()
+        # Lê e valida os dados, incluindo a senha opcional.
         ids_servicos = request.form.getlist('servicos_ids')
         # Lê os serviços marcados.
         if erro:
             # Verifica erro de validação.
             return render_template('admin/profissional_form.html', profissional=profissional, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=EMPRESA)
             # Reabre o formulário mantendo o que foi digitado.
-        db.execute(
-            # Atualiza os dados principais da profissional.
-            'UPDATE profissionais SET nome = ?, especialidade = ?, foto = ?, ativo = ? WHERE id = ?',
-            # Atualiza tudo de uma vez.
-            (nome, especialidade, foto, ativo, id)
-            # Envia os dados para o SQLite.
-        )
-        # Finaliza o update principal.
+        if senha:
+            # Quando o admin digita uma nova senha, atualiza inclusive a coluna senha.
+            db.execute(
+                # Atualiza todos os campos da profissional.
+                'UPDATE profissionais SET nome = ?, especialidade = ?, foto = ?, ativo = ?, senha = ? WHERE id = ?',
+                # Inclui a nova senha no UPDATE.
+                (nome, especialidade, foto, ativo, senha, id)
+                # Envia os dados.
+            )
+            # Finaliza o UPDATE com senha.
+        else:
+            # Senha em branco: preserva a senha atual e atualiza apenas o resto.
+            db.execute(
+                # Atualiza somente os campos comuns.
+                'UPDATE profissionais SET nome = ?, especialidade = ?, foto = ?, ativo = ? WHERE id = ?',
+                # Mantém a senha intacta.
+                (nome, especialidade, foto, ativo, id)
+                # Envia os dados.
+            )
+            # Finaliza o UPDATE sem mexer na senha.
         db.execute('DELETE FROM profissionais_servicos WHERE profissional_id = ?', (id,))
         # Apaga os vínculos antigos para reescrever conforme a tela.
         for sid in ids_servicos:
@@ -1550,11 +1610,299 @@ def agendamento_restaurar(id):
     # Volta para a tela de histórico.
 
 
+@admin.route('/configuracoes', methods=['GET', 'POST'])
+# Cria a rota de configurações visuais globais (admin define fonte e cores).
+def configuracoes():
+    # Define a função que mostra/grava as preferências visuais.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    if request.method == 'POST':
+        # Verifica se o admin enviou o formulário.
+        novas = {
+            # Lê cada campo de configuração enviado.
+            'fonte': request.form.get('fonte', '').strip() or 'Arial, Helvetica, sans-serif',
+            # Mantém um fallback caso o campo venha vazio.
+            'cor_texto': request.form.get('cor_texto', '').strip() or '#3f2d25',
+            # Cor principal de texto.
+            'cor_fundo': request.form.get('cor_fundo', '').strip() or '#efe0d1',
+            # Cor de fundo geral.
+            'cor_destaque': request.form.get('cor_destaque', '').strip() or '#6f4f3f',
+            # Cor dos botões e destaques.
+        }
+        # Fecha o dicionário com as novas preferências.
+        for chave, valor in novas.items():
+            # Salva cada par no banco.
+            db.execute(
+                # Cria ou atualiza a linha.
+                'INSERT INTO configuracoes (chave, valor) VALUES (?, ?) ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor',
+                # SQLite suporta ON CONFLICT a partir da 3.24.
+                (chave, valor)
+                # Envia chave e valor.
+            )
+            # Finaliza o upsert.
+        db.commit()
+        # Confirma a gravação.
+        flash('Configurações visuais atualizadas.', 'success')
+        # Mostra mensagem de sucesso.
+        return redirect(url_for('admin.configuracoes'))
+        # Recarrega a página com os novos valores aplicados.
+    config = carregar_configuracoes_visuais()
+    # GET: carrega valores atuais para preencher o formulário.
+    return render_template('admin/configuracoes.html', config=config, empresa=EMPRESA)
+    # Renderiza a página de configurações.
+
+
+# =================== BLUEPRINT DA ÁREA RESTRITA DA PROFISSIONAL =================== #
+
+@profissional.route('/login', methods=['GET', 'POST'])
+# Cria a rota de login da profissional não-admin.
+def login_profissional():
+    # Define a função de login da área restrita.
+    db = get_db()
+    # Abre o banco.
+    profissionais_lista = db.execute('SELECT id, nome FROM profissionais WHERE ativo = 1 AND senha IS NOT NULL AND senha != "" ORDER BY nome').fetchall()
+    # Lista somente profissionais ativas que já têm senha definida pelo admin.
+    if request.method == 'POST':
+        # Verifica envio do formulário.
+        profissional_id = request.form.get('profissional_id', '').strip()
+        # Recebe o id da profissional escolhida.
+        senha = request.form.get('senha', '')
+        # Recebe a senha digitada.
+        if profissional_id and senha:
+            # Valida campos preenchidos.
+            linha = db.execute('SELECT * FROM profissionais WHERE id = ? AND ativo = 1', (profissional_id,)).fetchone()
+            # Busca a profissional pelo id apenas se estiver ativa.
+            if linha and linha['senha'] and linha['senha'] == senha:
+                # Confere senha exata.
+                session.clear()
+                # Garante que não fica nada de sessão anterior.
+                session['profissional_id'] = linha['id']
+                # Marca a sessão como pertencente a esta profissional.
+                return redirect(url_for('profissional.agenda_profissional'))
+                # Envia para a agenda dela.
+        return render_template('profissional/login.html', profissionais=profissionais_lista, erro='Profissional ou senha inválida.', empresa=EMPRESA)
+        # Reabre o login com mensagem de erro.
+    return render_template('profissional/login.html', profissionais=profissionais_lista, erro=None, empresa=EMPRESA)
+    # GET: mostra o formulário vazio.
+
+
+@profissional.route('/logout')
+# Cria a rota de saída da área restrita.
+def logout_profissional():
+    # Define a função de logout.
+    session.pop('profissional_id', None)
+    # Remove só a chave da profissional (não mexe na sessão do admin se houver).
+    return redirect(url_for('profissional.login_profissional'))
+    # Volta para a tela de login.
+
+
+@profissional.route('/agenda')
+# Cria a rota da agenda própria da profissional logada.
+def agenda_profissional():
+    # Define a função que mostra a agenda da profissional.
+    prof = buscar_profissional_logada()
+    # Carrega a profissional logada.
+    if not prof:
+        # Sem profissional logada, redireciona para o login.
+        return redirect(url_for('profissional.login_profissional'))
+        # Envia para o login.
+    return render_template('profissional/agenda.html', profissional=prof, empresa=EMPRESA)
+    # Renderiza a página de agenda.
+
+
+@profissional.route('/agenda/dia')
+# Cria a rota JSON com os horários do dia, restrita à profissional logada.
+def agenda_profissional_dia():
+    # Define a função usada pelo JavaScript da agenda.
+    prof = buscar_profissional_logada()
+    # Carrega a profissional.
+    if not prof:
+        # Sem login, devolve 401.
+        return jsonify({'erro': 'nao_autenticado'}), 401
+        # Bloqueia consulta sem autenticação.
+    data_texto = request.args.get('data', '').strip()
+    # Recebe a data escolhida.
+    if not data_texto:
+        # Data obrigatória.
+        return jsonify({'data': data_texto, 'horarios': []})
+        # Devolve lista vazia se faltar.
+    aberto = dia_funciona(data_texto)
+    # Verifica funcionamento do dia.
+    db = get_db()
+    # Abre o banco.
+    sql = '''SELECT a.id, a.horario, a.status,
+                    c.nome AS cliente_nome, c.telefone,
+                    s.nome AS servico_nome, s.preco, s.duracao_min
+             FROM agendamentos a
+             JOIN clientes c ON c.id = a.cliente_id
+             JOIN servicos s ON s.id = a.servico_id
+             WHERE a.data = ? AND a.profissional_id = ? AND a.status != ?'''
+    # Busca atendimentos do dia para esta profissional (sem cancelados).
+    linhas = db.execute(sql, (data_texto, prof['id'], 'cancelado')).fetchall()
+    # Executa a consulta.
+    ocupados = {linha['horario']: linha for linha in linhas}
+    # Indexa por horário.
+    bloqueios = buscar_bloqueios(data_texto, str(prof['id']))
+    # Carrega bloqueios cadastrados.
+    bloqueios_horarios = {b['horario']: b for b in bloqueios}
+    # Indexa bloqueios por horário (vazio significa dia inteiro).
+    dia_bloqueado_inteiro = '' in bloqueios_horarios
+    # Marca se o dia foi bloqueado por inteiro.
+    resposta = []
+    # Lista a devolver.
+    for horario in HORARIOS:
+        # Percorre os horários padrão.
+        ocupado = ocupados.get(horario)
+        # Localiza agendamento daquele horário.
+        slot = {
+            # Monta cada slot.
+            'horario': horario,
+            'aberto': aberto and not dia_bloqueado_inteiro,
+            'bloqueado': horario in bloqueios_horarios or dia_bloqueado_inteiro,
+            'agendamento': None,
+        }
+        # Fecha o slot base.
+        if ocupado:
+            # Inclui detalhes do cliente.
+            slot['agendamento'] = {
+                'id': ocupado['id'],
+                'cliente_nome': ocupado['cliente_nome'],
+                'telefone': ocupado['telefone'],
+                'servico_nome': ocupado['servico_nome'],
+                'preco': float(ocupado['preco']),
+                'duracao_min': ocupado['duracao_min'],
+                'status': ocupado['status'],
+            }
+            # Fecha o dicionário do agendamento.
+        resposta.append(slot)
+        # Adiciona ao retorno.
+    return jsonify({'data': data_texto, 'aberto': aberto, 'horarios': resposta})
+    # Retorna agenda do dia.
+
+
+@profissional.route('/disponibilidade-mes')
+# Calendário mensal restrito à profissional logada.
+def profissional_disponibilidade_mes():
+    # Define a função.
+    prof = buscar_profissional_logada()
+    # Carrega a profissional.
+    if not prof:
+        # Sem login, bloqueia.
+        return jsonify({'erro': 'nao_autenticado'}), 401
+        # Devolve 401.
+    ano = int(request.args.get('ano', date.today().year))
+    # Recebe o ano.
+    mes = int(request.args.get('mes', date.today().month))
+    # Recebe o mês.
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    # Último dia do mês.
+    resposta = {}
+    # Dicionário de saída.
+    for dia in range(1, ultimo_dia + 1):
+        # Percorre cada dia.
+        data_texto = f'{ano:04d}-{mes:02d}-{dia:02d}'
+        # Monta a data.
+        aberto = dia_funciona(data_texto)
+        # Funcionamento do dia.
+        livres = contar_horarios_disponiveis(data_texto, str(prof['id'])) if aberto else 0
+        # Quantos slots livres existem.
+        resposta[data_texto] = {'aberto': aberto, 'livres': livres, 'total': len(HORARIOS)}
+        # Salva o resumo do dia.
+    return jsonify(resposta)
+    # Retorna o calendário.
+
+
+@profissional.route('/bloqueios', methods=['GET', 'POST'])
+# Página onde a profissional vê/cria bloqueios próprios.
+def bloqueios_profissional():
+    # Define a função.
+    prof = buscar_profissional_logada()
+    # Carrega a profissional.
+    if not prof:
+        # Sem login, redireciona.
+        return redirect(url_for('profissional.login_profissional'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    if request.method == 'POST':
+        # Trata envio do formulário.
+        data_texto = request.form.get('data', '').strip()
+        # Recebe a data.
+        horario = request.form.get('horario', '').strip()
+        # Recebe o horário (ou 'dia_inteiro').
+        motivo = request.form.get('motivo', '').strip()
+        # Recebe o motivo livre.
+        if not data_texto:
+            # Data obrigatória.
+            flash('Informe a data que você não vai poder comparecer.', 'error')
+            # Mostra erro.
+        else:
+            # Tudo certo, salva no banco.
+            horario_salvo = '' if (horario == 'dia_inteiro' or horario == '') else horario
+            # Vazio significa "dia inteiro" no schema.
+            motivo_salvo = motivo if motivo else 'Indisponibilidade'
+            # Texto padrão se não informar motivo.
+            db.execute(
+                # Insere bloqueio no banco.
+                'INSERT INTO bloqueios_agenda (profissional_id, data, horario, motivo) VALUES (?, ?, ?, ?)',
+                # Os 4 valores na ordem do schema.
+                (prof['id'], data_texto, horario_salvo, motivo_salvo)
+                # Profissional é sempre a logada.
+            )
+            # Finaliza o INSERT.
+            db.commit()
+            # Salva.
+            flash('Bloqueio cadastrado com sucesso.', 'success')
+            # Confirma para a profissional.
+        return redirect(url_for('profissional.bloqueios_profissional'))
+        # Volta para a tela de bloqueios.
+    lista = db.execute(
+        # Lista somente bloqueios da profissional logada.
+        '''SELECT id, data, horario, motivo
+             FROM bloqueios_agenda
+            WHERE profissional_id = ?
+            ORDER BY data DESC, horario''',
+        (prof['id'],)
+    ).fetchall()
+    # Carrega a lista.
+    return render_template('profissional/bloqueios.html', profissional=prof, bloqueios=lista, horarios=HORARIOS, empresa=EMPRESA)
+    # Renderiza a tela.
+
+
+@profissional.route('/bloqueios/<int:bid>/excluir', methods=['POST'])
+# Permite a profissional remover um bloqueio próprio.
+def bloqueio_profissional_excluir(bid):
+    # Define a função.
+    prof = buscar_profissional_logada()
+    # Carrega a profissional.
+    if not prof:
+        # Sem login, redireciona.
+        return redirect(url_for('profissional.login_profissional'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    db.execute('DELETE FROM bloqueios_agenda WHERE id = ? AND profissional_id = ?', (bid, prof['id']))
+    # Garante que só apaga se for da própria profissional.
+    db.commit()
+    # Salva a exclusão.
+    flash('Bloqueio removido.', 'success')
+    # Confirma.
+    return redirect(url_for('profissional.bloqueios_profissional'))
+    # Volta para a lista.
+
+
 app.register_blueprint(publico)
 # Registra as rotas públicas dentro do Flask.
 
 app.register_blueprint(admin)
 # Registra as rotas administrativas dentro do Flask.
+
+app.register_blueprint(profissional)
+# Registra as rotas da área restrita das profissionais.
 
 
 @app.teardown_appcontext

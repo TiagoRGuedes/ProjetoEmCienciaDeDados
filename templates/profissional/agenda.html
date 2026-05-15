@@ -1,0 +1,193 @@
+{% extends 'profissional/_base.html' %}
+{% block title %}Minha agenda{% endblock %}
+{% block content %}
+
+<section class="painel-secao"> <!-- Seção principal. -->
+  <div class="painel-cabecalho">
+    <h2>Minha agenda</h2>
+    <p>Escolha um dia para ver os atendimentos marcados (cliente, telefone e serviço).</p>
+  </div>
+
+  <div class="card-admin"> <!-- Cartão de conteúdo. -->
+    <div class="resumo-escolhas-admin">
+      <div class="resumo-item">
+        <span class="resumo-label">Profissional</span>
+        <strong>{{ profissional.nome }}</strong>
+      </div>
+      <div class="resumo-item">
+        <span class="resumo-label">Data</span>
+        <strong id="resumo-data">—</strong>
+      </div>
+    </div>
+
+    <div class="acoes-agenda">
+      <button type="button" class="botao-form" id="botao-escolher-data">Escolher data</button>
+    </div>
+
+    <div class="painel-horarios-admin oculto" id="painel-horarios-admin">
+      <h3>Horários em <span id="texto-data-escolhida">—</span></h3>
+      <p class="texto-suave" id="texto-resumo-agenda">Selecione uma data para ver seus atendimentos.</p>
+      <ul class="lista-horarios-admin" id="lista-horarios-admin"></ul>
+    </div>
+  </div>
+</section>
+
+<div class="modal-fundo oculto" id="modal-data" aria-hidden="true">
+  <div class="modal-caixa modal-caixa-grande" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-data">
+    <div class="modal-cabecalho">
+      <span class="numero-passo">1</span>
+      <div>
+        <h3 id="titulo-modal-data">Escolha a data</h3>
+        <p>Clique em um dia para ver seus horários.</p>
+      </div>
+    </div>
+
+    <div class="calendario-card">
+      <div class="calendario-topo">
+        <button type="button" class="calendario-nav" id="mes-anterior-prof">‹</button>
+        <strong id="calendario-titulo-prof">Carregando...</strong>
+        <button type="button" class="calendario-nav" id="mes-proximo-prof">›</button>
+      </div>
+      <div class="calendario-semana">
+        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+      <div class="calendario-grade" id="calendario-grade-prof"></div>
+      <div class="calendario-legenda">
+        <span><i class="legenda livre"></i> Tem agendamentos</span>
+        <span><i class="legenda lotado"></i> Sem agendamentos</span>
+        <span><i class="legenda fechado"></i> Fechado</span>
+      </div>
+    </div>
+
+    <div class="modal-acoes">
+      <button type="button" class="botao-form botao-secundario" data-fechar-modal="modal-data">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const mesesProf = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const diasSemanaProf = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const botaoEscolherData = document.getElementById('botao-escolher-data');
+const tituloCal = document.getElementById('calendario-titulo-prof');
+const gradeCal = document.getElementById('calendario-grade-prof');
+const btnAnt = document.getElementById('mes-anterior-prof');
+const btnProx = document.getElementById('mes-proximo-prof');
+const resumoData = document.getElementById('resumo-data');
+const painelHorarios = document.getElementById('painel-horarios-admin');
+const listaHorarios = document.getElementById('lista-horarios-admin');
+const textoData = document.getElementById('texto-data-escolhida');
+const textoResumo = document.getElementById('texto-resumo-agenda');
+
+let dataSelecionada = '';
+const hoje = new Date();
+let ano = hoje.getFullYear(), mes = hoje.getMonth();
+
+function abrirModal(id) {
+  document.querySelectorAll('.modal-fundo').forEach(m => m.classList.add('oculto'));
+  const m = document.getElementById(id);
+  m.classList.remove('oculto');
+  m.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('com-modal');
+}
+function fecharModal(id) {
+  const m = document.getElementById(id);
+  m.classList.add('oculto');
+  m.setAttribute('aria-hidden', 'true');
+  if (!document.querySelector('.modal-fundo:not(.oculto)')) document.body.classList.remove('com-modal');
+}
+function formatarBR(iso) { if (!iso) return '—'; const p = iso.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+function diaSemanaTexto(iso) { const [a,m,d] = iso.split('-').map(Number); return diasSemanaProf[new Date(a, m-1, d).getDay()]; }
+
+async function carregarCalendario() {
+  tituloCal.textContent = `${mesesProf[mes]} de ${ano}`;
+  gradeCal.innerHTML = '';
+  const resp = await fetch(`{{ url_for('profissional.profissional_disponibilidade_mes') }}?ano=${ano}&mes=${mes+1}`);
+  const dados = await resp.json();
+  const primeiroDia = new Date(ano, mes, 1).getDay();
+  const ultimoDia = new Date(ano, mes+1, 0).getDate();
+  for (let v = 0; v < primeiroDia; v++) {
+    const e = document.createElement('div'); e.className = 'dia-vazio'; gradeCal.appendChild(e);
+  }
+  for (let d = 1; d <= ultimoDia; d++) {
+    const iso = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const info = dados[iso] || {};
+    const total = info.total || 10;
+    const livres = info.livres || 0;
+    const ocupados = info.aberto ? Math.max(total - livres, 0) : 0;
+    const aberto = info.aberto;
+    const status = aberto ? (ocupados > 0 ? `${ocupados} agend.` : 'Sem agend.') : 'Fechado';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'dia-calendario';
+    b.innerHTML = `<strong>${d}</strong><small>${status}</small>`;
+    if (!aberto) { b.classList.add('fechado'); b.disabled = true; }
+    else if (ocupados > 0) b.classList.add('livre');
+    else b.classList.add('lotado');
+    if (aberto) b.addEventListener('click', () => selecionarData(iso));
+    if (iso === dataSelecionada) b.classList.add('selecionado');
+    gradeCal.appendChild(b);
+  }
+}
+
+async function selecionarData(iso) {
+  dataSelecionada = iso;
+  resumoData.textContent = formatarBR(iso);
+  await carregarCalendario();
+  await carregarHorarios();
+  fecharModal('modal-data');
+  painelHorarios.classList.remove('oculto');
+}
+
+async function carregarHorarios() {
+  listaHorarios.innerHTML = '<li class="horario-linha texto-suave">Carregando agenda...</li>';
+  textoData.textContent = formatarBR(dataSelecionada);
+  const resp = await fetch(`{{ url_for('profissional.agenda_profissional_dia') }}?data=${dataSelecionada}`);
+  if (resp.status === 401) { listaHorarios.innerHTML = '<li class="horario-linha">Sessão expirada.</li>'; return; }
+  const dados = await resp.json();
+  listaHorarios.innerHTML = '';
+  if (!dados.aberto) {
+    textoResumo.textContent = `${diaSemanaTexto(dataSelecionada)} — dia fora do funcionamento.`;
+    listaHorarios.innerHTML = '<li class="horario-linha texto-suave">A loja não atende neste dia.</li>';
+    return;
+  }
+  const totalAg = (dados.horarios || []).filter(s => s.agendamento).length;
+  textoResumo.textContent = `${diaSemanaTexto(dataSelecionada)} — ${totalAg} atendimento(s) marcados.`;
+  dados.horarios.forEach(slot => {
+    const item = document.createElement('li');
+    item.className = 'horario-linha';
+    const hora = `<span class="horario-hora">${slot.horario}</span>`;
+    if (slot.agendamento) {
+      const ag = slot.agendamento;
+      const preco = ag.preco.toFixed(2).replace('.', ',');
+      item.classList.add('horario-ocupado');
+      item.innerHTML = `${hora}
+        <div class="horario-detalhe">
+          <div class="horario-cliente"><strong>${ag.cliente_nome}</strong> · <span>${ag.telefone}</span></div>
+          <div class="horario-servico">${ag.servico_nome} · R$ ${preco} · ${ag.duracao_min} min</div>
+        </div>
+        <div class="horario-acoes"><span class="status-badge status-${ag.status}">${ag.status}</span></div>`;
+    } else if (slot.bloqueado) {
+      item.classList.add('horario-bloqueado');
+      item.innerHTML = `${hora}
+        <div class="horario-detalhe"><div class="horario-cliente texto-suave">Indisponível (bloqueio)</div></div>
+        <div class="horario-acoes"><span class="status-badge status-bloqueado">bloqueio</span></div>`;
+    } else {
+      item.classList.add('horario-livre');
+      item.innerHTML = `${hora}
+        <div class="horario-detalhe"><div class="horario-cliente texto-suave">Livre</div></div>
+        <div class="horario-acoes"><span class="status-badge status-livre">livre</span></div>`;
+    }
+    listaHorarios.appendChild(item);
+  });
+}
+
+botaoEscolherData.addEventListener('click', () => { abrirModal('modal-data'); carregarCalendario(); });
+btnAnt.addEventListener('click', () => { mes--; if (mes < 0) { mes = 11; ano--; } carregarCalendario(); });
+btnProx.addEventListener('click', () => { mes++; if (mes > 11) { mes = 0; ano++; } carregarCalendario(); });
+document.querySelectorAll('[data-fechar-modal]').forEach(b => b.addEventListener('click', () => fecharModal(b.dataset.fecharModal)));
+document.querySelectorAll('.modal-fundo').forEach(m => m.addEventListener('click', e => { if (e.target === m) fecharModal(m.id); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-fundo:not(.oculto)').forEach(m => fecharModal(m.id)); });
+</script>
+
+{% endblock %}

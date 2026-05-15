@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o site se adaptar melhor a celulares e computadores. -->
     <title>{{ empresa.nome }}</title> <!-- Define o título da aba usando o nome da empresa. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}"> <!-- Carrega o CSS público do site. -->
+    <style>
+        /* Aplica as preferências visuais globais sobre as variáveis do tema padrão. */
+        :root {
+            --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
+            --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
+            --config-cor-fundo: {{ config_visual.cor_fundo or '#efe0d1' }};
+            --config-cor-destaque: {{ config_visual.cor_destaque or '#6f4f3f' }};
+        }
+        body { font-family: var(--config-fonte); background: var(--config-cor-fundo); color: var(--config-cor-texto); }
+        .topo, .rodape { background: var(--config-cor-destaque); }
+        .botao, .botao-form, button[type="submit"], .botao-destaque { background: var(--config-cor-destaque); }
+        .nav-destaque, nav a:hover { background: var(--config-cor-destaque) !important; }
+    </style>
 </head> <!-- Fecha a área de configurações. -->
 <body> <!-- Abre o corpo visível da página. -->
     <header class="topo"> <!-- Cria o cabeçalho fixo do site. -->
@@ -45,6 +58,7 @@
                 <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p> <!-- Mostra o usuário do Instagram. -->
                 <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p> <!-- Link para abrir Instagram. -->
                 <p><a class="link-admin-discreto" href="{{ url_for('admin.login') }}">Acesso à Administração</a></p> <!-- Link discreto para a área administrativa. -->
+                <p><a class="link-admin-discreto" href="{{ url_for('profissional.login_profissional') }}">Acesso da Profissional</a></p> <!-- Link discreto para a área restrita da profissional. -->
             </div> <!-- Fecha a terceira coluna. -->
         </div> <!-- Fecha o grid do rodapé. -->
     </footer> <!-- Fecha o rodapé. -->

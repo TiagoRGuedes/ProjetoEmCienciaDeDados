@@ -28,6 +28,12 @@
       <span class="form-help">A foto precisa estar dentro de <code>static/img/</code>. Use o mesmo nome do arquivo.</span> <!-- Ajuda sobre onde colocar a foto. -->
     </div> <!-- Fecha o grupo. -->
 
+    <div class="form-group"> <!-- Agrupa a senha de acesso da profissional. -->
+      <label class="form-label" for="senha">Senha de acesso da profissional</label> <!-- Rótulo da senha. -->
+      <input class="form-input" type="text" id="senha" name="senha" value="{{ form.senha if form else (profissional.senha if profissional else '') }}" maxlength="60" placeholder="{% if profissional %}deixe em branco para manter a senha atual{% else %}defina uma senha para o login restrito{% endif %}"> <!-- Campo da senha (opcional na edição para manter a atual). -->
+      <span class="form-help">A profissional usa essa senha em <code>/profissional/login</code> para ver a própria agenda e marcar bloqueios. Deixe em branco para não permitir login.</span> <!-- Texto de ajuda explicando o uso. -->
+    </div> <!-- Fecha o grupo de senha. -->
+
     <div class="form-group"> <!-- Agrupa o status. -->
       <label class="form-label">Status</label> <!-- Rótulo do status. -->
       <label class="checkbox-item" style="display:inline-flex;width:auto;"> <!-- Reusa o estilo de checkbox-card. -->

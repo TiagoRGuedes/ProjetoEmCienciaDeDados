@@ -38,6 +38,29 @@ h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); } /* Estiliza tít
 .navbar-link:hover { background: rgba(255, 255, 255, 0.18); text-decoration: none; color: white; } /* Define hover dos links admin. */
 .navbar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Destaca link ativo com o nude que aparece no topo do site. */
 
+/* ===== TOPBAR + SIDEBAR ADMIN (menu hamburguer) ===== */
+.topbar { background: var(--marrom-escuro); color: white; padding: 12px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 30; border-bottom: 3px solid var(--nude); } /* Barra superior do admin com hamburguer + marca. */
+.topbar-brand { color: white; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; text-decoration: none; } /* Marca clicável na topbar. */
+.topbar-brand:hover { text-decoration: none; opacity: 0.92; } /* Mantém o estilo no hover. */
+.botao-menu { background: transparent; border: 0; cursor: pointer; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; } /* Botão hamburguer minimalista. */
+.botao-menu span { display: block; width: 24px; height: 3px; background: white; border-radius: 2px; transition: 0.2s; } /* Cada uma das três barras do ícone. */
+.botao-menu:hover span { background: var(--nude); } /* Mostra interação ao passar o mouse. */
+
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; max-width: 80vw; background: var(--bege-card); border-right: 1px solid var(--nude); box-shadow: 4px 0 18px rgba(63, 45, 37, 0.15); transform: translateX(-100%); transition: transform 0.25s ease; z-index: 50; display: flex; flex-direction: column; } /* Menu lateral fechado por padrão. */
+.sidebar.aberta { transform: translateX(0); } /* Estado aberto: aparece deslizando da esquerda. */
+.sidebar-cabecalho { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--nude); color: var(--marrom-escuro); font-size: 1.05rem; } /* Cabeçalho do menu lateral. */
+.botao-fechar-menu { background: transparent; border: 0; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--marrom-escuro); } /* Botão X para fechar o menu. */
+.botao-fechar-menu:hover { color: var(--marrom-principal); } /* Estado hover do botão de fechar. */
+.sidebar-links { display: flex; flex-direction: column; padding: 12px 8px; gap: 4px; overflow-y: auto; } /* Lista de links em coluna dentro do menu. */
+.sidebar-link { display: block; padding: 11px 14px; border-radius: var(--radius-sm); color: var(--marrom-escuro); font-weight: 500; } /* Cada link do menu lateral. */
+.sidebar-link:hover { background: var(--bege-claro); text-decoration: none; color: var(--marrom-escuro); } /* Hover dos links. */
+.sidebar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Link ativo destacado. */
+.sidebar-link-sair { margin-top: 12px; border-top: 1px solid var(--nude); padding-top: 14px; color: var(--marrom-principal); } /* Estiliza o link de sair separado dos demais. */
+
+.sidebar-backdrop { position: fixed; inset: 0; background: rgba(45, 26, 18, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 40; } /* Fundo escuro do menu. */
+.sidebar-backdrop.visivel { opacity: 1; pointer-events: auto; } /* Aparece quando o menu está aberto. */
+body.sidebar-aberta { overflow: hidden; } /* Trava a rolagem do corpo quando o menu está aberto. */
+
 .container { max-width: 1180px; margin: 0 auto; padding: 28px 24px 48px; } /* Centraliza conteúdo admin alinhado ao container do site. */
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; } /* Organiza cabeçalho da página. */
 .page-title { display: flex; align-items: baseline; gap: 12px; margin: 0; color: var(--marrom-escuro); } /* Organiza título com contador. */

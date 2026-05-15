@@ -1,0 +1,69 @@
+{% extends 'profissional/_base.html' %}
+{% block title %}Indisponibilidades{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">Minhas indisponibilidades</h1>
+  <p class="texto-suave">Marque os dias e horários em que você <strong>não</strong> vai poder comparecer.</p>
+</div>
+
+<div class="card" style="max-width: 720px;">
+  <form method="POST" class="form-grid">
+    <div class="form-group">
+      <label class="form-label" for="data">Data</label>
+      <input class="form-input" type="date" id="data" name="data" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="horario">Horário</label>
+      <select class="form-select" id="horario" name="horario">
+        <option value="dia_inteiro">Dia inteiro</option>
+        {% for h in horarios %}
+        <option value="{{ h }}">{{ h }}</option>
+        {% endfor %}
+      </select>
+      <span class="form-help">Escolha "Dia inteiro" para bloquear todos os horários do dia.</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="motivo">Motivo (opcional)</label>
+      <input class="form-input" type="text" id="motivo" name="motivo" maxlength="120" placeholder="Ex: consulta médica, folga, viagem">
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Marcar indisponibilidade</button>
+    </div>
+  </form>
+</div>
+
+{% if bloqueios %}
+<div class="table-wrapper" style="margin-top: 18px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Motivo</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bloqueios %}
+      <tr>
+        <td>{{ b.data }}</td>
+        <td>{{ b.horario or 'Dia inteiro' }}</td>
+        <td>{{ b.motivo }}</td>
+        <td class="actions">
+          <form method="POST" action="{{ url_for('profissional.bloqueio_profissional_excluir', bid=b.id) }}" onsubmit="return confirm('Remover essa indisponibilidade?');">
+            <button type="submit" class="btn btn-sm btn-danger">Remover</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card" style="margin-top: 18px;">
+  <p><strong>Nenhuma indisponibilidade cadastrada ainda.</strong></p>
+</div>
+{% endif %}
+
+{% endblock %}
