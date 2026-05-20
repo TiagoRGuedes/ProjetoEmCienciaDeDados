@@ -32,8 +32,10 @@ CREATE TABLE IF NOT EXISTS profissionais (
     -- Guarda a especialidade principal da profissional.
     foto TEXT NOT NULL,
     -- Guarda o nome do arquivo de imagem usado no card.
-    ativo INTEGER NOT NULL DEFAULT 1
+    ativo INTEGER NOT NULL DEFAULT 1,
     -- Controla se a profissional aparece ou não no agendamento.
+    senha TEXT
+    -- Guarda a senha da profissional para o login da área restrita (pode ser NULL antes do admin definir).
 );
 -- Finaliza a tabela profissionais.
 
@@ -70,6 +72,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     -- Guarda o horário do atendimento.
     status TEXT NOT NULL,
     -- Guarda o status do agendamento.
+    arquivado INTEGER NOT NULL DEFAULT 0,
+    -- Marca como 1 quando o atendimento foi movido para o histórico (limpa o dashboard).
     FOREIGN KEY (cliente_id) REFERENCES clientes(id),
     -- Liga o agendamento ao cliente.
     FOREIGN KEY (servico_id) REFERENCES servicos(id),
@@ -95,3 +99,13 @@ CREATE TABLE IF NOT EXISTS bloqueios_agenda (
     -- Liga o bloqueio à profissional.
 );
 -- Finaliza a tabela bloqueios_agenda.
+
+CREATE TABLE IF NOT EXISTS configuracoes (
+    -- Cria a tabela chave-valor que guarda preferências visuais globais do sistema.
+    chave TEXT PRIMARY KEY,
+    -- Nome da preferência (ex: fonte, cor_texto, cor_fundo, cor_destaque).
+    valor TEXT NOT NULL
+    -- Valor associado à preferência (ex: 'Arial', '#3f2d25', '#efe0d1').
+);
+-- Finaliza a tabela configuracoes.
+

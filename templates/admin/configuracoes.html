@@ -1,0 +1,62 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Aparência{% endblock %} {# Define o título da aba. #}
+{% block content %} {# Começa o conteúdo. #}
+
+<div class="page-header"> <!-- Cabeçalho da página. -->
+  <h1 class="page-title">Configurações visuais</h1> <!-- Título. -->
+  <p class="texto-suave">Personalize a fonte e as cores que aparecem em todo o site (área pública, admin e área da profissional).</p> <!-- Texto explicativo. -->
+</div>
+
+<div class="card" style="max-width: 720px;"> <!-- Cartão com largura limitada. -->
+  <form method="POST" action="{{ url_for('admin.configuracoes') }}" class="form-grid"> <!-- Formulário das configurações visuais. -->
+
+    <div class="form-group"> <!-- Grupo da fonte. -->
+      <label class="form-label" for="fonte">Fonte do site</label>
+      <select class="form-select" id="fonte" name="fonte"> <!-- Lista de fontes pré-definidas e seguras para web. -->
+        {% set opcoes_fonte = [
+          ('Arial, Helvetica, sans-serif', 'Arial'),
+          ('Georgia, serif', 'Georgia'),
+          ('"Times New Roman", Times, serif', 'Times New Roman'),
+          ('Tahoma, Geneva, sans-serif', 'Tahoma'),
+          ('Verdana, Geneva, sans-serif', 'Verdana'),
+          ('"Trebuchet MS", sans-serif', 'Trebuchet MS'),
+          ('"Courier New", Courier, monospace', 'Courier New')
+        ] %}
+        {% for valor, rotulo in opcoes_fonte %}
+        <option value="{{ valor }}" {% if config.fonte == valor %}selected{% endif %}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+      <span class="form-help">A fonte se aplica em todas as páginas, tanto admin quanto pública.</span>
+    </div>
+
+    <div class="form-group"> <!-- Grupo da cor de texto. -->
+      <label class="form-label" for="cor_texto">Cor do texto</label>
+      <input class="form-input" type="color" id="cor_texto" name="cor_texto" value="{{ config.cor_texto or '#3f2d25' }}" style="height: 48px; padding: 4px;"> <!-- Picker de cor de texto. -->
+      <span class="form-help">Cor principal dos textos. Sugestão: tons escuros para boa leitura.</span>
+    </div>
+
+    <div class="form-group"> <!-- Grupo da cor de fundo. -->
+      <label class="form-label" for="cor_fundo">Cor de fundo</label>
+      <input class="form-input" type="color" id="cor_fundo" name="cor_fundo" value="{{ config.cor_fundo or '#efe0d1' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de fundo. -->
+      <span class="form-help">Cor de fundo geral. Use tons claros para combinar com a paleta marrom/bege.</span>
+    </div>
+
+    <div class="form-group"> <!-- Grupo da cor de destaque. -->
+      <label class="form-label" for="cor_destaque">Cor de destaque (botões e topo)</label>
+      <input class="form-input" type="color" id="cor_destaque" name="cor_destaque" value="{{ config.cor_destaque or '#6f4f3f' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de destaque. -->
+      <span class="form-help">Cor de botões principais e elementos de destaque.</span>
+    </div>
+
+    <div class="card" style="margin: 6px 0; background: var(--bege-claro);"> <!-- Pré-visualização rápida. -->
+      <strong>Pré-visualização rápida</strong>
+      <p style="margin-top: 6px;">Atualize a página depois de salvar para ver as cores em toda a interface.</p>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Salvar configurações</button>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
