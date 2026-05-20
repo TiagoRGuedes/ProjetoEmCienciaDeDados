@@ -1,36 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Admin{% endblock %} — Esmalteria</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body>
-  <nav class="navbar">
-    <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">Refúgio da Preta · Admin</a>
-    <div class="navbar-links">
-      <a href="{{ url_for('admin.dashboard') }}" class="navbar-link {% if request.endpoint and (request.endpoint == 'admin.dashboard' or request.endpoint.startswith('admin.agendamento')) %}active{% endif %}">Agendamentos</a>
-      <a href="{{ url_for('admin.profissionais') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.profissional') %}active{% endif %}">Profissionais</a>
-      <a href="{{ url_for('admin.servicos') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a>
-      <a href="{{ url_for('admin.bloqueios') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a>
-      <a href="{{ url_for('admin.clientes') }}" class="navbar-link {% if request.endpoint and request.endpoint.startswith('admin.client') %}active{% endif %}">Clientes</a>
-      <a href="{{ url_for('admin.logout') }}" class="navbar-link">Sair</a>
+<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
+<html lang="pt-BR"> <!-- Abre o documento HTML e define português do Brasil como idioma. -->
+<head> <!-- Abre a área de configurações da página admin. -->
+  <meta charset="UTF-8"> <!-- Permite acentos e caracteres especiais. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o painel se adaptar a diferentes telas. -->
+  <title>{% block title %}Admin{% endblock %} — Esmalteria</title> <!-- Define o título da aba com um bloco editável. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Carrega o CSS do painel administrativo. -->
+  <style>
+    /* Aplica as preferências visuais globais usando variáveis CSS para sobrescrever cores e fonte. */
+    :root {
+      --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
+      --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
+      --config-cor-fundo: {{ config_visual.cor_fundo or '#efe0d1' }};
+      --config-cor-destaque: {{ config_visual.cor_destaque or '#6f4f3f' }};
+    }
+    body { font-family: var(--config-fonte); background: var(--config-cor-fundo); color: var(--config-cor-texto); }
+    .btn-primary, .btn-success { background: var(--config-cor-destaque); border-color: var(--config-cor-destaque); }
+    .navbar { background: var(--config-cor-destaque); }
+    .page-title, .table thead th, .form-label { color: var(--config-cor-texto); }
+  </style>
+</head> <!-- Fecha o head. -->
+<body> <!-- Abre o corpo visível da página admin. -->
+
+  <header class="topbar"> <!-- Barra superior fixa com hamburguer e marca. -->
+    <button id="botao-menu" class="botao-menu" aria-label="Abrir menu" aria-controls="sidebar-admin" aria-expanded="false">
+      <span></span><span></span><span></span> <!-- Três barras do ícone hamburguer. -->
+    </button>
+    <a href="{{ url_for('admin.dashboard') }}" class="topbar-brand">Refúgio da Preta · Admin</a> <!-- Marca clicável que volta ao dashboard. -->
+  </header>
+
+  <aside id="sidebar-admin" class="sidebar" aria-hidden="true"> <!-- Menu lateral escondido por padrão. -->
+    <div class="sidebar-cabecalho"> <!-- Topo da sidebar. -->
+      <strong>Administração</strong>
+      <button id="botao-fechar-menu" class="botao-fechar-menu" aria-label="Fechar menu">×</button>
     </div>
-  </nav>
+    <nav class="sidebar-links" aria-label="Menu administrativo"> <!-- Lista de links. -->
+      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint and (request.endpoint == 'admin.dashboard' or request.endpoint.startswith('admin.agendamento')) %}active{% endif %}">Agendamentos</a>
+      <a href="{{ url_for('admin.historico') }}" class="sidebar-link {% if request.endpoint and (request.endpoint == 'admin.historico' or request.endpoint == 'admin.agendamento_restaurar') %}active{% endif %}">Histórico</a>
+      <a href="{{ url_for('admin.agenda') }}" class="sidebar-link {% if request.endpoint == 'admin.agenda' %}active{% endif %}">Agenda</a>
+      <a href="{{ url_for('admin.profissionais') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.profissional') %}active{% endif %}">Profissionais</a>
+      <a href="{{ url_for('admin.servicos') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a>
+      <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a>
+      <a href="{{ url_for('admin.clientes') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.client') %}active{% endif %}">Clientes</a>
+      <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if request.endpoint == 'admin.configuracoes' %}active{% endif %}">Aparência</a>
+      <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-link-sair">Sair</a>
+    </nav>
+  </aside>
 
-  <main class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flash-list">
-          {% for category, msg in messages %}
-            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+  <div id="backdrop-sidebar" class="sidebar-backdrop" aria-hidden="true"></div> <!-- Fundo escuro que aparece junto com a sidebar. -->
 
-    {% block content %}{% endblock %}
-  </main>
-</body>
-</html>
+  <main class="container"> <!-- Abre o conteúdo principal do admin dentro de um container. -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {# Busca mensagens temporárias enviadas pelo Flask. #}
+      {% if messages %} {# Verifica se existem mensagens para mostrar. #}
+        <ul class="flash-list"> <!-- Cria uma lista visual de mensagens. -->
+          {% for category, msg in messages %} {# Percorre cada mensagem recebida. #}
+            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li> <!-- Mostra a mensagem com classe de cor adequada. -->
+          {% endfor %} {# Finaliza o loop de mensagens. #}
+        </ul> <!-- Fecha a lista de mensagens. -->
+      {% endif %} {# Finaliza a verificação de mensagens. #}
+    {% endwith %} {# Finaliza o bloco de mensagens flash. #}
+
+    {% block content %}{% endblock %} <!-- Define o espaço onde cada página admin coloca seu conteúdo. -->
+  </main> <!-- Fecha o conteúdo principal do admin. -->
+
+  <script>
+    // Controla a abertura/fechamento da sidebar do admin.
+    (function () {
+      const sidebar = document.getElementById('sidebar-admin');
+      const backdrop = document.getElementById('backdrop-sidebar');
+      const botaoMenu = document.getElementById('botao-menu');
+      const botaoFechar = document.getElementById('botao-fechar-menu');
+      function abrir() {
+        sidebar.classList.add('aberta');
+        backdrop.classList.add('visivel');
+        sidebar.setAttribute('aria-hidden', 'false');
+        botaoMenu.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('sidebar-aberta');
+      }
+      function fechar() {
+        sidebar.classList.remove('aberta');
+        backdrop.classList.remove('visivel');
+        sidebar.setAttribute('aria-hidden', 'true');
+        botaoMenu.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('sidebar-aberta');
+      }
+      botaoMenu.addEventListener('click', abrir);
+      botaoFechar.addEventListener('click', fechar);
+      backdrop.addEventListener('click', fechar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+    })();
+  </script>
+</body> <!-- Fecha o corpo da página. -->
+</html> <!-- Fecha o documento HTML. -->

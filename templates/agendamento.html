@@ -1,39 +1,39 @@
-{% extends "base.html" %}
-{% block conteudo %}
-<section class="secao agendamento-page">
-    <div class="container formulario-area">
-        <div class="agendamento-cabecalho">
-            <p class="subtitulo subtitulo-escuro">Agendamento online</p>
-            <h2>Vamos começar o seu agendamento</h2>
-            <p>Informe seu nome e telefone para contato. Em seguida vamos escolher serviço, profissional, data e horário em etapas rápidas.</p>
-            <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p>
-        </div>
+{% extends "base.html" %} {# Usa o layout base com cabeçalho e rodapé. #}
+{% block conteudo %} {# Começa o conteúdo específico da página de agendamento. #}
+<section class="secao agendamento-page"> <!-- Cria a seção principal do agendamento. -->
+    <div class="container formulario-area"> <!-- Centraliza e limita a largura do conteúdo. -->
+        <div class="agendamento-cabecalho"> <!-- Cria o cabeçalho visual da tela de agendamento. -->
+            <p class="subtitulo subtitulo-escuro">Agendamento online</p> <!-- Mostra um subtítulo da página. -->
+            <h2>Vamos começar o seu agendamento</h2> <!-- Mostra o título principal. -->
+            <p>Informe seu nome e telefone para contato. Em seguida vamos escolher serviço, profissional, data e horário em etapas rápidas.</p> <!-- Explica o novo fluxo guiado. -->
+            <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
+        </div> <!-- Fecha o cabeçalho visual. -->
 
-        {% if erro %}
-        <div class="mensagem-erro">
-            <strong>{{ erro }}</strong>
-        </div>
-        {% endif %}
+        {% if erro %} {# Verifica se existe mensagem de erro enviada pelo Flask. #}
+        <div class="mensagem-erro"> <!-- Cria uma caixa visual para o erro. -->
+            <strong>{{ erro }}</strong> <!-- Mostra o texto do erro. -->
+        </div> <!-- Fecha a caixa de erro. -->
+        {% endif %} {# Finaliza a verificação de erro. #}
 
-        <form method="POST" action="{{ url_for('publico.agendar_post') }}" class="form-box agendamento-form" id="form-agendamento">
+        <form method="POST" action="{{ url_for('publico.agendar_post') }}" class="form-box agendamento-form" id="form-agendamento"> <!-- Cria o formulário que envia os dados para a rota POST /agendar. -->
 
-            <div class="passo-agendamento">
-                <span class="numero-passo">1</span>
-                <div>
-                    <h3>Seus dados de contato</h3>
-                    <p>Vamos precisar apenas do seu nome e telefone para confirmar o agendamento.</p>
-                </div>
-            </div>
+            <div class="passo-agendamento"> <!-- Cria o primeiro bloco do agendamento. -->
+                <span class="numero-passo">1</span> <!-- Mostra o número do passo. -->
+                <div> <!-- Abre a área de conteúdo do passo. -->
+                    <h3>Seus dados de contato</h3> <!-- Mostra o título do primeiro passo. -->
+                    <p>Vamos precisar apenas do seu nome e telefone para confirmar o agendamento.</p> <!-- Explica o que será pedido. -->
+                </div> <!-- Fecha a área de conteúdo do passo. -->
+            </div> <!-- Fecha o primeiro bloco. -->
 
-            <label for="nome">Nome completo:</label>
-            <input type="text" id="nome" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required>
+            <label for="nome">Nome completo:</label> <!-- Identifica o campo de nome. -->
+            <input type="text" id="nome" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required> <!-- Campo para digitar o nome da cliente. -->
 
-            <label for="telefone">Telefone para contato:</label>
-            <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required>
+            <label for="telefone">Telefone para contato:</label> <!-- Identifica o campo de telefone. -->
+            <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required> <!-- Campo para digitar o telefone da cliente. -->
 
-            <div class="resumo-escolhas oculto" id="resumo-escolhas">
-                <h4>Resumo do seu agendamento</h4>
-                <ul>
+            <div class="resumo-escolhas oculto" id="resumo-escolhas"> <!-- Cria área que resume as escolhas feitas nos modais. -->
+                <h4>Resumo do seu agendamento</h4> <!-- Mostra título do resumo. -->
+                <ul> <!-- Cria lista do resumo. -->
                     <li><strong>Serviço:</strong> <span id="resumo-servico">—</span></li>
                     <li><strong>Profissional:</strong> <span id="resumo-profissional">—</span></li>
                     <li><strong>Data:</strong> <span id="resumo-data">—</span></li>
@@ -50,6 +50,8 @@
         </form>
     </div>
 </section>
+
+<!-- ===================== MODAIS ===================== -->
 
 <div class="modal-fundo oculto" id="modal-servico" aria-hidden="true">
     <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-servico">
@@ -127,16 +129,9 @@
                 <button type="button" class="calendario-nav" id="mes-proximo">›</button>
             </div>
             <div class="calendario-semana">
-                <span>Dom</span>
-                <span>Seg</span>
-                <span>Ter</span>
-                <span>Qua</span>
-                <span>Qui</span>
-                <span>Sex</span>
-                <span>Sáb</span>
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
             </div>
-            <div class="calendario-grade" id="calendario-grade">
-            </div>
+            <div class="calendario-grade" id="calendario-grade"></div>
             <div class="calendario-legenda">
                 <span><i class="legenda livre"></i> Disponível</span>
                 <span><i class="legenda lotado"></i> Sem horários</span>
@@ -164,8 +159,7 @@
         </div>
 
         <div class="painel-horarios">
-            <div class="horarios" id="horarios-grade">
-            </div>
+            <div class="horarios" id="horarios-grade"></div>
         </div>
 
         <p class="erro-modal oculto" id="erro-modal-horario">Selecione um horário disponível para continuar.</p>
@@ -180,43 +174,36 @@
 <script>
 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const mapaProfissionaisServicos = {{ profissionais_servicos|tojson }};
-
 const campoServico = document.getElementById('servico_id');
 const campoProfissional = document.getElementById('profissional_id');
 const campoData = document.getElementById('data');
 const campoHorario = document.getElementById('horario');
 const campoNome = document.getElementById('nome');
 const campoTelefone = document.getElementById('telefone');
-
 const selectServicoModal = document.getElementById('modal-servico-select');
 const erroModalServico = document.getElementById('erro-modal-servico');
-
 const gradeProfissionaisModal = document.getElementById('modal-profissionais-grid');
 const avisoModalProfissional = document.getElementById('aviso-modal-profissional');
 const erroModalProfissional = document.getElementById('erro-modal-profissional');
-
 const tituloCalendario = document.getElementById('calendario-titulo');
 const gradeCalendario = document.getElementById('calendario-grade');
 const botaoAnterior = document.getElementById('mes-anterior');
 const botaoProximo = document.getElementById('mes-proximo');
 const erroModalData = document.getElementById('erro-modal-data');
-
 const gradeHorarios = document.getElementById('horarios-grade');
 const textoDataEscolhida = document.getElementById('data-escolhida-texto');
 const erroModalHorario = document.getElementById('erro-modal-horario');
-
 const resumoEscolhas = document.getElementById('resumo-escolhas');
 const resumoServico = document.getElementById('resumo-servico');
 const resumoProfissional = document.getElementById('resumo-profissional');
 const resumoData = document.getElementById('resumo-data');
 const resumoHorario = document.getElementById('resumo-horario');
-
 const botaoIniciar = document.getElementById('botao-iniciar-etapas');
 const formulario = document.getElementById('form-agendamento');
 
 let hoje = new Date();
 let anoAtual = hoje.getFullYear();
-let mesAtual = hoje.getMonth(); // 0-indexed; a API espera mês 1-indexed (mesAtual + 1)
+let mesAtual = hoje.getMonth();
 let dataSelecionada = campoData.value;
 
 function abrirModal(id) {
@@ -344,9 +331,7 @@ function selecionarData(dataISO) {
 async function carregarHorarios() {
     const profissionalId = campoProfissional.value;
     gradeHorarios.innerHTML = '';
-    if (!profissionalId || !dataSelecionada) {
-        return;
-    }
+    if (!profissionalId || !dataSelecionada) { return; }
     const resposta = await fetch(`/horarios-disponiveis?data=${dataSelecionada}&profissional_id=${profissionalId}`);
     const dados = await resposta.json();
     textoDataEscolhida.textContent = formatarDataBrasil(dataSelecionada);
@@ -372,15 +357,11 @@ botaoIniciar.addEventListener('click', () => {
 });
 
 document.querySelectorAll('[data-fechar-modal]').forEach(botao => {
-    botao.addEventListener('click', () => {
-        fecharModal(botao.dataset.fecharModal);
-    });
+    botao.addEventListener('click', () => { fecharModal(botao.dataset.fecharModal); });
 });
 
 document.querySelectorAll('[data-voltar-modal]').forEach(botao => {
-    botao.addEventListener('click', () => {
-        abrirModal(botao.dataset.voltarModal);
-    });
+    botao.addEventListener('click', () => { abrirModal(botao.dataset.voltarModal); });
 });
 
 document.querySelectorAll('.modal-fundo').forEach(modal => {

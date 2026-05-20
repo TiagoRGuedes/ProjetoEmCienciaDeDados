@@ -1,127 +1,250 @@
-:root {
-  --marrom-principal: #6f4f3f;
-  --marrom-escuro: #4b3329;
-  --marrom-medio: #8a6a58;
-  --bege-principal: #efe0d1;
-  --bege-claro: #f8f0e8;
-  --bege-card: #fffaf5;
-  --nude: #d9bca8;
-  --rosa-detalhe: #c9879a;
-  --rosa-claro: #f3dbe2;
-  --texto-base: #3f2d25;
-  --texto-suave: #6f5a4f;
-  --cinza-300: #d8cfc4;
-  --cinza-100: #f1eae0;
-  --verde-sucesso: #4f8a4f;
-  --verde-fundo: #e8f1e2;
-  --amarelo-aviso: #a87a1a;
-  --amarelo-fundo: #f6e9c8;
-  --vermelho-erro: #b14b59;
-  --vermelho-fundo: #f3d8dd;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 2px 10px rgba(63, 45, 37, 0.10);
-  --shadow-lg: 0 8px 24px rgba(63, 45, 37, 0.16);
-}
+:root { /* Cria variáveis globais para o painel administrativo. */
+  --marrom-principal: #6f4f3f; /* Define o marrom principal alinhado ao site público. */
+  --marrom-escuro: #4b3329; /* Define um marrom escuro para títulos e fundo da navbar. */
+  --marrom-medio: #8a6a58; /* Define um marrom médio para detalhes e hover. */
+  --bege-principal: #efe0d1; /* Define o bege principal do fundo. */
+  --bege-claro: #f8f0e8; /* Define um bege bem claro para áreas suaves. */
+  --bege-card: #fffaf5; /* Define um bege quase branco para cartões e linhas. */
+  --nude: #d9bca8; /* Define o nude usado em bordas e detalhes. */
+  --rosa-detalhe: #c9879a; /* Define o rosa apenas como detalhe visual. */
+  --rosa-claro: #f3dbe2; /* Define rosa claro para destaques pequenos. */
+  --texto-base: #3f2d25; /* Define a cor principal dos textos. */
+  --texto-suave: #6f5a4f; /* Define a cor de textos secundários. */
+  --cinza-300: #d8cfc4; /* Define um tom bege/cinza para bordas. */
+  --cinza-100: #f1eae0; /* Define um tom bege bem claro para fundos. */
+  --verde-sucesso: #4f8a4f; /* Define verde para sucesso. */
+  --verde-fundo: #e8f1e2; /* Define fundo verde claro. */
+  --amarelo-aviso: #a87a1a; /* Define dourado para aviso, combinando com a paleta. */
+  --amarelo-fundo: #f6e9c8; /* Define fundo amarelo claro. */
+  --vermelho-erro: #b14b59; /* Define vermelho/rosa escuro para erro. */
+  --vermelho-fundo: #f3d8dd; /* Define fundo vermelho claro. */
+  --radius: 10px; /* Define arredondamento padrão. */
+  --radius-sm: 6px; /* Define arredondamento menor. */
+  --shadow: 0 2px 10px rgba(63, 45, 37, 0.10); /* Define sombra padrão com tom marrom. */
+  --shadow-lg: 0 8px 24px rgba(63, 45, 37, 0.16); /* Define sombra grande. */
+} /* Fecha as variáveis do admin. */
 
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body { font-family: Arial, Helvetica, sans-serif; color: var(--texto-base); background: var(--bege-principal); min-height: 100vh; }
-a { color: var(--marrom-principal); text-decoration: none; }
-a:hover { text-decoration: underline; color: var(--marrom-escuro); }
-h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); }
+* { box-sizing: border-box; } /* Faz todos os elementos calcularem tamanho incluindo padding e borda. */
+html, body { margin: 0; padding: 0; } /* Remove margem e padding padrão do navegador. */
+body { font-family: Arial, Helvetica, sans-serif; color: var(--texto-base); background: var(--bege-principal); min-height: 100vh; } /* Estiliza o corpo do admin com a paleta marrom/bege. */
+a { color: var(--marrom-principal); text-decoration: none; } /* Estiliza links do admin. */
+a:hover { text-decoration: underline; color: var(--marrom-escuro); } /* Sublinha links ao passar o mouse. */
+h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); } /* Estiliza títulos do admin. */
 
-.navbar { background: var(--marrom-escuro); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; border-bottom: 3px solid var(--nude); }
-.navbar-brand { font-size: 1.15rem; font-weight: 700; color: white; letter-spacing: 0.3px; }
-.navbar-links { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.navbar-link { color: rgba(255, 255, 255, 0.92); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 500; }
-.navbar-link:hover { background: rgba(255, 255, 255, 0.18); text-decoration: none; color: white; }
-.navbar-link.active { background: var(--nude); color: var(--marrom-escuro); }
+.navbar { background: var(--marrom-escuro); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; border-bottom: 3px solid var(--nude); } /* Cria a barra superior do admin combinando com o site público. */
+.navbar-brand { font-size: 1.15rem; font-weight: 700; color: white; letter-spacing: 0.3px; } /* Estiliza a marca do admin. */
+.navbar-links { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } /* Organiza links da navbar. */
+.navbar-link { color: rgba(255, 255, 255, 0.92); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 500; } /* Estiliza links do menu admin. */
+.navbar-link:hover { background: rgba(255, 255, 255, 0.18); text-decoration: none; color: white; } /* Define hover dos links admin. */
+.navbar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Destaca link ativo com o nude que aparece no topo do site. */
 
-.container { max-width: 1180px; margin: 0 auto; padding: 28px 24px 48px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
-.page-title { display: flex; align-items: baseline; gap: 12px; margin: 0; color: var(--marrom-escuro); }
-.page-counter { font-size: 0.9rem; color: var(--texto-suave); font-weight: 500; }
-.card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; border: 1px solid var(--nude); }
+/* ===== TOPBAR + SIDEBAR ADMIN (menu hamburguer) ===== */
+.topbar { background: var(--marrom-escuro); color: white; padding: 12px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 30; border-bottom: 3px solid var(--nude); } /* Barra superior do admin com hamburguer + marca. */
+.topbar-brand { color: white; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; text-decoration: none; } /* Marca clicável na topbar. */
+.topbar-brand:hover { text-decoration: none; opacity: 0.92; } /* Mantém o estilo no hover. */
+.botao-menu { background: transparent; border: 0; cursor: pointer; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; } /* Botão hamburguer minimalista. */
+.botao-menu span { display: block; width: 24px; height: 3px; background: white; border-radius: 2px; transition: 0.2s; } /* Cada uma das três barras do ícone. */
+.botao-menu:hover span { background: var(--nude); } /* Mostra interação ao passar o mouse. */
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.92rem; font-weight: 500; cursor: pointer; text-decoration: none; }
-.btn:hover { text-decoration: none; }
-.btn-primary { background: var(--marrom-principal); color: white; }
-.btn-primary:hover { background: var(--marrom-escuro); color: white; }
-.btn-secondary { background: var(--bege-card); color: var(--marrom-escuro); border-color: var(--nude); }
-.btn-secondary:hover { background: var(--bege-claro); color: var(--marrom-escuro); }
-.btn-success { background: var(--verde-sucesso); color: white; }
-.btn-success:hover { background: #3f6f3f; color: white; }
-.btn-danger { background: var(--vermelho-erro); color: white; }
-.btn-danger:hover { background: #8d3a46; color: white; }
-.btn-accent { background: var(--rosa-detalhe); color: white; }
-.btn-accent:hover { background: #b3697e; color: white; }
-.btn-sm { padding: 6px 11px; font-size: 0.85rem; }
-.btn-block { width: 100%; }
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; max-width: 80vw; background: var(--bege-card); border-right: 1px solid var(--nude); box-shadow: 4px 0 18px rgba(63, 45, 37, 0.15); transform: translateX(-100%); transition: transform 0.25s ease; z-index: 50; display: flex; flex-direction: column; } /* Menu lateral fechado por padrão. */
+.sidebar.aberta { transform: translateX(0); } /* Estado aberto: aparece deslizando da esquerda. */
+.sidebar-cabecalho { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--nude); color: var(--marrom-escuro); font-size: 1.05rem; } /* Cabeçalho do menu lateral. */
+.botao-fechar-menu { background: transparent; border: 0; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--marrom-escuro); } /* Botão X para fechar o menu. */
+.botao-fechar-menu:hover { color: var(--marrom-principal); } /* Estado hover do botão de fechar. */
+.sidebar-links { display: flex; flex-direction: column; padding: 12px 8px; gap: 4px; overflow-y: auto; } /* Lista de links em coluna dentro do menu. */
+.sidebar-link { display: block; padding: 11px 14px; border-radius: var(--radius-sm); color: var(--marrom-escuro); font-weight: 500; } /* Cada link do menu lateral. */
+.sidebar-link:hover { background: var(--bege-claro); text-decoration: none; color: var(--marrom-escuro); } /* Hover dos links. */
+.sidebar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Link ativo destacado. */
+.sidebar-link-sair { margin-top: 12px; border-top: 1px solid var(--nude); padding-top: 14px; color: var(--marrom-principal); } /* Estiliza o link de sair separado dos demais. */
 
-.table-wrapper { overflow-x: auto; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--nude); }
-.table { width: 100%; border-collapse: collapse; font-size: 0.94rem; }
-.table thead th { text-align: left; padding: 14px 16px; background: var(--bege-claro); color: var(--marrom-escuro); font-weight: 600; border-bottom: 2px solid var(--nude); }
-.table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--cinza-100); vertical-align: middle; color: var(--texto-base); }
-.table tbody tr:hover { background: var(--bege-claro); }
-.table .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.table .actions form { margin: 0; display: inline; }
+.sidebar-backdrop { position: fixed; inset: 0; background: rgba(45, 26, 18, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 40; } /* Fundo escuro do menu. */
+.sidebar-backdrop.visivel { opacity: 1; pointer-events: auto; } /* Aparece quando o menu está aberto. */
+body.sidebar-aberta { overflow: hidden; } /* Trava a rolagem do corpo quando o menu está aberto. */
 
-.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; text-transform: capitalize; }
-.badge-pendente { background: var(--amarelo-fundo); color: var(--amarelo-aviso); }
-.badge-confirmado { background: var(--verde-fundo); color: #2f6432; }
-.badge-cancelado { background: var(--vermelho-fundo); color: #8b2a40; }
-.badge-ativo { background: var(--verde-fundo); color: #2f6432; }
-.badge-inativo { background: var(--cinza-100); color: var(--texto-suave); }
+.container { max-width: 1180px; margin: 0 auto; padding: 28px 24px 48px; } /* Centraliza conteúdo admin alinhado ao container do site. */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; } /* Organiza cabeçalho da página. */
+.page-title { display: flex; align-items: baseline; gap: 12px; margin: 0; color: var(--marrom-escuro); } /* Organiza título com contador. */
+.page-counter { font-size: 0.9rem; color: var(--texto-suave); font-weight: 500; } /* Estiliza contador. */
+.card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; border: 1px solid var(--nude); } /* Cria cartões com tom bege claro. */
 
-.form-grid { display: grid; gap: 16px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-weight: 500; font-size: 0.9rem; color: var(--marrom-escuro); }
-.form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid var(--nude); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: white; color: var(--texto-base); }
-.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--marrom-medio); box-shadow: 0 0 0 3px rgba(138, 106, 88, 0.20); }
-.form-textarea { resize: vertical; min-height: 90px; }
-.form-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-.form-help { font-size: 0.82rem; color: var(--texto-suave); }
-.filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 16px 18px; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; border: 1px solid var(--nude); }
-.filter-actions { display: flex; gap: 8px; margin-left: auto; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.92rem; font-weight: 500; cursor: pointer; text-decoration: none; } /* Estiliza botões base. */
+.btn:hover { text-decoration: none; } /* Remove sublinhado no hover de botões. */
+.btn-primary { background: var(--marrom-principal); color: white; } /* Botão principal em marrom. */
+.btn-primary:hover { background: var(--marrom-escuro); color: white; } /* Escurece botão principal ao passar mouse. */
+.btn-secondary { background: var(--bege-card); color: var(--marrom-escuro); border-color: var(--nude); } /* Botão secundário em bege claro. */
+.btn-secondary:hover { background: var(--bege-claro); color: var(--marrom-escuro); } /* Hover do botão secundário. */
+.btn-success { background: var(--verde-sucesso); color: white; } /* Botão de confirmação. */
+.btn-success:hover { background: #3f6f3f; color: white; } /* Hover do botão de sucesso. */
+.btn-danger { background: var(--vermelho-erro); color: white; } /* Botão de cancelamento. */
+.btn-danger:hover { background: #8d3a46; color: white; } /* Hover do botão de perigo. */
+.btn-accent { background: var(--rosa-detalhe); color: white; } /* Botão de detalhe rosa, usado com parcimônia. */
+.btn-accent:hover { background: #b3697e; color: white; } /* Hover do botão de detalhe. */
+.btn-sm { padding: 6px 11px; font-size: 0.85rem; } /* Cria botões menores. */
+.btn-block { width: 100%; } /* Botão ocupando toda a largura. */
 
-.flash-list { list-style: none; padding: 0; margin: 0 0 18px 0; display: flex; flex-direction: column; gap: 8px; }
-.flash { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.93rem; border-left: 4px solid; }
-.flash-success { background: var(--verde-fundo); border-color: var(--verde-sucesso); color: #2f6432; }
-.flash-error { background: var(--vermelho-fundo); border-color: var(--vermelho-erro); color: #8b2a40; }
-.flash-info { background: var(--bege-claro); border-color: var(--nude); color: var(--marrom-escuro); }
-.empty-state { text-align: center; padding: 48px 20px; color: var(--texto-suave); }
+.table-wrapper { overflow-x: auto; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--nude); } /* Cria área para tabela com rolagem. */
+.table { width: 100%; border-collapse: collapse; font-size: 0.94rem; } /* Estiliza tabela. */
+.table thead th { text-align: left; padding: 14px 16px; background: var(--bege-claro); color: var(--marrom-escuro); font-weight: 600; border-bottom: 2px solid var(--nude); } /* Estiliza cabeçalho da tabela. */
+.table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--cinza-100); vertical-align: middle; color: var(--texto-base); } /* Estiliza células da tabela. */
+.table tbody tr:hover { background: var(--bege-claro); } /* Destaca linha ao passar mouse. */
+.table .actions { display: flex; gap: 6px; flex-wrap: wrap; } /* Organiza botões de ação. */
+.table .actions form { margin: 0; display: inline; } /* Remove margem dos formulários dentro da tabela. */
 
-.kpi-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 22px; }
-.kpi { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
-.kpi-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-suave); margin-bottom: 6px; }
-.kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--marrom-escuro); line-height: 1.1; }
-.kpi-detail { font-size: 0.85rem; color: var(--texto-suave); margin-top: 4px; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; text-transform: capitalize; } /* Estiliza etiquetas de status. */
+.badge-pendente { background: var(--amarelo-fundo); color: var(--amarelo-aviso); } /* Estiliza status pendente. */
+.badge-confirmado { background: var(--verde-fundo); color: #2f6432; } /* Estiliza status confirmado. */
+.badge-cancelado { background: var(--vermelho-fundo); color: #8b2a40; } /* Estiliza status cancelado. */
+.badge-ativo { background: var(--verde-fundo); color: #2f6432; } /* Etiqueta de profissional ativa. */
+.badge-inativo { background: var(--cinza-100); color: var(--texto-suave); } /* Etiqueta de profissional inativa. */
 
-.profissional-card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-.profissional-card { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-.profissional-card img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bege-claro); }
-.profissional-card h3 { margin: 4px 0 0; color: var(--marrom-escuro); }
-.profissional-card .servicos-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.chip { background: var(--bege-claro); color: var(--marrom-escuro); padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; border: 1px solid var(--nude); }
-.chip-rosa { background: var(--rosa-claro); color: var(--marrom-escuro); border-color: var(--rosa-detalhe); }
+.form-grid { display: grid; gap: 16px; } /* Organiza formulários em grade. */
+.form-group { display: flex; flex-direction: column; gap: 6px; } /* Organiza label e campo em coluna. */
+.form-label { font-weight: 500; font-size: 0.9rem; color: var(--marrom-escuro); } /* Estiliza labels. */
+.form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid var(--nude); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: white; color: var(--texto-base); } /* Estiliza inputs, selects e textareas. */
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--marrom-medio); box-shadow: 0 0 0 3px rgba(138, 106, 88, 0.20); } /* Estiliza foco dos campos. */
+.form-textarea { resize: vertical; min-height: 90px; } /* Permite redimensionar textareas. */
+.form-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; } /* Organiza botões de formulário. */
+.form-help { font-size: 0.82rem; color: var(--texto-suave); } /* Estiliza textos auxiliares dos formulários. */
+.filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 16px 18px; background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; border: 1px solid var(--nude); } /* Estiliza filtros do dashboard. */
+.filter-actions { display: flex; gap: 8px; margin-left: auto; } /* Organiza botões dos filtros. */
 
-.checkbox-group { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-.checkbox-item { display: flex; align-items: center; gap: 8px; background: var(--bege-claro); border: 1px solid var(--nude); padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; }
-.checkbox-item input { accent-color: var(--marrom-principal); }
-.checkbox-item:has(input:checked) { background: var(--bege-card); border-color: var(--marrom-medio); }
+.flash-list { list-style: none; padding: 0; margin: 0 0 18px 0; display: flex; flex-direction: column; gap: 8px; } /* Organiza mensagens flash. */
+.flash { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.93rem; border-left: 4px solid; } /* Estiliza mensagem base. */
+.flash-success { background: var(--verde-fundo); border-color: var(--verde-sucesso); color: #2f6432; } /* Estiliza sucesso. */
+.flash-error { background: var(--vermelho-fundo); border-color: var(--vermelho-erro); color: #8b2a40; } /* Estiliza erro. */
+.flash-info { background: var(--bege-claro); border-color: var(--nude); color: var(--marrom-escuro); } /* Estiliza informação. */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--texto-suave); } /* Estiliza estado vazio. */
 
-.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, var(--bege-principal) 0%, var(--nude) 100%); }
-.login-card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 36px 32px; width: 100%; max-width: 380px; border: 1px solid var(--nude); }
-.login-logo { text-align: center; margin-bottom: 22px; }
-.login-logo .icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--marrom-principal), var(--marrom-medio)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
-.login-logo h1 { font-size: 1.35rem; margin: 0; color: var(--marrom-escuro); }
-.login-logo .subtitle { font-size: 0.88rem; color: var(--texto-suave); margin-top: 4px; }
+.kpi-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 22px; } /* Cria a grade dos cartões resumo. */
+.kpi { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; } /* Estiliza cada KPI. */
+.kpi-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-suave); margin-bottom: 6px; } /* Rótulo do KPI. */
+.kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--marrom-escuro); line-height: 1.1; } /* Valor principal do KPI. */
+.kpi-detail { font-size: 0.85rem; color: var(--texto-suave); margin-top: 4px; } /* Detalhe complementar do KPI. */
+
+.profissional-card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } /* Grade para cards de profissionais. */
+.profissional-card { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 8px; } /* Estiliza cada card de profissional. */
+.profissional-card img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bege-claro); } /* Estiliza a foto da profissional. */
+.profissional-card h3 { margin: 4px 0 0; color: var(--marrom-escuro); } /* Estiliza o nome da profissional. */
+.profissional-card .servicos-chips { display: flex; gap: 6px; flex-wrap: wrap; } /* Linha de "chips" com os serviços. */
+.chip { background: var(--bege-claro); color: var(--marrom-escuro); padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; border: 1px solid var(--nude); } /* Estiliza cada chip de serviço. */
+.chip-rosa { background: var(--rosa-claro); color: var(--marrom-escuro); border-color: var(--rosa-detalhe); } /* Chip com detalhe rosa para destacar pontualmente. */
+
+.checkbox-group { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } /* Organiza checkboxes lado a lado. */
+.checkbox-item { display: flex; align-items: center; gap: 8px; background: var(--bege-claro); border: 1px solid var(--nude); padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; } /* Cada checkbox como cartão. */
+.checkbox-item input { accent-color: var(--marrom-principal); } /* Cor do "check". */
+.checkbox-item:has(input:checked) { background: var(--bege-card); border-color: var(--marrom-medio); } /* Destaca opção selecionada. */
+
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, var(--bege-principal) 0%, var(--nude) 100%); } /* Centraliza tela de login com fundo bege. */
+.login-card { background: var(--bege-card); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 36px 32px; width: 100%; max-width: 380px; border: 1px solid var(--nude); } /* Estiliza cartão de login. */
+.login-logo { text-align: center; margin-bottom: 22px; } /* Centraliza logo de login. */
+.login-logo .icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--marrom-principal), var(--marrom-medio)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; } /* Estiliza ícone circular do login. */
+.login-logo h1 { font-size: 1.35rem; margin: 0; color: var(--marrom-escuro); } /* Estiliza título do login. */
+.login-logo .subtitle { font-size: 0.88rem; color: var(--texto-suave); margin-top: 4px; } /* Estiliza subtítulo do login. */
+
+@media (max-width: 768px) { /* Cria regras para telas menores. */
+  .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; } /* Ajusta navbar no celular. */
+  .navbar-links { flex-wrap: wrap; } /* Permite quebrar links do menu. */
+  .container { padding: 18px 14px 40px; } /* Ajusta espaçamento em telas pequenas. */
+  .filter-actions { margin-left: 0; width: 100%; } /* Ajusta botões de filtro no celular. */
+  .kpi-value { font-size: 1.4rem; } /* Reduz valor do KPI em telas pequenas. */
+} /* Fecha regras responsivas. */
+
+/* ===================== AGENDA DO ADMIN ===================== */
+.painel-secao { margin-top: 20px; } /* Espaço acima do conteúdo da agenda. */
+.painel-cabecalho { margin-bottom: 16px; } /* Espaço abaixo do cabeçalho da agenda. */
+.painel-cabecalho h2 { color: var(--marrom-escuro); margin-bottom: 4px; } /* Título da página. */
+.painel-cabecalho p { color: var(--texto-suave); } /* Texto de apoio. */
+.card-admin { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; } /* Cartão branco para abrigar a agenda. */
+.resumo-escolhas-admin { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; } /* Linha com profissional e data escolhidas. */
+.resumo-item { background: var(--bege-claro); border: 1px solid var(--nude); border-radius: var(--radius-sm); padding: 10px 12px; } /* Caixa de cada item de resumo. */
+.resumo-label { display: block; font-size: 12px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: .6px; } /* Rótulo do resumo. */
+.resumo-item strong { color: var(--marrom-escuro); font-size: 1.05rem; } /* Conteúdo do resumo. */
+.acoes-agenda { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; } /* Linha de botões de ação. */
+.painel-horarios-admin { border-top: 1px solid var(--nude); padding-top: 18px; margin-top: 8px; } /* Separa visualmente a lista do resumo. */
+.painel-horarios-admin h3 { color: var(--marrom-escuro); margin-bottom: 6px; } /* Título da lista do dia. */
+.lista-horarios-admin { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 10px; } /* Lista vertical de horários. */
+.horario-linha { display: grid; grid-template-columns: 80px 1fr auto; gap: 14px; align-items: center; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--nude); background: var(--branco); } /* Linha individual do horário. */
+.horario-hora { font-weight: bold; color: var(--marrom-escuro); font-size: 1.05rem; } /* Hora destacada. */
+.horario-detalhe { display: flex; flex-direction: column; gap: 2px; } /* Coluna de cliente/serviço. */
+.horario-cliente { color: var(--texto-base); } /* Nome do cliente. */
+.horario-cliente strong { color: var(--marrom-escuro); } /* Destaca o nome do cliente. */
+.horario-servico { color: var(--texto-suave); font-size: 0.92rem; } /* Linha com serviço, preço e duração. */
+.horario-acoes { display: flex; align-items: center; gap: 10px; } /* Coluna direita: badge e link. */
+.horario-ocupado { background: #fff7ef; border-color: #e1c6ad; } /* Linha de horário ocupado. */
+.horario-livre { background: #f4faf1; border-color: #bcd9b2; } /* Linha de horário livre. */
+.horario-bloqueado { background: #f6dddd; border-color: #cc8d8d; } /* Linha de horário bloqueado. */
+.status-badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; font-weight: bold; } /* Etiqueta de status. */
+.status-pendente { background: #fff1cf; color: #8a6700; border: 1px solid #e0c66a; } /* Pendente. */
+.status-confirmado { background: #e3f4dc; color: #36661f; border: 1px solid #87b773; } /* Confirmado. */
+.status-cancelado { background: #f6dddd; color: #7a2a2a; border: 1px solid #cc8d8d; } /* Cancelado. */
+.status-livre { background: var(--bege-claro); color: var(--marrom-escuro); border: 1px solid var(--nude); } /* Livre. */
+.status-bloqueado { background: #f6dddd; color: #7a2a2a; border: 1px solid #cc8d8d; } /* Bloqueio manual. */
+.link-detalhe { color: var(--marrom-principal); text-decoration: underline; font-size: 13px; } /* Link de "editar". */
+.link-detalhe:hover { color: var(--marrom-escuro); } /* Hover do link. */
+.texto-suave { color: var(--texto-suave); } /* Auxiliar para texto secundário. */
+
+/* Modais e calendário do admin (compatibilidade com o CSS público do agendamento). */
+.modal-fundo { position: fixed; inset: 0; background-color: rgba(45, 26, 18, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; overflow-y: auto; } /* Fundo escuro. */
+.modal-caixa { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 520px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; } /* Caixa do modal. */
+.modal-caixa-grande { max-width: 680px; } /* Variação maior. */
+.modal-cabecalho { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; } /* Cabeçalho do modal. */
+.modal-cabecalho h3 { color: var(--marrom-escuro); margin: 0; } /* Título. */
+.modal-cabecalho p { color: var(--texto-suave); font-size: 14px; margin: 0; } /* Texto. */
+.modal-acoes { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; } /* Barra de ações. */
+.modal-acoes .botao-form { flex: 1 1 160px; } /* Botões com tamanho igual. */
+.numero-passo { width: 36px; height: 36px; border-radius: 50%; background-color: var(--marrom-principal); color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; } /* Círculo numerado. */
+.erro-modal { color: #a23737; background: #fbeaea; border: 1px solid #e6c2c2; padding: 8px 12px; border-radius: 10px; margin-top: 12px; font-size: 14px; } /* Mensagem de erro no modal. */
+.oculto { display: none !important; } /* Util para esconder. */
+body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
+.botao-form { background: var(--marrom-principal); color: var(--branco); border: none; border-radius: 10px; padding: 12px 22px; font-weight: bold; cursor: pointer; transition: .2s; } /* Botão principal padrão (compat). */
+.botao-form:hover { background: var(--marrom-escuro); } /* Hover. */
+.botao-secundario { background: var(--bege-claro); color: var(--marrom-escuro); border: 1px solid var(--nude); padding: 12px 22px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: .2s; } /* Botão secundário. */
+.botao-secundario:hover { background: var(--nude); } /* Hover. */
+
+.profissionais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; } /* Grade de profissionais no modal. */
+.profissional-card { display: flex; align-items: center; gap: 12px; background: #fffdf9; color: var(--texto-base); border: 1px solid var(--nude); border-radius: 14px; padding: 12px; cursor: pointer; transition: .2s; } /* Card de profissional. */
+.profissional-card:hover { border-color: var(--marrom-medio); background: #fff7ef; } /* Hover. */
+.profissional-card input { width: auto; margin: 0; accent-color: var(--marrom-principal); } /* Radio. */
+.profissional-card img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--nude); } /* Foto. */
+.profissional-card.selecionada { border-color: var(--marrom-principal); background: #f7eadf; box-shadow: 0 0 0 3px rgba(111,79,63,.18); } /* Selecionada. */
+.profissional-info { display: flex; flex-direction: column; } /* Texto do card. */
+.profissional-info small { color: var(--texto-suave); font-weight: normal; } /* Especialidade. */
+
+.calendario-card { background: #fffdf9; border: 1px solid var(--nude); border-radius: 18px; padding: 18px; margin-top: 8px; box-shadow: var(--shadow); } /* Cartão do calendário. */
+.calendario-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; } /* Topo do calendário. */
+.calendario-topo strong { color: var(--marrom-escuro); font-size: 20px; } /* Título do mês. */
+.calendario-nav { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--nude); background: var(--bege-claro); color: var(--marrom-escuro); font-size: 24px; font-weight: bold; cursor: pointer; padding: 0; } /* Botões mês. */
+.calendario-nav:hover { background: var(--nude); } /* Hover. */
+.calendario-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; } /* Linha dos dias da semana. */
+.calendario-semana span { text-align: center; font-size: 12px; font-weight: bold; color: var(--marrom-medio); text-transform: uppercase; } /* Texto dos dias da semana. */
+.calendario-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; } /* Grade dos dias. */
+.dia-vazio { min-height: 74px; } /* Espaço antes do dia 1. */
+.dia-calendario { min-height: 74px; border-radius: 14px; border: 1px solid var(--nude); background: #fffaf5; color: var(--texto-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: .2s; padding: 6px; } /* Cada dia. */
+.dia-calendario strong { font-size: 18px; line-height: 1; } /* Número do dia. */
+.dia-calendario small { font-size: 10px; color: var(--texto-suave); line-height: 1.1; text-align: center; } /* Status. */
+.dia-calendario.livre { background: #eef6ea; border-color: #8ab77f; } /* Dias com agendamentos. */
+.dia-calendario.livre:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63,45,37,.12); } /* Hover dos dias com agendamento. */
+.dia-calendario.lotado { background: #f4faf1; border-color: #d9bca8; } /* Dias sem agendamentos (cinza-claro). */
+.dia-calendario.lotado:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(63,45,37,.10); } /* Hover dos dias livres. */
+.dia-calendario.fechado { background: #eee4da; color: #9a8a80; cursor: not-allowed; opacity: .72; } /* Dia fechado. */
+.dia-calendario.selecionado { background: var(--marrom-principal); border-color: var(--marrom-escuro); color: var(--branco); box-shadow: 0 0 0 3px rgba(111,79,63,.22); } /* Dia selecionado. */
+.calendario-legenda { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; color: var(--texto-suave); font-size: 13px; } /* Legenda. */
+.calendario-legenda span { display: inline-flex; align-items: center; gap: 6px; } /* Itens da legenda. */
+.legenda { width: 12px; height: 12px; border-radius: 50%; display: inline-block; } /* Bolinha de legenda. */
+.legenda.livre { background: #8ab77f; } /* Verde para "tem agendamentos". */
+.legenda.lotado { background: #d9bca8; } /* Bege para "sem agendamentos". */
+.legenda.fechado { background: #d1c4ba; } /* Cinza para fechado. */
+.calendario-aviso { grid-column: 1 / -1; text-align: center; padding: 24px; background: var(--bege-claro); border-radius: 14px; color: var(--texto-suave); } /* Aviso interno do calendário. */
 
 @media (max-width: 768px) {
-  .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-  .navbar-links { flex-wrap: wrap; }
-  .container { padding: 18px 14px 40px; }
-  .filter-actions { margin-left: 0; width: 100%; }
-  .kpi-value { font-size: 1.4rem; }
+  .horario-linha { grid-template-columns: 70px 1fr; }
+  .horario-acoes { grid-column: 1 / -1; justify-content: flex-end; }
+  .dia-calendario small { display: none; }
 }
+
+/* ============ AVISO DE HISTÓRICO E PAGINAÇÃO ============ */
+.card-aviso-historico { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 18px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; } /* Cartão horizontal com aviso de atendimentos completos. */
+.card-aviso-historico-texto strong { color: var(--marrom-escuro); display: block; } /* Destaca a frase principal do aviso. */
+.card-aviso-historico-texto p { color: var(--texto-suave); font-size: 0.9rem; margin-top: 4px; } /* Texto secundário do aviso. */
+.paginacao-historico { display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 16px; } /* Linha da paginação do histórico. */
+.paginacao-info { color: var(--texto-suave); font-size: 0.9rem; } /* Estilo do texto "Página X de Y". */
