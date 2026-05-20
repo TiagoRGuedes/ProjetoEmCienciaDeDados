@@ -1,78 +1,78 @@
-{% extends "base.html" %} {# Usa o arquivo base.html como estrutura principal da página. #}
-{% block conteudo %} {# Começa o conteúdo específico da página inicial. #}
-<section class="hero"> <!-- Cria a primeira seção de destaque visual da página inicial. -->
-    <div class="container hero-conteudo"> <!-- Centraliza e organiza o conteúdo principal. -->
-        <div class="hero-texto"> <!-- Cria a coluna de texto da apresentação. -->
-            <p class="subtitulo">beleza • cuidado • acolhimento</p> <!-- Mostra uma frase curta acima do título. -->
+{% extends "base.html" %} {# Usa o layout principal do site. #}
+{% block conteudo %} {# Começa o conteúdo da página inicial. #}
+<section class="hero"> <!-- Cria a seção de abertura com destaque. -->
+    <div class="container hero-conteudo"> <!-- Organiza o conteúdo principal em colunas. -->
+        <div class="hero-texto"> <!-- Cria a coluna de texto institucional. -->
+            <p class="subtitulo">Cuidado estético especializado</p> <!-- Mostra uma frase curta de apoio. -->
             <h2>{{ empresa.nome }}</h2> <!-- Mostra o nome da empresa em destaque. -->
-            <p>Um espaço criado por {{ empresa.dona }} para valorizar o autocuidado com elegância, identidade e conforto.</p> <!-- Apresenta a proposta da empresa. -->
-            <p>Agende seu horário online, escolha a profissional e veja trabalhos reais realizados no salão.</p> <!-- Explica o que a cliente pode fazer. -->
+            <p>Um espaço dedicado ao cuidado das mãos e unhas, com atendimento personalizado, técnica e atenção aos detalhes.</p> <!-- Apresenta a proposta do espaço. -->
+            <p>Escolha o serviço desejado, selecione a profissional disponível e reserve o melhor horário de forma prática.</p> <!-- Explica a principal ação do site. -->
             <div class="hero-botoes"> <!-- Cria a área dos botões principais. -->
-                <a class="botao" href="{{ url_for('publico.agendar_get') }}">Agendar agora</a> <!-- Botão para ir ao agendamento. -->
-                <a class="botao-secundario" href="{{ empresa.instagram_url }}" target="_blank">Ver Instagram</a> <!-- Botão para abrir o Instagram. -->
+                <a class="botao botao-principal" href="{{ url_for('publico.agendar_get') }}">Agendar horário</a> <!-- Botão principal para agendamento. -->
+                <a class="botao-secundario" href="{{ empresa.instagram_url }}" target="_blank">Conhecer trabalhos</a> <!-- Botão para Instagram. -->
             </div> <!-- Fecha a área dos botões. -->
         </div> <!-- Fecha a coluna de texto. -->
-        <div class="hero-card"> <!-- Cria um cartão lateral com informações rápidas. -->
-            <h3>Informações rápidas</h3> <!-- Mostra o título do cartão. -->
-            <p><strong>Dona:</strong> {{ empresa.dona }}</p> <!-- Mostra a dona. -->
-            <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o funcionamento. -->
-            <p><strong>Telefone:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone. -->
+        <div class="hero-card"> <!-- Cria o cartão lateral com informações rápidas. -->
+            <h3>Reserva online</h3> <!-- Mostra o título do cartão. -->
+            <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
+            <p><strong>Confirmação:</strong> realizada pelo telefone informado.</p> <!-- Explica como ocorre a confirmação. -->
             <p><strong>Endereço:</strong> {{ empresa.endereco }}</p> <!-- Mostra o endereço. -->
         </div> <!-- Fecha o cartão lateral. -->
     </div> <!-- Fecha o container do hero. -->
 </section> <!-- Fecha a seção hero. -->
 
+<section class="secao chamada-agendamento"> <!-- Cria uma seção específica para reforçar o agendamento. -->
+    <div class="container chamada-final-conteudo"> <!-- Centraliza o conteúdo da chamada. -->
+        <p class="subtitulo subtitulo-escuro">Agendamento prático</p> <!-- Mostra subtítulo da chamada. -->
+        <h2>Reserve seu atendimento com organização e conforto</h2> <!-- Mostra título da chamada. -->
+        <p class="texto-central">O sistema exibe profissionais e horários disponíveis conforme o serviço selecionado.</p> <!-- Explica a funcionalidade principal. -->
+        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">Iniciar agendamento</a> <!-- Botão de destaque para agendar. -->
+    </div> <!-- Fecha o container da chamada. -->
+</section> <!-- Fecha a seção de chamada. -->
+
 <section id="servicos" class="secao"> <!-- Cria a seção de serviços. -->
-    <div class="container"> <!-- Centraliza o conteúdo da seção. -->
-        <h2>Serviços</h2> <!-- Mostra o título da seção. -->
-        <p class="texto-central">Confira algumas opções disponíveis para agendamento no {{ empresa.nome }}.</p> <!-- Mostra uma descrição curta. -->
-        <div class="cards-servicos"> <!-- Cria a grade de cartões de serviços. -->
-            {% for s in servicos %} {# Repete um cartão para cada serviço recebido do banco. #}
-            <div class="card-servico"> <!-- Cria um cartão individual de serviço. -->
+    <div class="container"> <!-- Centraliza os serviços. -->
+        <h2>Serviços</h2> <!-- Mostra título da seção. -->
+        <p class="texto-central">Confira algumas opções disponíveis para reserva.</p> <!-- Mostra texto de apoio. -->
+        <div class="cards-servicos"> <!-- Cria a grade de serviços. -->
+            {% for s in servicos %} {# Percorre todos os serviços recebidos do Flask. #}
+            <div class="card-servico"> <!-- Cria um card para cada serviço. -->
                 <h3>{{ s.nome }}</h3> <!-- Mostra o nome do serviço. -->
-                <p><strong>Preço:</strong> R$ {{ "%.2f"|format(s.preco) }}</p> <!-- Mostra o preço do serviço. -->
+                <p><strong>Valor:</strong> R$ {{ "%.2f"|format(s.preco) }}</p> <!-- Mostra o preço do serviço. -->
                 <p><strong>Duração:</strong> {{ s.duracao_min }} minutos</p> <!-- Mostra a duração do serviço. -->
-            </div> <!-- Fecha o cartão individual. -->
-            {% endfor %} {# Finaliza o loop dos serviços. #}
+            </div> <!-- Fecha o card do serviço. -->
+            {% endfor %} {# Finaliza a repetição de serviços. #}
         </div> <!-- Fecha a grade de serviços. -->
     </div> <!-- Fecha o container. -->
 </section> <!-- Fecha a seção de serviços. -->
 
-<section id="galeria" class="secao galeria-fundo"> <!-- Cria a seção de galeria com fundo diferenciado. -->
-    <div class="container"> <!-- Centraliza o conteúdo da galeria. -->
-        <h2>Galeria de trabalhos</h2> <!-- Mostra o título da galeria. -->
-        <p class="texto-central">Alguns resultados reais do atendimento e da esmaltação feita no salão.</p> <!-- Descreve a galeria. -->
-        <div class="galeria galeria-tres-colunas"> <!-- Cria a grade com três colunas para fotos. -->
-            {% for foto in galeria %} {# Repete um cartão para cada foto. #}
-            <div class="foto-card"> <!-- Cria o cartão da foto. -->
+<section id="galeria" class="secao galeria-fundo"> <!-- Cria a seção da galeria. -->
+    <div class="container"> <!-- Centraliza a galeria. -->
+        <h2>Galeria de trabalhos</h2> <!-- Mostra título da galeria. -->
+        <p class="texto-central">Resultados que demonstram cuidado, acabamento e atenção aos detalhes.</p> <!-- Mostra descrição da galeria. -->
+        <div class="galeria galeria-tres-colunas"> <!-- Organiza a galeria em três colunas. -->
+            {% for foto in galeria %} {# Percorre as fotos da galeria. #}
+            <div class="foto-card"> <!-- Cria o card da foto. -->
                 <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo }}"> <!-- Carrega a imagem da pasta static/img. -->
-                <p>{{ foto.titulo }}</p> <!-- Mostra a legenda da foto. -->
-            </div> <!-- Fecha o cartão da foto. -->
-            {% endfor %} {# Finaliza o loop da galeria. #}
+                <p>{{ foto.titulo }}</p> <!-- Mostra a legenda da imagem. -->
+            </div> <!-- Fecha o card da foto. -->
+            {% endfor %} {# Finaliza a repetição das fotos. #}
         </div> <!-- Fecha a grade da galeria. -->
-    </div> <!-- Fecha o container. -->
-</section> <!-- Fecha a seção de galeria. -->
+    </div> <!-- Fecha o container da galeria. -->
+</section> <!-- Fecha a seção da galeria. -->
 
-<section id="dona" class="secao"> <!-- Cria a seção sobre a profissional. -->
-    <div class="container dona-grid"> <!-- Cria uma grade com foto e texto. -->
+<section id="dona" class="secao"> <!-- Cria a seção sobre a responsável. -->
+    <div class="container dona-grid"> <!-- Organiza foto e texto em grade. -->
         <div class="dona-foto"> <!-- Cria a área da foto. -->
-            <img src="{{ url_for('static', filename='img/' + empresa.foto_dona) }}" alt="Foto de {{ empresa.dona }}"> <!-- Mostra a foto da Pamela. -->
+            <img src="{{ url_for('static', filename='img/' + empresa.foto_dona) }}" alt="Foto de {{ empresa.dona }}"> <!-- Exibe a foto da responsável. -->
         </div> <!-- Fecha a área da foto. -->
-        <div class="dona-texto"> <!-- Cria a área de texto. -->
-            <p class="subtitulo">Conheça a profissional</p> <!-- Mostra um subtítulo. -->
-            <h2>{{ empresa.dona }}</h2> <!-- Mostra o nome da profissional. -->
-            <p>Fundadora do {{ empresa.nome }}, Pamela atende com simpatia, cuidado e atenção aos detalhes.</p> <!-- Apresenta a profissional. -->
-            <p>O espaço combina tons terrosos, bege e pequenos detalhes rosa para transmitir beleza e acolhimento.</p> <!-- Explica a estética da marca. -->
-            <a class="botao" href="{{ url_for('publico.agendar_get') }}">Quero marcar meu horário</a> <!-- Botão para agendamento. -->
-        </div> <!-- Fecha a área de texto. -->
-    </div> <!-- Fecha a grade. -->
-</section> <!-- Fecha a seção da dona. -->
-
-<section class="secao chamada-final"> <!-- Cria a seção final de chamada para ação. -->
-    <div class="container chamada-final-conteudo"> <!-- Centraliza o conteúdo da chamada final. -->
-        <h2>Pronta para reservar seu atendimento?</h2> <!-- Mostra o título final. -->
-        <p class="texto-central">Escolha um serviço, selecione a profissional e envie seu agendamento em poucos passos.</p> <!-- Explica o fluxo. -->
-        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">Ir para agendamento</a> <!-- Botão de destaque para agendar. -->
-    </div> <!-- Fecha o container. -->
-</section> <!-- Fecha a chamada final. -->
-{% endblock %} {# Finaliza o bloco de conteúdo da página inicial. #}
+        <div class="dona-texto"> <!-- Cria o bloco de texto sobre a profissional. -->
+            <p class="subtitulo subtitulo-escuro">Responsável pelo atendimento</p> <!-- Mostra subtítulo. -->
+            <h2>{{ empresa.dona }}</h2> <!-- Mostra o nome da responsável. -->
+            <p>Responsável pelo {{ empresa.nome }}, Pamela conduz o atendimento com profissionalismo, cordialidade e precisão técnica.</p> <!-- Apresenta a responsável. -->
+            <p>A proposta do espaço é oferecer uma experiência agradável, organizada e cuidadosa em cada detalhe.</p> <!-- Explica a proposta do espaço. -->
+            <a class="botao" href="{{ url_for('publico.agendar_get') }}">Agendar atendimento</a> <!-- Botão para agendamento. -->
+        </div> <!-- Fecha o bloco de texto. -->
+    </div> <!-- Fecha o grid da responsável. -->
+</section> <!-- Fecha a seção da responsável. -->
+{% endblock %} {# Finaliza o conteúdo da página inicial. #}

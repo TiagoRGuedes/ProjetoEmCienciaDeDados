@@ -1,54 +1,54 @@
-{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
-{% block title %}Profissionais{% endblock %} {# Define o título da aba como Profissionais. #}
-{% block content %} {# Começa o conteúdo principal da página. #}
+{% extends 'admin/_base.html' %}
+{% block title %}Profissionais{% endblock %}
+{% block content %}
 
-<div class="page-header"> <!-- Cria o cabeçalho da página. -->
-  <h1 class="page-title"> <!-- Cria o título principal. -->
-    Profissionais <!-- Texto do título. -->
-    <span class="page-counter">{{ profissionais|length }} cadastrada{{ '' if profissionais|length == 1 else 's' }}</span> <!-- Mostra a quantidade total. -->
-  </h1> <!-- Fecha o título principal. -->
-  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary">+ Nova profissional</a> <!-- Link para cadastrar uma nova profissional. -->
-</div> <!-- Fecha o cabeçalho da página. -->
+<div class="page-header">
+  <h1 class="page-title">
+    Profissionais
+    <span class="page-counter">{{ profissionais|length }} cadastrada{{ '' if profissionais|length == 1 else 's' }}</span>
+  </h1>
+  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary">+ Nova profissional</a>
+</div>
 
-{% if profissionais %} {# Verifica se há profissionais cadastradas. #}
-<div class="profissional-card-grid"> <!-- Cria a grade de cards de profissionais. -->
-  {% for p in profissionais %} {# Percorre cada profissional. #}
-  <article class="profissional-card"> <!-- Cria o card visual da profissional. -->
-    <img src="{{ url_for('static', filename='img/' ~ p.foto) }}" alt="Foto de {{ p.nome }}" onerror="this.src='{{ url_for('static', filename='img/pamela_francisco.png') }}'"> <!-- Mostra a foto e cai para a foto padrão se o arquivo não existir. -->
-    <h3>{{ p.nome }}</h3> <!-- Mostra o nome da profissional. -->
-    <p style="margin:0;color:var(--texto-suave);">{{ p.especialidade }}</p> <!-- Mostra a especialidade. -->
-    <span class="badge badge-{{ 'ativo' if p.ativo else 'inativo' }}"> <!-- Mostra o status atual. -->
-      {{ 'Ativa' if p.ativo else 'Inativa' }} <!-- Texto do status. -->
-    </span> <!-- Fecha o badge. -->
-    <div class="servicos-chips"> <!-- Lista os serviços que a profissional atende. -->
-      {% if p.servicos_atende %} {# Verifica se há serviços vinculados. #}
-        {% for nome_servico in p.servicos_atende.split(', ') %} {# Quebra a string concatenada em chips. #}
-          <span class="chip">{{ nome_servico }}</span> <!-- Mostra um chip por serviço. -->
-        {% endfor %} {# Encerra o loop de chips. #}
-      {% else %} {# Caso não haja vínculo cadastrado. #}
-        <span class="chip chip-rosa">Sem serviços vinculados</span> <!-- Avisa visualmente sobre a falta de vínculo. -->
-      {% endif %} {# Fecha a verificação. #}
-    </div> <!-- Fecha os chips. -->
-    <div class="form-actions" style="margin-top:8px;"> <!-- Cria a barra de ações do card. -->
-      <a href="{{ url_for('admin.profissional_editar', id=p.id) }}" class="btn btn-sm btn-secondary">Editar</a> <!-- Link para editar a profissional. -->
-      <form method="POST" action="{{ url_for('admin.profissional_alternar_ativo', id=p.id) }}"> <!-- Formulário para alternar ativo/inativo. -->
-        <button type="submit" class="btn btn-sm {{ 'btn-danger' if p.ativo else 'btn-success' }}"> <!-- Botão muda de cor conforme o status atual. -->
-          {{ 'Inativar' if p.ativo else 'Reativar' }} <!-- Texto do botão. -->
-        </button> <!-- Fecha o botão. -->
-      </form> <!-- Fecha o formulário. -->
-      <form method="POST" action="{{ url_for('admin.profissional_excluir', id=p.id) }}" onsubmit="return confirm('Excluir {{ p.nome }}? Essa ação só funciona se não houver agendamentos.');"> <!-- Formulário de exclusão com confirmação. -->
-        <button type="submit" class="btn btn-sm btn-secondary">Excluir</button> <!-- Botão de exclusão definitiva. -->
-      </form> <!-- Fecha o formulário. -->
-    </div> <!-- Fecha a barra de ações. -->
-  </article> <!-- Fecha o card. -->
-  {% endfor %} {# Finaliza o loop de profissionais. #}
-</div> <!-- Fecha a grade. -->
-{% else %} <!-- Caso não exista nenhuma profissional. -->
-<div class="card empty-state"> <!-- Cria cartão de estado vazio. -->
-  <p><strong>Nenhuma profissional cadastrada.</strong></p> <!-- Mostra a mensagem principal. -->
-  <p>Cadastre as profissionais para que apareçam na tela pública de agendamento.</p> <!-- Explica o próximo passo. -->
-  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary" style="margin-top:10px;">+ Nova profissional</a> <!-- Botão para o primeiro cadastro. -->
-</div> <!-- Fecha o cartão. -->
-{% endif %} {# Finaliza a verificação. #}
+{% if profissionais %}
+<div class="profissional-card-grid">
+  {% for p in profissionais %}
+  <article class="profissional-card">
+    <img src="{{ url_for('static', filename='img/' ~ p.foto) }}" alt="Foto de {{ p.nome }}" onerror="this.src='{{ url_for('static', filename='img/pamela_francisco.png') }}'">
+    <h3>{{ p.nome }}</h3>
+    <p style="margin:0;color:var(--texto-suave);">{{ p.especialidade }}</p>
+    <span class="badge badge-{{ 'ativo' if p.ativo else 'inativo' }}">
+      {{ 'Ativa' if p.ativo else 'Inativa' }}
+    </span>
+    <div class="servicos-chips">
+      {% if p.servicos_atende %}
+        {% for nome_servico in p.servicos_atende.split(', ') %}
+          <span class="chip">{{ nome_servico }}</span>
+        {% endfor %}
+      {% else %}
+        <span class="chip chip-rosa">Sem serviços vinculados</span>
+      {% endif %}
+    </div>
+    <div class="form-actions" style="margin-top:8px;">
+      <a href="{{ url_for('admin.profissional_editar', id=p.id) }}" class="btn btn-sm btn-secondary">Editar</a>
+      <form method="POST" action="{{ url_for('admin.profissional_alternar_ativo', id=p.id) }}">
+        <button type="submit" class="btn btn-sm {{ 'btn-danger' if p.ativo else 'btn-success' }}">
+          {{ 'Inativar' if p.ativo else 'Reativar' }}
+        </button>
+      </form>
+      <form method="POST" action="{{ url_for('admin.profissional_excluir', id=p.id) }}" onsubmit="return confirm('Excluir {{ p.nome }}? Essa ação só funciona se não houver agendamentos.');">
+        <button type="submit" class="btn btn-sm btn-secondary">Excluir</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty-state">
+  <p><strong>Nenhuma profissional cadastrada.</strong></p>
+  <p>Cadastre as profissionais para que apareçam na tela pública de agendamento.</p>
+  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary" style="margin-top:10px;">+ Nova profissional</a>
+</div>
+{% endif %}
 
-{% endblock %} {# Finaliza o conteúdo da página. #}
+{% endblock %}
