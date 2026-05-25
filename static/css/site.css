@@ -1,8 +1,8 @@
 :root { /* Cria variáveis de cores e medidas para reutilizar no site inteiro. */
     --marrom-principal: #6f4f3f; /* Define o marrom principal do site. */
     --marrom-escuro: #4b3329; /* Define um marrom mais escuro para títulos e rodapé. */
-    --hero-rosado-escuro: #6a4048; /* Define o tom rosado escuro do degradê da seção principal (cor escolhida pela Pamela). */
-    --hero-rosado-claro: #8c5a60; /* Define o tom rosado claro do degradê da seção principal. */
+    --hero-terracota-escuro: #7a4a3a; /* Define o tom terracota escuro do degradê da seção principal (cor escolhida pela Pamela). */
+    --hero-terracota-claro: #9a6650; /* Define o tom terracota claro do degradê da seção principal. */
     --marrom-medio: #8a6a58; /* Define um marrom médio para detalhes. */
     --bege-principal: #efe0d1; /* Define o bege principal do fundo. */
     --bege-claro: #f8f0e8; /* Define um bege bem claro para áreas suaves. */
@@ -100,7 +100,7 @@ nav a:hover { /* Estiliza links ao passar o mouse. */
 } /* Fecha o hover dos links. */
 
 .hero { /* Estiliza a seção principal. */
-    background: linear-gradient(135deg, var(--hero-rosado-escuro), var(--hero-rosado-claro)); /* Cria fundo em degradê marrom rosado (cor escolhida pela Pamela). */
+    background: linear-gradient(135deg, var(--hero-terracota-escuro), var(--hero-terracota-claro)); /* Cria fundo em degradê terracota (cor escolhida pela Pamela). */
     color: var(--branco); /* Deixa o texto branco. */
     padding: 88px 0; /* Cria espaço vertical grande. */
 } /* Fecha a regra hero. */
