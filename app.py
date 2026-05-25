@@ -10,11 +10,32 @@ from datetime import date, datetime, timedelta
 import calendar
 # Importa calendar para descobrir quantos dias existem em cada mês.
 
+import os
+# Importa os para montar caminhos de pastas e salvar as fotos enviadas pelo admin.
+
+import re
+# Importa re para validar se uma cor enviada está no formato hexadecimal seguro.
+
+import uuid
+# Importa uuid para gerar nomes únicos de arquivo e evitar que uploads se sobrescrevam.
+
+from werkzeug.utils import secure_filename
+# Importa secure_filename para limpar o nome dos arquivos enviados e evitar caminhos maliciosos.
+
 app = Flask(__name__)
 # Cria a aplicação Flask, que funciona como o servidor principal do projeto.
 
 app.config['SECRET_KEY'] = 'esmalteria-secret-key'
 # Define uma chave secreta para proteger a sessão de login do painel administrativo.
+
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+# Limita o tamanho de cada upload a 5 MB para evitar arquivos gigantes.
+
+PASTA_UPLOAD = os.path.join(app.static_folder, 'img', 'uploads')
+# Define a pasta onde as fotos enviadas pelo admin serão salvas (static/img/uploads).
+
+EXTENSOES_IMAGEM = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+# Define quais extensões de imagem são aceitas no upload.
 
 publico = Blueprint('publico', __name__)
 # Cria o grupo de rotas públicas, usadas pelas clientes no site.
@@ -31,11 +52,18 @@ def injetar_configuracoes():
     # Disponibiliza as configurações visuais para qualquer template renderizado.
     try:
         # Protege contra falhas em rotas que rodam antes do banco existir.
-        return {'config_visual': carregar_configuracoes_visuais()}
-        # Devolve o dicionário com fonte e cores para o template usar.
+        return {
+            # Devolve as preferências visuais e os dados de aparência para o template usar.
+            'config_visual': carregar_configuracoes_visuais(),
+            # Dicionário com fonte e cores globais (compatível com o que já existia).
+            'css_aparencia': gerar_css_aparencia(),
+            # Bloco de CSS gerado a partir das cores por página/área escolhidas no admin.
+            'pagina_atual': pagina_atual(),
+            # Nome curto da página atual, usado para aplicar as cores só na página certa.
+        }
     except Exception:
-        # Em caso de erro (banco indisponível), devolve um dicionário vazio.
-        return {'config_visual': {}}
+        # Em caso de erro (banco indisponível), devolve valores vazios e seguros.
+        return {'config_visual': {}, 'css_aparencia': '', 'pagina_atual': ''}
         # Templates ficam usando os defaults do próprio CSS.
 
 
@@ -47,8 +75,8 @@ EMPRESA = {
     # Define o nome da dona/profissional principal.
     'telefone': '(11) 99220-4706',
     # Define o telefone de contato da empresa.
-    'endereco': 'Rua Carapicuíba, 143 - BNH Grajaú',
-    # Define o endereço físico da empresa.
+    'atendimento': 'Atendimento a domicílio e na residência da profissional',
+    # Substitui o antigo endereço fixo: agora o atendimento é a domicílio ou na casa da profissional, sem endereço público.
     'horarios': 'Terça a sábado, das 10h às 19h',
     # Define o horário de funcionamento exibido para as clientes.
     'instagram_nome': '@refugiodapreta',
@@ -108,6 +136,219 @@ def carregar_configuracoes_visuais():
     # Busca todas as preferências cadastradas.
     return {linha['chave']: linha['valor'] for linha in linhas}
     # Converte para dicionário simples para o template usar.
+
+
+PROP_CSS = {
+    # Liga cada propriedade editável à propriedade CSS correspondente.
+    'cor_fundo': 'background-color',
+    # cor_fundo vira a cor de fundo do elemento.
+    'cor_texto': 'color',
+    # cor_texto vira a cor do texto do elemento.
+}
+# Fecha o mapa de propriedade para CSS.
+
+PROP_ROTULO = {
+    # Define o rótulo amigável de cada propriedade para mostrar no painel admin.
+    'cor_fundo': 'Cor de fundo',
+    # Texto exibido ao lado do seletor de cor de fundo.
+    'cor_texto': 'Cor do texto',
+    # Texto exibido ao lado do seletor de cor de texto.
+}
+# Fecha o mapa de rótulos das propriedades.
+
+PROP_PADRAO = {
+    # Define um valor inicial sugerido para cada propriedade no seletor de cor.
+    'cor_fundo': '#efe0d1',
+    # Bege padrão do tema como ponto de partida do seletor de fundo.
+    'cor_texto': '#3f2d25',
+    # Marrom escuro padrão do tema como ponto de partida do seletor de texto.
+}
+# Fecha o mapa de cores padrão.
+
+APARENCIA_PAGINAS = {
+    # Define quais páginas e áreas do site a Pamela pode personalizar (seleção de página -> área -> cores).
+    'global': {
+        # Grupo de áreas que valem para o site inteiro, em qualquer página.
+        'rotulo': 'Geral (todas as páginas)',
+        # Nome do grupo mostrado no seletor de página.
+        'escopo': None,
+        # escopo None significa que as cores valem em todas as páginas.
+        'areas': {
+            # Áreas globais editáveis.
+            'corpo': {'rotulo': 'Fundo e texto gerais', 'seletor': 'body', 'props': ['cor_fundo', 'cor_texto']},
+            # Fundo e texto padrão de todo o site.
+            'topo': {'rotulo': 'Topo / cabeçalho', 'seletor': '.topo', 'props': ['cor_fundo', 'cor_texto']},
+            # Cabeçalho fixo no topo do site.
+            'rodape': {'rotulo': 'Rodapé', 'seletor': '.rodape', 'props': ['cor_fundo', 'cor_texto']},
+            # Rodapé com contato e informações.
+            'botoes': {'rotulo': 'Botões e destaques', 'seletor': '.botao, .botao-principal, .botao-destaque, .nav-destaque, button[type="submit"]', 'props': ['cor_fundo', 'cor_texto']},
+            # Botões principais e elementos de destaque.
+        },
+    },
+    'inicio': {
+        # Áreas exclusivas da página inicial.
+        'rotulo': 'Página Início',
+        # Nome amigável da página.
+        'escopo': 'inicio',
+        # escopo 'inicio' faz as cores valerem só na página inicial.
+        'areas': {
+            # Áreas editáveis da página inicial.
+            'hero': {'rotulo': 'Destaque principal (topo da página)', 'seletor': '.hero', 'props': ['cor_fundo', 'cor_texto']},
+            # Seção de abertura com o nome e os botões.
+            'chamada': {'rotulo': 'Chamada de agendamento', 'seletor': '.chamada-agendamento', 'props': ['cor_fundo', 'cor_texto']},
+            # Faixa que reforça o agendamento.
+            'servicos': {'rotulo': 'Seção de serviços', 'seletor': '#servicos', 'props': ['cor_fundo', 'cor_texto']},
+            # Lista de serviços oferecidos.
+            'galeria': {'rotulo': 'Seção da galeria', 'seletor': '#galeria', 'props': ['cor_fundo', 'cor_texto']},
+            # Galeria de trabalhos (carrossel).
+            'responsavel': {'rotulo': 'Seção da responsável', 'seletor': '#dona', 'props': ['cor_fundo', 'cor_texto']},
+            # Bloco que apresenta a Pamela.
+        },
+    },
+    'agendamento': {
+        # Área da página de agendamento.
+        'rotulo': 'Página de Agendamento',
+        # Nome amigável da página.
+        'escopo': 'agendamento',
+        # escopo 'agendamento' aplica as cores só na página de agendamento.
+        'areas': {
+            # Áreas editáveis do agendamento.
+            'conteudo': {'rotulo': 'Fundo do conteúdo', 'seletor': 'main', 'props': ['cor_fundo', 'cor_texto']},
+            # Área principal onde fica o formulário de agendamento.
+        },
+    },
+}
+# Fecha o mapa de páginas/áreas editáveis.
+
+FOTOS_LOCAIS = {
+    # Define os locais de fotos que o admin pode gerenciar e se aceitam várias fotos (carrossel).
+    'galeria': {'rotulo': 'Galeria de trabalhos (página inicial)', 'multiplas': True},
+    # A galeria aceita várias fotos e vira um carrossel com adicionar/remover.
+    'responsavel': {'rotulo': 'Foto da responsável (Pamela)', 'multiplas': False},
+    # A foto da responsável é única e apenas substituída.
+}
+# Fecha o mapa de locais de fotos.
+
+
+def cor_valida(valor):
+    # Verifica se a cor está no formato hexadecimal seguro (#rgb ou #rrggbb) antes de salvar/usar no CSS.
+    return bool(valor) and bool(re.fullmatch(r'#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?', valor))
+    # Retorna True só para valores como #fff ou #6f4f3f, evitando injeção de CSS.
+
+
+def carregar_aparencia():
+    # Lê do banco apenas as preferências de aparência por página/área (chaves que começam com 'aparencia.').
+    db = get_db()
+    # Abre o banco.
+    linhas = db.execute("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'aparencia.%'").fetchall()
+    # Busca só as chaves de aparência por área.
+    return {linha['chave']: linha['valor'] for linha in linhas}
+    # Devolve um dicionário chave->cor para o template e o gerador de CSS usarem.
+
+
+def gerar_css_aparencia():
+    # Monta o bloco de CSS final a partir das cores escolhidas para cada página/área.
+    valores = carregar_aparencia()
+    # Carrega as cores salvas.
+    regras = []
+    # Lista que vai acumular as regras CSS.
+    for pagina, info in APARENCIA_PAGINAS.items():
+        # Percorre cada página configurável.
+        escopo = info.get('escopo')
+        # Descobre se as cores valem só em uma página.
+        prefixo = '.pagina-' + escopo + ' ' if escopo else ''
+        # Quando há escopo, prefixa o seletor com a classe da página (aplicada no body).
+        for area, dados in info['areas'].items():
+            # Percorre cada área da página.
+            declaracoes = []
+            # Lista de declarações CSS daquela área.
+            for prop in dados['props']:
+                # Percorre cada propriedade editável da área.
+                valor = valores.get('aparencia.' + pagina + '.' + area + '.' + prop)
+                # Busca a cor salva para essa página/área/propriedade.
+                if cor_valida(valor):
+                    # Só usa o valor se for uma cor hexadecimal válida.
+                    declaracoes.append(PROP_CSS[prop] + ': ' + valor + ';')
+                    # Adiciona a declaração CSS correspondente.
+            if declaracoes:
+                # Se a área tem ao menos uma cor personalizada, gera a regra.
+                regras.append(prefixo + dados['seletor'] + ' { ' + ' '.join(declaracoes) + ' }')
+                # Junta seletor + declarações em uma regra CSS.
+    return '\n'.join(regras)
+    # Devolve o CSS completo (string vazia se nada foi personalizado).
+
+
+def pagina_atual():
+    # Descobre um nome curto da página atual para aplicar as cores certas no body.
+    endpoint = request.endpoint or ''
+    # Lê o endpoint da rota atual (ex: 'publico.index').
+    if endpoint == 'publico.index':
+        # Página inicial.
+        return 'inicio'
+    if endpoint.startswith('publico.agendar'):
+        # Qualquer etapa do agendamento.
+        return 'agendamento'
+    if endpoint == 'publico.confirmacao':
+        # Página de confirmação.
+        return 'confirmacao'
+    return ''
+    # Demais páginas não recebem escopo específico.
+
+
+def buscar_fotos(local):
+    # Busca as fotos de um local específico já na ordem de exibição.
+    db = get_db()
+    # Abre o banco.
+    return db.execute('SELECT * FROM fotos WHERE local = ? ORDER BY ordem, id', (local,)).fetchall()
+    # Retorna a lista de fotos ordenada por ordem e depois id.
+
+
+def extensao_permitida(nome_arquivo):
+    # Confere se o arquivo enviado tem uma extensão de imagem aceita.
+    return '.' in nome_arquivo and nome_arquivo.rsplit('.', 1)[1].lower() in EXTENSOES_IMAGEM
+    # Retorna True apenas para png, jpg, jpeg, webp ou gif.
+
+
+def salvar_foto_upload(arquivo):
+    # Salva uma foto enviada pelo formulário e devolve o caminho relativo a static/img.
+    if not arquivo or arquivo.filename == '':
+        # Sai cedo se nenhum arquivo foi enviado.
+        return None
+        # Sem arquivo, não há o que salvar.
+    if not extensao_permitida(arquivo.filename):
+        # Recusa arquivos que não sejam imagens permitidas.
+        return None
+        # Retorna None para o chamador mostrar erro.
+    os.makedirs(PASTA_UPLOAD, exist_ok=True)
+    # Garante que a pasta de uploads exista.
+    extensao = arquivo.filename.rsplit('.', 1)[1].lower()
+    # Pega a extensão original do arquivo.
+    base = secure_filename(arquivo.filename.rsplit('.', 1)[0]) or 'foto'
+    # Limpa o nome base do arquivo, usando 'foto' como reserva.
+    nome_final = base + '_' + uuid.uuid4().hex[:8] + '.' + extensao
+    # Monta um nome único para não sobrescrever outras fotos.
+    arquivo.save(os.path.join(PASTA_UPLOAD, nome_final))
+    # Salva o arquivo dentro de static/img/uploads.
+    return 'uploads/' + nome_final
+    # Devolve o caminho relativo usado nos templates (img/ + este valor).
+
+
+def remover_arquivo_foto(caminho):
+    # Apaga do disco apenas arquivos que foram enviados pelo admin (pasta uploads), preservando as imagens originais do projeto.
+    if not caminho or not caminho.startswith('uploads/'):
+        # Não apaga imagens originais (ex: trabalho1.png) que são compartilhadas e versionadas.
+        return
+        # Sai sem fazer nada.
+    caminho_completo = os.path.join(app.static_folder, 'img', caminho)
+    # Monta o caminho absoluto do arquivo enviado.
+    try:
+        # Protege contra arquivo já inexistente.
+        os.remove(caminho_completo)
+        # Remove o arquivo do disco.
+    except OSError:
+        # Ignora erros (arquivo ausente, permissão), pois a remoção do banco é o que importa.
+        pass
+        # Não interrompe o fluxo do admin.
 
 
 def buscar_servicos():
@@ -290,18 +531,14 @@ def index():
     # Define a função executada quando a cliente acessa a página inicial.
     servicos = buscar_servicos()
     # Busca os serviços para mostrar na seção de serviços.
-    galeria = [
-        # Cria a lista de fotos usadas na galeria.
-        {'arquivo': 'trabalho1.png', 'titulo': 'Esmaltação marrom nude elegante'},
-        # Define a primeira foto da galeria.
-        {'arquivo': 'trabalho2.png', 'titulo': 'Atendimento com cuidado e técnica'},
-        # Define a segunda foto da galeria.
-        {'arquivo': 'trabalho3.png', 'titulo': 'Nude com brilho delicado'},
-        # Define a terceira foto da galeria.
-    ]
-    # Fecha a lista da galeria.
-    return render_template('index.html', servicos=servicos, empresa=EMPRESA, galeria=galeria)
-    # Abre o template index.html e envia serviços, empresa e galeria para o HTML.
+    galeria = buscar_fotos('galeria')
+    # Busca as fotos da galeria no banco (gerenciadas pelo admin) para montar o carrossel.
+    fotos_responsavel = buscar_fotos('responsavel')
+    # Busca a foto da responsável cadastrada pelo admin.
+    foto_dona = fotos_responsavel[0]['arquivo'] if fotos_responsavel else EMPRESA['foto_dona']
+    # Usa a foto cadastrada ou cai no arquivo padrão caso ainda não haja nenhuma.
+    return render_template('index.html', servicos=servicos, empresa=EMPRESA, galeria=galeria, foto_dona=foto_dona)
+    # Abre o template index.html e envia serviços, empresa, galeria e a foto da responsável para o HTML.
 
 
 @publico.route('/agendar', methods=['GET'])
@@ -1111,7 +1348,13 @@ def _parse_profissional_form():
     especialidade = request.form.get('especialidade', '').strip()
     # Lê a especialidade.
     foto = request.form.get('foto', '').strip()
-    # Lê o nome do arquivo de foto (já presente em static/img).
+    # Lê o nome do arquivo de foto já existente (campo de texto, opcional quando há upload).
+    caminho_upload = salvar_foto_upload(request.files.get('foto_upload'))
+    # Tenta salvar uma foto enviada pelo formulário; devolve o caminho ou None.
+    if caminho_upload:
+        # Quando o admin enviou uma imagem nova.
+        foto = caminho_upload
+        # Usa o arquivo enviado no lugar do nome digitado.
     ativo = 1 if request.form.get('ativo') == 'on' else 0
     # Converte o checkbox em 0 ou 1 para o banco.
     senha = request.form.get('senha', '').strip()
@@ -1127,8 +1370,8 @@ def _parse_profissional_form():
         erro = 'Informe a especialidade.'
         # Define a mensagem.
     elif foto == '':
-        # Verifica se a foto foi informada.
-        erro = 'Informe o nome do arquivo da foto (ex: pamela_francisco.png).'
+        # Verifica se há foto (enviada agora ou nome de arquivo existente).
+        erro = 'Envie uma foto ou informe o nome de um arquivo já existente (ex: pamela_francisco.png).'
         # Define mensagem padrão sobre a foto.
     return nome, especialidade, foto, ativo, senha, erro
     # Retorna os dados normalizados, a senha e o erro de validação.
@@ -1644,6 +1887,34 @@ def configuracoes():
                 # Envia chave e valor.
             )
             # Finaliza o upsert.
+        for pagina, info in APARENCIA_PAGINAS.items():
+            # Percorre cada página configurável para salvar as cores por área.
+            for area, dados in info['areas'].items():
+                # Percorre cada área da página.
+                for prop in dados['props']:
+                    # Percorre cada propriedade de cor da área.
+                    base = pagina + '__' + area + '__' + prop
+                    # Monta o sufixo usado nos campos do formulário.
+                    chave = 'aparencia.' + pagina + '.' + area + '.' + prop
+                    # Monta a chave salva no banco.
+                    if request.form.get('usar__' + base) == 'on':
+                        # Só personaliza a cor quando a caixinha "personalizar" estiver marcada.
+                        valor = request.form.get('cor__' + base, '').strip()
+                        # Lê a cor escolhida no seletor.
+                        if cor_valida(valor):
+                            # Garante que é uma cor hexadecimal válida antes de salvar.
+                            db.execute(
+                                # Cria ou atualiza a cor daquela área.
+                                'INSERT INTO configuracoes (chave, valor) VALUES (?, ?) ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor',
+                                # Faz upsert na tabela de configurações.
+                                (chave, valor)
+                                # Envia chave e cor.
+                            )
+                            # Finaliza o upsert da cor.
+                    else:
+                        # Caixinha desmarcada significa "voltar ao padrão do tema".
+                        db.execute('DELETE FROM configuracoes WHERE chave = ?', (chave,))
+                        # Remove a personalização para a área usar a cor padrão do CSS.
         db.commit()
         # Confirma a gravação.
         flash('Configurações visuais atualizadas.', 'success')
@@ -1652,8 +1923,165 @@ def configuracoes():
         # Recarrega a página com os novos valores aplicados.
     config = carregar_configuracoes_visuais()
     # GET: carrega valores atuais para preencher o formulário.
-    return render_template('admin/configuracoes.html', config=config, empresa=EMPRESA)
+    aparencia_valores = carregar_aparencia()
+    # Carrega as cores por área já salvas para preencher o formulário.
+    return render_template(
+        # Renderiza a página de configurações com tudo que o painel precisa.
+        'admin/configuracoes.html',
+        config=config,
+        empresa=EMPRESA,
+        aparencia_paginas=APARENCIA_PAGINAS,
+        aparencia_valores=aparencia_valores,
+        prop_rotulo=PROP_ROTULO,
+        prop_padrao=PROP_PADRAO,
+    )
     # Renderiza a página de configurações.
+
+
+@admin.route('/fotos')
+# Cria a rota que lista e gerencia as fotos do site (galeria, responsável, etc.).
+def gerenciar_fotos():
+    # Define a função que mostra a página de gestão de fotos.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    locais = {}
+    # Dicionário que junta, para cada local, suas informações e suas fotos atuais.
+    for chave, info in FOTOS_LOCAIS.items():
+        # Percorre cada local de fotos configurável.
+        locais[chave] = {'info': info, 'fotos': buscar_fotos(chave)}
+        # Guarda os dados do local e a lista de fotos já cadastradas.
+    return render_template('admin/fotos.html', locais=locais, empresa=EMPRESA)
+    # Renderiza a página de gestão de fotos.
+
+
+@admin.route('/fotos/<local>/adicionar', methods=['POST'])
+# Cria a rota que adiciona (ou substitui) uma foto em um local.
+def adicionar_foto(local):
+    # Define a função que recebe o upload de uma nova foto.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    if local not in FOTOS_LOCAIS:
+        # Recusa locais que não existem no mapa.
+        flash('Local de foto inválido.', 'error')
+        # Avisa o admin.
+        return redirect(url_for('admin.gerenciar_fotos'))
+        # Volta para a página de fotos.
+    db = get_db()
+    # Abre o banco.
+    caminho = salvar_foto_upload(request.files.get('foto'))
+    # Salva o arquivo enviado e recebe o caminho relativo (ou None se inválido).
+    if not caminho:
+        # Quando o upload falha ou não é imagem válida.
+        flash('Selecione uma imagem válida (png, jpg, jpeg, webp ou gif, até 5 MB).', 'error')
+        # Mostra a mensagem de erro.
+        return redirect(url_for('admin.gerenciar_fotos'))
+        # Volta para a página de fotos.
+    titulo = request.form.get('titulo', '').strip()
+    # Lê a legenda opcional da foto.
+    if not FOTOS_LOCAIS[local]['multiplas']:
+        # Quando o local aceita apenas uma foto (ex: responsável).
+        antigas = buscar_fotos(local)
+        # Busca as fotos atuais para remover antes de inserir a nova.
+        for foto in antigas:
+            # Percorre as fotos antigas.
+            remover_arquivo_foto(foto['arquivo'])
+            # Apaga o arquivo enviado anteriormente (preserva imagens originais do projeto).
+        db.execute('DELETE FROM fotos WHERE local = ?', (local,))
+        # Remove os registros antigos para manter apenas a foto nova.
+    proxima_ordem = db.execute('SELECT COALESCE(MAX(ordem), 0) + 1 FROM fotos WHERE local = ?', (local,)).fetchone()[0]
+    # Calcula a próxima posição na ordem do local.
+    db.execute(
+        # Insere a nova foto no banco.
+        'INSERT INTO fotos (local, arquivo, titulo, ordem) VALUES (?, ?, ?, ?)',
+        # Usa parâmetros para evitar injeção de SQL.
+        (local, caminho, titulo, proxima_ordem)
+        # Envia os dados da foto.
+    )
+    # Finaliza a inserção.
+    db.commit()
+    # Salva no banco.
+    flash('Foto adicionada com sucesso.', 'success')
+    # Confirma para o admin.
+    return redirect(url_for('admin.gerenciar_fotos'))
+    # Volta para a página de fotos.
+
+
+@admin.route('/fotos/<int:id>/remover', methods=['POST'])
+# Cria a rota que remove uma foto específica.
+def remover_foto(id):
+    # Define a função que apaga uma foto.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    foto = db.execute('SELECT * FROM fotos WHERE id = ?', (id,)).fetchone()
+    # Busca a foto pelo id.
+    if foto is None:
+        # Quando a foto não existe.
+        flash('Foto não encontrada.', 'error')
+        # Avisa o admin.
+        return redirect(url_for('admin.gerenciar_fotos'))
+        # Volta para a página de fotos.
+    remover_arquivo_foto(foto['arquivo'])
+    # Apaga o arquivo do disco apenas se foi um upload do admin.
+    db.execute('DELETE FROM fotos WHERE id = ?', (id,))
+    # Remove o registro do banco.
+    db.commit()
+    # Salva a remoção.
+    flash('Foto removida.', 'success')
+    # Confirma para o admin.
+    return redirect(url_for('admin.gerenciar_fotos'))
+    # Volta para a página de fotos.
+
+
+@admin.route('/fotos/<int:id>/mover', methods=['POST'])
+# Cria a rota que reordena uma foto dentro do carrossel (subir/descer).
+def mover_foto(id):
+    # Define a função que troca a ordem de duas fotos vizinhas.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    foto = db.execute('SELECT * FROM fotos WHERE id = ?', (id,)).fetchone()
+    # Busca a foto que será movida.
+    if foto is None:
+        # Quando a foto não existe.
+        return redirect(url_for('admin.gerenciar_fotos'))
+        # Volta sem alterar nada.
+    direcao = request.form.get('direcao', '')
+    # Lê se a foto deve subir ou descer.
+    if direcao == 'subir':
+        # Para subir, procura a foto imediatamente anterior na ordem.
+        vizinha = db.execute(
+            'SELECT * FROM fotos WHERE local = ? AND (ordem < ? OR (ordem = ? AND id < ?)) ORDER BY ordem DESC, id DESC LIMIT 1',
+            (foto['local'], foto['ordem'], foto['ordem'], foto['id'])
+        ).fetchone()
+        # Pega a vizinha de cima.
+    else:
+        # Para descer, procura a foto imediatamente seguinte na ordem.
+        vizinha = db.execute(
+            'SELECT * FROM fotos WHERE local = ? AND (ordem > ? OR (ordem = ? AND id > ?)) ORDER BY ordem ASC, id ASC LIMIT 1',
+            (foto['local'], foto['ordem'], foto['ordem'], foto['id'])
+        ).fetchone()
+        # Pega a vizinha de baixo.
+    if vizinha is not None:
+        # Só troca se existir uma vizinha para o lado pedido.
+        db.execute('UPDATE fotos SET ordem = ? WHERE id = ?', (vizinha['ordem'], foto['id']))
+        # Coloca a foto na posição da vizinha.
+        db.execute('UPDATE fotos SET ordem = ? WHERE id = ?', (foto['ordem'], vizinha['id']))
+        # Coloca a vizinha na posição da foto.
+        db.commit()
+        # Salva a nova ordem.
+    return redirect(url_for('admin.gerenciar_fotos'))
+    # Volta para a página de fotos.
 
 
 # =================== BLUEPRINT DA ÁREA RESTRITA DA PROFISSIONAL =================== #

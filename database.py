@@ -47,6 +47,20 @@ PROFISSIONAIS_SERVICOS_INICIAIS = {
 # Fecha o dicionário de vínculos entre profissionais e serviços.
 
 
+FOTOS_INICIAIS = [
+    # Cria a lista de fotos iniciais que já existem em static/img para popular a galeria e a seção da responsável.
+    ('galeria', 'trabalho1.png', 'Esmaltação marrom nude elegante', 1),
+    # Primeira foto da galeria da página inicial.
+    ('galeria', 'trabalho2.png', 'Atendimento com cuidado e técnica', 2),
+    # Segunda foto da galeria da página inicial.
+    ('galeria', 'trabalho3.png', 'Nude com brilho delicado', 3),
+    # Terceira foto da galeria da página inicial.
+    ('responsavel', 'pamela_francisco.png', 'Pamela Francisco', 1),
+    # Foto da responsável exibida na seção "Responsável pelo atendimento".
+]
+# Fecha a lista de fotos iniciais.
+
+
 def get_db():
     # Cria uma função para abrir ou reutilizar a conexão com o banco.
     if 'db' not in g:
@@ -180,6 +194,15 @@ def init_db():
 
     popular_profissionais_servicos(db)
     # Garante que cada profissional apareça somente nos serviços que ela atende.
+
+    total_fotos = db.execute('SELECT COUNT(*) FROM fotos').fetchone()[0]
+    # Conta quantas fotos já estão cadastradas no banco.
+    if total_fotos == 0:
+        # Verifica se a tabela de fotos ainda está vazia.
+        db.executemany('INSERT INTO fotos (local, arquivo, titulo, ordem) VALUES (?, ?, ?, ?)', FOTOS_INICIAIS)
+        # Insere as fotos iniciais (galeria e responsável) que já existem em static/img.
+        db.commit()
+        # Salva as fotos iniciais no banco.
 
     db.close()
     # Fecha a conexão direta usada na inicialização.

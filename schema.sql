@@ -103,9 +103,24 @@ CREATE TABLE IF NOT EXISTS bloqueios_agenda (
 CREATE TABLE IF NOT EXISTS configuracoes (
     -- Cria a tabela chave-valor que guarda preferências visuais globais do sistema.
     chave TEXT PRIMARY KEY,
-    -- Nome da preferência (ex: fonte, cor_texto, cor_fundo, cor_destaque).
+    -- Nome da preferência (ex: fonte, cor_texto, cor_fundo, cor_destaque ou aparencia.pagina.area.prop).
     valor TEXT NOT NULL
     -- Valor associado à preferência (ex: 'Arial', '#3f2d25', '#efe0d1').
 );
 -- Finaliza a tabela configuracoes.
+
+CREATE TABLE IF NOT EXISTS fotos (
+    -- Cria a tabela que guarda as fotos editáveis pelo admin (galeria, responsável, etc.).
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    -- Cria o identificador automático da foto.
+    local TEXT NOT NULL,
+    -- Guarda em qual área do site a foto aparece (ex: 'galeria', 'responsavel').
+    arquivo TEXT NOT NULL,
+    -- Guarda o caminho do arquivo dentro de static/img (ex: 'trabalho1.png' ou 'uploads/abc123.png').
+    titulo TEXT NOT NULL DEFAULT '',
+    -- Guarda a legenda opcional exibida junto da foto.
+    ordem INTEGER NOT NULL DEFAULT 0
+    -- Define a ordem de exibição, usada principalmente nos carrosséis.
+);
+-- Finaliza a tabela fotos.
 

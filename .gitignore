@@ -4,3 +4,4 @@ esmalteria.db
 .env
 venv/
 .venv/
+static/img/uploads/
