@@ -16,7 +16,7 @@
             <h3>Reserva online</h3> <!-- Mostra o título do cartão. -->
             <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
             <p><strong>Confirmação:</strong> realizada pelo telefone informado.</p> <!-- Explica como ocorre a confirmação. -->
-            <p><strong>Endereço:</strong> {{ empresa.endereco }}</p> <!-- Mostra o endereço. -->
+            <p><strong>Atendimento:</strong> {{ empresa.atendimento or 'Atendimento a domicílio' }}</p> <!-- Mostra que o atendimento é a domicílio/na residência da profissional, sem endereço fixo. -->
         </div> <!-- Fecha o cartão lateral. -->
     </div> <!-- Fecha o container do hero. -->
 </section> <!-- Fecha a seção hero. -->
@@ -50,21 +50,32 @@
     <div class="container"> <!-- Centraliza a galeria. -->
         <h2>Galeria de trabalhos</h2> <!-- Mostra título da galeria. -->
         <p class="texto-central">Resultados que demonstram cuidado, acabamento e atenção aos detalhes.</p> <!-- Mostra descrição da galeria. -->
-        <div class="galeria galeria-tres-colunas"> <!-- Organiza a galeria em três colunas. -->
-            {% for foto in galeria %} {# Percorre as fotos da galeria. #}
-            <div class="foto-card"> <!-- Cria o card da foto. -->
-                <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo }}"> <!-- Carrega a imagem da pasta static/img. -->
-                <p>{{ foto.titulo }}</p> <!-- Mostra a legenda da imagem. -->
-            </div> <!-- Fecha o card da foto. -->
-            {% endfor %} {# Finaliza a repetição das fotos. #}
-        </div> <!-- Fecha a grade da galeria. -->
+        {% if galeria %} {# Só mostra o carrossel se houver fotos cadastradas. #}
+        <div class="carrossel" data-carrossel> <!-- Cria o carrossel de fotos da galeria. -->
+            <button type="button" class="carrossel-seta carrossel-prev" aria-label="Foto anterior">‹</button> <!-- Botão para voltar uma foto. -->
+            <div class="carrossel-janela"> <!-- Janela que recorta a trilha de fotos. -->
+                <div class="carrossel-trilha"> <!-- Trilha que desliza horizontalmente. -->
+                    {% for foto in galeria %} {# Percorre as fotos da galeria vindas do banco. #}
+                    <figure class="carrossel-item"> <!-- Cria o slide de cada foto. -->
+                        <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Trabalho da galeria' }}"> <!-- Carrega a imagem da pasta static/img. -->
+                        {% if foto.titulo %}<figcaption>{{ foto.titulo }}</figcaption>{% endif %} <!-- Mostra a legenda quando existir. -->
+                    </figure> <!-- Fecha o slide. -->
+                    {% endfor %} {# Finaliza a repetição das fotos. #}
+                </div> <!-- Fecha a trilha. -->
+            </div> <!-- Fecha a janela. -->
+            <button type="button" class="carrossel-seta carrossel-next" aria-label="Próxima foto">›</button> <!-- Botão para avançar uma foto. -->
+            <div class="carrossel-pontos" aria-hidden="true"></div> <!-- Área dos pontinhos de navegação (preenchida via JS). -->
+        </div> <!-- Fecha o carrossel. -->
+        {% else %} {# Quando não há fotos cadastradas. #}
+        <p class="texto-central">Em breve novas fotos dos trabalhos.</p> <!-- Mensagem amigável de galeria vazia. -->
+        {% endif %} {# Fecha a verificação de galeria. #}
     </div> <!-- Fecha o container da galeria. -->
 </section> <!-- Fecha a seção da galeria. -->
 
 <section id="dona" class="secao"> <!-- Cria a seção sobre a responsável. -->
     <div class="container dona-grid"> <!-- Organiza foto e texto em grade. -->
         <div class="dona-foto"> <!-- Cria a área da foto. -->
-            <img src="{{ url_for('static', filename='img/' + empresa.foto_dona) }}" alt="Foto de {{ empresa.dona }}"> <!-- Exibe a foto da responsável. -->
+            <img src="{{ url_for('static', filename='img/' + (foto_dona or empresa.foto_dona)) }}" alt="Foto de {{ empresa.dona }}"> <!-- Exibe a foto da responsável cadastrada pelo admin (ou a padrão). -->
         </div> <!-- Fecha a área da foto. -->
         <div class="dona-texto"> <!-- Cria o bloco de texto sobre a profissional. -->
             <p class="subtitulo subtitulo-escuro">Responsável pelo atendimento</p> <!-- Mostra subtítulo. -->

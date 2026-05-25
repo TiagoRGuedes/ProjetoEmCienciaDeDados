@@ -17,9 +17,11 @@
         .topo, .rodape { background: var(--config-cor-destaque); }
         .botao, .botao-form, button[type="submit"], .botao-destaque { background: var(--config-cor-destaque); }
         .nav-destaque, nav a:hover { background: var(--config-cor-destaque) !important; }
+        /* Aplica as cores escolhidas pelo admin para cada página/área (vem depois para ter prioridade). */
+        {{ css_aparencia|safe }}
     </style>
 </head> <!-- Fecha a área de configurações. -->
-<body> <!-- Abre o corpo visível da página. -->
+<body class="pagina-{{ pagina_atual or 'outras' }}"> <!-- Abre o corpo e marca a página atual para aplicar as cores por área. -->
     <header class="topo"> <!-- Cria o cabeçalho fixo do site. -->
         <div class="container topo-conteudo"> <!-- Cria um container para organizar marca e menu. -->
             <div class="marca"> <!-- Cria a área da marca. -->
@@ -51,7 +53,7 @@
                 <h3>Atendimento</h3> <!-- Mostra o título da coluna de atendimento. -->
                 <p><strong>Telefone:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone. -->
                 <p><strong>Horários:</strong> {{ empresa.horarios }}</p> <!-- Mostra horário de funcionamento. -->
-                <p><strong>Endereço:</strong> {{ empresa.endereco }}</p> <!-- Mostra o endereço. -->
+                <p><strong>Atendimento:</strong> {{ empresa.atendimento or 'Atendimento a domicílio' }}</p> <!-- Mostra como é o atendimento (a domicílio/na residência da profissional), sem endereço público. -->
             </div> <!-- Fecha a segunda coluna. -->
             <div> <!-- Abre a terceira coluna do rodapé. -->
                 <h3>Informações</h3> <!-- Mostra o título da coluna informativa. -->
@@ -62,5 +64,6 @@
             </div> <!-- Fecha a terceira coluna. -->
         </div> <!-- Fecha o grid do rodapé. -->
     </footer> <!-- Fecha o rodapé. -->
+    <script src="{{ url_for('static', filename='js/carrossel.js') }}"></script> <!-- Carrega o JavaScript que controla os carrosséis de fotos. -->
 </body> <!-- Fecha o corpo da página. -->
 </html> <!-- Fecha o documento HTML. -->
