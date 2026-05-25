@@ -56,6 +56,14 @@ h1, h2, h3 { margin: 0 0 12px 0; color: var(--marrom-escuro); } /* Estiliza tít
 .sidebar-link:hover { background: var(--bege-claro); text-decoration: none; color: var(--marrom-escuro); } /* Hover dos links. */
 .sidebar-link.active { background: var(--nude); color: var(--marrom-escuro); } /* Link ativo destacado. */
 .sidebar-link-sair { margin-top: 12px; border-top: 1px solid var(--nude); padding-top: 14px; color: var(--marrom-principal); } /* Estiliza o link de sair separado dos demais. */
+.sidebar-grupo { display: flex; flex-direction: column; } /* Grupo recolhível de itens por tópico. */
+.sidebar-grupo-titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; background: none; border: none; cursor: pointer; padding: 11px 14px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; font-weight: 700; color: var(--marrom-escuro); text-align: left; } /* Cabeçalho clicável que abre/fecha o grupo. */
+.sidebar-grupo-titulo:hover { background: var(--bege-claro); } /* Hover do cabeçalho do grupo. */
+.sidebar-grupo-seta { transition: transform 0.2s ease; color: var(--marrom-medio); font-size: 1.2rem; line-height: 1; } /* Seta que indica se o grupo está aberto. */
+.sidebar-grupo.aberto .sidebar-grupo-seta { transform: rotate(90deg); } /* Gira a seta para baixo quando o grupo está aberto. */
+.sidebar-grupo-itens { display: none; flex-direction: column; gap: 2px; padding: 2px 0 6px 8px; } /* Itens do grupo, escondidos por padrão. */
+.sidebar-grupo.aberto .sidebar-grupo-itens { display: flex; } /* Mostra os itens quando o grupo está aberto. */
+.sidebar-grupo-itens .sidebar-link { padding-left: 22px; font-size: 0.9rem; } /* Recua os itens para mostrar que pertencem ao tópico. */
 
 .sidebar-backdrop { position: fixed; inset: 0; background: rgba(45, 26, 18, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 40; } /* Fundo escuro do menu. */
 .sidebar-backdrop.visivel { opacity: 1; pointer-events: auto; } /* Aparece quando o menu está aberto. */

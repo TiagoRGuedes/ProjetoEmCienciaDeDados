@@ -33,17 +33,49 @@
       <strong>Administração</strong>
       <button id="botao-fechar-menu" class="botao-fechar-menu" aria-label="Fechar menu">×</button>
     </div>
-    <nav class="sidebar-links" aria-label="Menu administrativo"> <!-- Lista de links. -->
-      <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint and (request.endpoint == 'admin.dashboard' or request.endpoint.startswith('admin.agendamento')) %}active{% endif %}">Agendamentos</a>
-      <a href="{{ url_for('admin.historico') }}" class="sidebar-link {% if request.endpoint and (request.endpoint == 'admin.historico' or request.endpoint == 'admin.agendamento_restaurar') %}active{% endif %}">Histórico</a>
-      <a href="{{ url_for('admin.agenda') }}" class="sidebar-link {% if request.endpoint == 'admin.agenda' %}active{% endif %}">Agenda</a>
-      <a href="{{ url_for('admin.profissionais') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.profissional') %}active{% endif %}">Profissionais</a>
-      <a href="{{ url_for('admin.servicos') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.servic') %}active{% endif %}">Serviços</a>
-      <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a>
-      <a href="{{ url_for('admin.clientes') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.client') %}active{% endif %}">Clientes</a>
-      <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if request.endpoint == 'admin.configuracoes' %}active{% endif %}">Aparência</a>
-      <a href="{{ url_for('admin.gerenciar_fotos') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.') and 'foto' in request.endpoint %}active{% endif %}">Fotos</a>
-      <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-link-sair">Sair</a>
+    <nav class="sidebar-links" aria-label="Menu administrativo"> <!-- Menu lateral com itens agrupados por tópico. -->
+      {% set ep = request.endpoint or '' %} {# Guarda o endpoint atual para destacar o item e abrir o grupo certo. #}
+      {% set g_atendimentos = ep in ['admin.dashboard', 'admin.agenda', 'admin.historico', 'admin.agendamento_restaurar'] or ep.startswith('admin.agendamento') or ep.startswith('admin.bloqueio') %} {# Marca o grupo Atendimentos como ativo. #}
+      {% set g_cadastros = ep.startswith('admin.profissional') or ep.startswith('admin.servic') or ep.startswith('admin.client') %} {# Marca o grupo Cadastros como ativo. #}
+      {% set g_site = ep == 'admin.configuracoes' or 'foto' in ep %} {# Marca o grupo Site/Aparência como ativo. #}
+
+      <div class="sidebar-grupo {% if g_atendimentos %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Atendimentos. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_atendimentos else 'false' }}"> <!-- Cabeçalho que abre/fecha o grupo. -->
+          <span>Atendimentos</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta que gira ao abrir. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo (visíveis só quando aberto). -->
+          <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if ep == 'admin.dashboard' or (ep.startswith('admin.agendamento') and ep != 'admin.agendamento_restaurar') %}active{% endif %}">Agendamentos</a> <!-- Painel de agendamentos. -->
+          <a href="{{ url_for('admin.agenda') }}" class="sidebar-link {% if ep == 'admin.agenda' %}active{% endif %}">Agenda</a> <!-- Agenda por profissional. -->
+          <a href="{{ url_for('admin.historico') }}" class="sidebar-link {% if ep == 'admin.historico' or ep == 'admin.agendamento_restaurar' %}active{% endif %}">Histórico</a> <!-- Histórico de atendimentos. -->
+          <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if ep.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Bloqueios de agenda. -->
+        </div>
+      </div>
+
+      <div class="sidebar-grupo {% if g_cadastros %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Cadastros. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_cadastros else 'false' }}"> <!-- Cabeçalho do grupo. -->
+          <span>Cadastros</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo. -->
+          <a href="{{ url_for('admin.profissionais') }}" class="sidebar-link {% if ep.startswith('admin.profissional') %}active{% endif %}">Profissionais</a> <!-- Cadastro de profissionais. -->
+          <a href="{{ url_for('admin.servicos') }}" class="sidebar-link {% if ep.startswith('admin.servic') %}active{% endif %}">Serviços</a> <!-- Cadastro de serviços. -->
+          <a href="{{ url_for('admin.clientes') }}" class="sidebar-link {% if ep.startswith('admin.client') %}active{% endif %}">Clientes</a> <!-- Cadastro de clientes. -->
+        </div>
+      </div>
+
+      <div class="sidebar-grupo {% if g_site %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Site / Aparência. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_site else 'false' }}"> <!-- Cabeçalho do grupo. -->
+          <span>Site / Aparência</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo. -->
+          <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if ep == 'admin.configuracoes' %}active{% endif %}">Aparência</a> <!-- Cores e fonte do site. -->
+          <a href="{{ url_for('admin.gerenciar_fotos') }}" class="sidebar-link {% if 'foto' in ep %}active{% endif %}">Fotos</a> <!-- Gestão de fotos do site. -->
+        </div>
+      </div>
+
+      <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-link-sair">Sair</a> <!-- Sair fica solto no final. -->
     </nav>
   </aside>
 
@@ -88,6 +120,17 @@
       botaoFechar.addEventListener('click', fechar);
       backdrop.addEventListener('click', fechar);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+    })();
+
+    // Abre e fecha os grupos do menu lateral (acordeão por tópico).
+    (function () {
+      document.querySelectorAll('[data-grupo] .sidebar-grupo-titulo').forEach(function (titulo) {
+        titulo.addEventListener('click', function () {
+          const grupo = titulo.closest('[data-grupo]');
+          const aberto = grupo.classList.toggle('aberto');
+          titulo.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+        });
+      });
     })();
   </script>
 </body> <!-- Fecha o corpo da página. -->
