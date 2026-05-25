@@ -248,3 +248,24 @@ body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
 .card-aviso-historico-texto p { color: var(--texto-suave); font-size: 0.9rem; margin-top: 4px; } /* Texto secundário do aviso. */
 .paginacao-historico { display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 16px; } /* Linha da paginação do histórico. */
 .paginacao-info { color: var(--texto-suave); font-size: 0.9rem; } /* Estilo do texto "Página X de Y". */
+
+/* ============ EDITOR DE APARÊNCIA POR ÁREA ============ */
+.area-aparencia { background: var(--bege-card); border: 1px solid var(--nude); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; } /* Cartão de cada área editável. */
+.area-aparencia-titulo { font-size: 0.98rem; color: var(--marrom-escuro); margin-bottom: 10px; } /* Título da área. */
+.area-aparencia-cores { display: flex; flex-wrap: wrap; gap: 18px; } /* Coloca as cores da área lado a lado. */
+.cor-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; } /* Cada item de cor com caixinha e seletor. */
+.cor-item-toggle { display: inline-flex; align-items: center; gap: 8px; width: auto; cursor: pointer; } /* Caixinha "personalizar" alinhada. */
+.cor-item-picker { height: 42px; padding: 4px; width: 100%; } /* Seletor de cor ocupando a largura do item. */
+
+/* ============ GESTÃO DE FOTOS ============ */
+.fotos-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; } /* Cabeçalho de cada local de fotos. */
+.fotos-tag { background: var(--bege-claro); border: 1px solid var(--nude); color: var(--texto-suave); border-radius: 999px; padding: 3px 12px; font-size: 0.8rem; } /* Etiqueta que indica foto única ou carrossel. */
+.fotos-grade { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 16px; } /* Grade com as fotos atuais. */
+.foto-admin { width: 170px; background: var(--bege-claro); border: 1px solid var(--nude); border-radius: var(--radius-sm); padding: 8px; } /* Cartão de cada foto. */
+.foto-admin img { width: 100%; height: 130px; object-fit: cover; border-radius: var(--radius-sm); display: block; } /* Miniatura da foto. */
+.foto-admin-titulo { font-size: 0.82rem; color: var(--texto-suave); margin: 6px 0; text-align: center; } /* Legenda da miniatura. */
+.foto-admin-acoes { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; } /* Linha de botões da foto. */
+.form-inline { display: inline; margin: 0; } /* Permite vários botões-formulário lado a lado. */
+.fotos-form { border-top: 1px dashed var(--nude); padding-top: 14px; } /* Separa o formulário de upload das fotos atuais. */
+.foto-atual-preview { margin-bottom: 10px; } /* Espaço da prévia da foto atual no formulário de profissional. */
+.foto-atual-preview img { width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--nude); display: block; margin-bottom: 4px; } /* Miniatura da foto atual. */

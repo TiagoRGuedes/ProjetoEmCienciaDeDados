@@ -11,7 +11,7 @@
     <ul class="flash-list"><li class="flash flash-error">{{ erro }}</li></ul> <!-- Mostra a mensagem de erro. -->
   {% endif %} <!-- Fecha a verificação. -->
 
-  <form method="POST" class="form-grid"> <!-- Cria o formulário de cadastro/edição. -->
+  <form method="POST" enctype="multipart/form-data" class="form-grid"> <!-- Cria o formulário de cadastro/edição (aceita upload de foto). -->
     <div class="form-group"> <!-- Agrupa o nome. -->
       <label class="form-label" for="nome">Nome</label> <!-- Rótulo do nome. -->
       <input class="form-input" type="text" id="nome" name="nome" value="{{ form.nome if form else (profissional.nome if profissional else '') }}" required maxlength="80" autofocus> <!-- Campo de nome. -->
@@ -23,9 +23,18 @@
     </div> <!-- Fecha o grupo. -->
 
     <div class="form-group"> <!-- Agrupa a foto. -->
-      <label class="form-label" for="foto">Arquivo da foto</label> <!-- Rótulo do arquivo. -->
-      <input class="form-input" type="text" id="foto" name="foto" value="{{ form.foto if form else (profissional.foto if profissional else '') }}" required placeholder="ex: pamela_francisco.png"> <!-- Campo para o nome do arquivo. -->
-      <span class="form-help">A foto precisa estar dentro de <code>static/img/</code>. Use o mesmo nome do arquivo.</span> <!-- Ajuda sobre onde colocar a foto. -->
+      <label class="form-label">Foto da profissional</label> <!-- Rótulo do bloco de foto. -->
+      {% set foto_atual = form.foto if form else (profissional.foto if profissional else '') %} <!-- Descobre a foto atual (edição) ou digitada. -->
+      {% if foto_atual %} <!-- Mostra uma prévia da foto atual quando existir. -->
+      <div class="foto-atual-preview"> <!-- Bloco da prévia. -->
+        <img src="{{ url_for('static', filename='img/' + foto_atual) }}" alt="Foto atual"> <!-- Mostra a foto atual. -->
+        <span class="form-help">Foto atual. Envie uma nova abaixo para substituir.</span> <!-- Explica a prévia. -->
+      </div> <!-- Fecha a prévia. -->
+      {% endif %} <!-- Fecha a verificação de prévia. -->
+      <input class="form-input" type="file" id="foto_upload" name="foto_upload" accept="image/*"> <!-- Campo de upload de imagem nova. -->
+      <span class="form-help">Envie uma imagem (png, jpg, jpeg, webp ou gif, até 5 MB){% if not profissional %} ou informe abaixo o nome de um arquivo já existente{% endif %}.</span> <!-- Ajuda sobre o upload. -->
+      <input class="form-input" type="text" id="foto" name="foto" value="{{ foto_atual }}" placeholder="ex: pamela_francisco.png" style="margin-top: 8px;"> <!-- Campo opcional com o nome de arquivo existente. -->
+      <span class="form-help">Opcional: nome de um arquivo já presente em <code>static/img/</code>. Ignorado quando você envia uma imagem nova.</span> <!-- Ajuda sobre o campo de texto. -->
     </div> <!-- Fecha o grupo. -->
 
     <div class="form-group"> <!-- Agrupa a senha de acesso da profissional. -->

@@ -4,59 +4,116 @@
 
 <div class="page-header"> <!-- Cabeçalho da página. -->
   <h1 class="page-title">Configurações visuais</h1> <!-- Título. -->
-  <p class="texto-suave">Personalize a fonte e as cores que aparecem em todo o site (área pública, admin e área da profissional).</p> <!-- Texto explicativo. -->
+  <p class="texto-suave">Personalize a fonte, as cores gerais e as cores de cada página e área do site público.</p> <!-- Texto explicativo. -->
 </div>
 
-<div class="card" style="max-width: 720px;"> <!-- Cartão com largura limitada. -->
-  <form method="POST" action="{{ url_for('admin.configuracoes') }}" class="form-grid"> <!-- Formulário das configurações visuais. -->
+<form method="POST" action="{{ url_for('admin.configuracoes') }}"> <!-- Formulário único que salva fonte, cores gerais e cores por área. -->
 
-    <div class="form-group"> <!-- Grupo da fonte. -->
-      <label class="form-label" for="fonte">Fonte do site</label>
-      <select class="form-select" id="fonte" name="fonte"> <!-- Lista de fontes pré-definidas e seguras para web. -->
-        {% set opcoes_fonte = [
-          ('Arial, Helvetica, sans-serif', 'Arial'),
-          ('Georgia, serif', 'Georgia'),
-          ('"Times New Roman", Times, serif', 'Times New Roman'),
-          ('Tahoma, Geneva, sans-serif', 'Tahoma'),
-          ('Verdana, Geneva, sans-serif', 'Verdana'),
-          ('"Trebuchet MS", sans-serif', 'Trebuchet MS'),
-          ('"Courier New", Courier, monospace', 'Courier New')
-        ] %}
-        {% for valor, rotulo in opcoes_fonte %}
-        <option value="{{ valor }}" {% if config.fonte == valor %}selected{% endif %}>{{ rotulo }}</option>
-        {% endfor %}
+  <div class="card" style="max-width: 760px;"> <!-- Cartão das configurações gerais. -->
+    <h2 class="page-title" style="font-size: 1.1rem;">Fonte e cores principais</h2> <!-- Subtítulo da seção geral. -->
+    <div class="form-grid"> <!-- Organiza os campos gerais. -->
+
+      <div class="form-group"> <!-- Grupo da fonte. -->
+        <label class="form-label" for="fonte">Fonte do site</label>
+        <select class="form-select" id="fonte" name="fonte"> <!-- Lista de fontes pré-definidas e seguras para web. -->
+          {% set opcoes_fonte = [
+            ('Arial, Helvetica, sans-serif', 'Arial'),
+            ('Georgia, serif', 'Georgia'),
+            ('"Times New Roman", Times, serif', 'Times New Roman'),
+            ('Tahoma, Geneva, sans-serif', 'Tahoma'),
+            ('Verdana, Geneva, sans-serif', 'Verdana'),
+            ('"Trebuchet MS", sans-serif', 'Trebuchet MS'),
+            ('"Courier New", Courier, monospace', 'Courier New')
+          ] %}
+          {% for valor, rotulo in opcoes_fonte %}
+          <option value="{{ valor }}" {% if config.fonte == valor %}selected{% endif %}>{{ rotulo }}</option>
+          {% endfor %}
+        </select>
+        <span class="form-help">A fonte se aplica em todas as páginas, tanto admin quanto pública.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de texto. -->
+        <label class="form-label" for="cor_texto">Cor do texto</label>
+        <input class="form-input" type="color" id="cor_texto" name="cor_texto" value="{{ config.cor_texto or '#3f2d25' }}" style="height: 48px; padding: 4px;"> <!-- Picker de cor de texto. -->
+        <span class="form-help">Cor principal dos textos. Sugestão: tons escuros para boa leitura.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de fundo. -->
+        <label class="form-label" for="cor_fundo">Cor de fundo</label>
+        <input class="form-input" type="color" id="cor_fundo" name="cor_fundo" value="{{ config.cor_fundo or '#efe0d1' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de fundo. -->
+        <span class="form-help">Cor de fundo geral. Use tons claros para combinar com a paleta marrom/bege.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de destaque. -->
+        <label class="form-label" for="cor_destaque">Cor de destaque (botões e topo)</label>
+        <input class="form-input" type="color" id="cor_destaque" name="cor_destaque" value="{{ config.cor_destaque or '#6f4f3f' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de destaque. -->
+        <span class="form-help">Cor de botões principais e elementos de destaque.</span>
+      </div>
+
+    </div> <!-- Fecha o grid de campos gerais. -->
+  </div> <!-- Fecha o cartão geral. -->
+
+  <div class="card" style="max-width: 760px; margin-top: 18px;"> <!-- Cartão das cores por página e área. -->
+    <h2 class="page-title" style="font-size: 1.1rem;">Cores por página e área</h2> <!-- Subtítulo da seção por área. -->
+    <p class="texto-suave">Escolha a página, depois ajuste as cores de cada área. Marque a opção para personalizar; desmarque para voltar à cor padrão do site.</p> <!-- Explica como usar. -->
+
+    <div class="form-group"> <!-- Grupo do seletor de página. -->
+      <label class="form-label" for="seletor-pagina">Página</label> <!-- Rótulo do seletor. -->
+      <select class="form-select" id="seletor-pagina"> <!-- Seletor que escolhe qual página editar. -->
+        {% for pagina, info in aparencia_paginas.items() %} {# Percorre cada página configurável. #}
+        <option value="{{ pagina }}">{{ info.rotulo }}</option> <!-- Opção com o nome amigável da página. -->
+        {% endfor %} {# Finaliza o loop de páginas. #}
       </select>
-      <span class="form-help">A fonte se aplica em todas as páginas, tanto admin quanto pública.</span>
-    </div>
+    </div> <!-- Fecha o grupo do seletor. -->
 
-    <div class="form-group"> <!-- Grupo da cor de texto. -->
-      <label class="form-label" for="cor_texto">Cor do texto</label>
-      <input class="form-input" type="color" id="cor_texto" name="cor_texto" value="{{ config.cor_texto or '#3f2d25' }}" style="height: 48px; padding: 4px;"> <!-- Picker de cor de texto. -->
-      <span class="form-help">Cor principal dos textos. Sugestão: tons escuros para boa leitura.</span>
-    </div>
+    {% for pagina, info in aparencia_paginas.items() %} {# Percorre cada página para montar seu bloco de áreas. #}
+    <div class="grupo-aparencia" data-pagina="{{ pagina }}" {% if not loop.first %}style="display: none;"{% endif %}> <!-- Bloco de uma página (só o primeiro aparece de início). -->
+      {% for area, dados in info.areas.items() %} {# Percorre cada área da página. #}
+      <div class="area-aparencia"> <!-- Cartão de uma área editável. -->
+        <h3 class="area-aparencia-titulo">{{ dados.rotulo }}</h3> <!-- Nome amigável da área. -->
+        <div class="area-aparencia-cores"> <!-- Lista de cores da área. -->
+          {% for prop in dados.props %} {# Percorre cada propriedade de cor da área. #}
+          {% set chave = 'aparencia.' ~ pagina ~ '.' ~ area ~ '.' ~ prop %} {# Monta a chave salva no banco. #}
+          {% set valor_salvo = aparencia_valores.get(chave) %} {# Busca o valor já salvo, se houver. #}
+          <div class="cor-item"> <!-- Linha com a caixinha de personalizar e o seletor de cor. -->
+            <label class="checkbox-item cor-item-toggle"> <!-- Caixinha "personalizar esta cor". -->
+              <input type="checkbox" name="usar__{{ pagina }}__{{ area }}__{{ prop }}" {% if valor_salvo %}checked{% endif %}> <!-- Marca quando a cor está personalizada. -->
+              <span>{{ prop_rotulo[prop] }}</span> <!-- Mostra "Cor de fundo" ou "Cor do texto". -->
+            </label>
+            <input type="color" name="cor__{{ pagina }}__{{ area }}__{{ prop }}" value="{{ valor_salvo or prop_padrao[prop] }}" class="cor-item-picker"> <!-- Seletor de cor da propriedade. -->
+          </div> <!-- Fecha a linha da cor. -->
+          {% endfor %} {# Finaliza o loop de propriedades. #}
+        </div> <!-- Fecha a lista de cores da área. -->
+      </div> <!-- Fecha o cartão da área. -->
+      {% endfor %} {# Finaliza o loop de áreas. #}
+    </div> <!-- Fecha o bloco da página. -->
+    {% endfor %} {# Finaliza o loop de páginas. #}
 
-    <div class="form-group"> <!-- Grupo da cor de fundo. -->
-      <label class="form-label" for="cor_fundo">Cor de fundo</label>
-      <input class="form-input" type="color" id="cor_fundo" name="cor_fundo" value="{{ config.cor_fundo or '#efe0d1' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de fundo. -->
-      <span class="form-help">Cor de fundo geral. Use tons claros para combinar com a paleta marrom/bege.</span>
+    <div class="card" style="margin: 6px 0; background: var(--bege-claro);"> <!-- Aviso de pré-visualização. -->
+      <strong>Dica</strong> <!-- Destaque do aviso. -->
+      <p style="margin-top: 6px;">Depois de salvar, abra o site público e atualize a página para ver as cores aplicadas.</p> <!-- Explica como conferir. -->
     </div>
+  </div> <!-- Fecha o cartão de cores por área. -->
 
-    <div class="form-group"> <!-- Grupo da cor de destaque. -->
-      <label class="form-label" for="cor_destaque">Cor de destaque (botões e topo)</label>
-      <input class="form-input" type="color" id="cor_destaque" name="cor_destaque" value="{{ config.cor_destaque or '#6f4f3f' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de destaque. -->
-      <span class="form-help">Cor de botões principais e elementos de destaque.</span>
-    </div>
+  <div class="form-actions" style="max-width: 760px;"> <!-- Área dos botões de ação. -->
+    <button type="submit" class="btn btn-primary">Salvar configurações</button> <!-- Botão que salva tudo de uma vez. -->
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a> <!-- Link para voltar sem salvar. -->
+  </div> <!-- Fecha a área de botões. -->
+</form> <!-- Fecha o formulário. -->
 
-    <div class="card" style="margin: 6px 0; background: var(--bege-claro);"> <!-- Pré-visualização rápida. -->
-      <strong>Pré-visualização rápida</strong>
-      <p style="margin-top: 6px;">Atualize a página depois de salvar para ver as cores em toda a interface.</p>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Salvar configurações</button>
-      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a>
-    </div>
-  </form>
-</div>
+<script>
+  // Mostra apenas o bloco de áreas da página escolhida no seletor.
+  (function () {
+    var seletor = document.getElementById('seletor-pagina');
+    var grupos = document.querySelectorAll('.grupo-aparencia');
+    function mostrar() {
+      grupos.forEach(function (grupo) {
+        grupo.style.display = (grupo.dataset.pagina === seletor.value) ? '' : 'none';
+      });
+    }
+    seletor.addEventListener('change', mostrar);
+    mostrar();
+  })();
+</script>
 
 {% endblock %}

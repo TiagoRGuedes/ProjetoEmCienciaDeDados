@@ -42,6 +42,7 @@
       <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a>
       <a href="{{ url_for('admin.clientes') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.client') %}active{% endif %}">Clientes</a>
       <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if request.endpoint == 'admin.configuracoes' %}active{% endif %}">Aparência</a>
+      <a href="{{ url_for('admin.gerenciar_fotos') }}" class="sidebar-link {% if request.endpoint and request.endpoint.startswith('admin.') and 'foto' in request.endpoint %}active{% endif %}">Fotos</a>
       <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-link-sair">Sair</a>
     </nav>
   </aside>
