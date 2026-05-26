@@ -7,6 +7,9 @@
   <p class="texto-suave">Personalize a fonte, as cores gerais e as cores de cada página e área do site público.</p> <!-- Texto explicativo. -->
 </div>
 
+<div class="editor-com-previa"> <!-- Layout em duas colunas: editor à esquerda e prévia do site à direita. -->
+  <div class="editor-coluna"> <!-- Coluna do editor (formulário). -->
+
 <form method="POST" action="{{ url_for('admin.configuracoes') }}"> <!-- Formulário único que salva fonte, cores gerais e cores por área. -->
 
   <div class="card" style="max-width: 760px;"> <!-- Cartão das configurações gerais. -->
@@ -91,7 +94,7 @@
 
     <div class="card" style="margin: 6px 0; background: var(--bege-claro);"> <!-- Aviso de pré-visualização. -->
       <strong>Dica</strong> <!-- Destaque do aviso. -->
-      <p style="margin-top: 6px;">Depois de salvar, abra o site público e atualize a página para ver as cores aplicadas.</p> <!-- Explica como conferir. -->
+      <p style="margin-top: 6px;">A prévia ao lado mostra as mudanças na hora. Ao trocar a página no seletor acima, a prévia também muda de página.</p> <!-- Explica a prévia ao vivo. -->
     </div>
   </div> <!-- Fecha o cartão de cores por área. -->
 
@@ -101,18 +104,89 @@
   </div> <!-- Fecha a área de botões. -->
 </form> <!-- Fecha o formulário. -->
 
+  </div> <!-- Fecha a coluna do editor. -->
+
+  <aside class="previa-coluna"> <!-- Coluna com a prévia do site. -->
+    <div class="previa-cabecalho"> <!-- Cabeçalho da prévia. -->
+      <strong>Prévia do site</strong> <!-- Título da prévia. -->
+      <a href="{{ url_for('publico.index') }}" target="_blank" class="btn btn-secondary btn-sm">Abrir em nova aba</a> <!-- Abre o site real em outra aba. -->
+    </div>
+    <div class="previa-frame"> <!-- Moldura que contém o site. -->
+      <iframe id="previa-site" src="{{ url_for('publico.index') }}" title="Prévia do site"></iframe> <!-- Mostra o site público com as cores aplicadas ao vivo. -->
+    </div>
+    <p class="form-help">As cores mudam aqui na hora enquanto você escolhe. Clique em <strong>Salvar</strong> para aplicar de verdade no site.</p> <!-- Explica o comportamento da prévia. -->
+  </aside>
+</div> <!-- Fecha o layout de duas colunas. -->
+
 <script>
-  // Mostra apenas o bloco de áreas da página escolhida no seletor.
+  // Controla o seletor de página, a prévia ao vivo e a navegação da prévia.
   (function () {
     var seletor = document.getElementById('seletor-pagina');
     var grupos = document.querySelectorAll('.grupo-aparencia');
-    function mostrar() {
+    var form = document.querySelector('.editor-coluna form');
+    var iframe = document.getElementById('previa-site');
+    var APARENCIA = {{ aparencia_paginas|tojson }} || {}; // Mapa de páginas/áreas vindo do backend.
+    var URLS = { // Para qual página a prévia navega conforme o seletor.
+      'global': '{{ url_for('publico.index') }}',
+      'inicio': '{{ url_for('publico.index') }}',
+      'agendamento': '{{ url_for('publico.agendar_get') }}'
+    };
+
+    // Mostra apenas o bloco de áreas da página escolhida.
+    function mostrarGrupo() {
       grupos.forEach(function (grupo) {
         grupo.style.display = (grupo.dataset.pagina === seletor.value) ? '' : 'none';
       });
     }
-    seletor.addEventListener('change', mostrar);
-    mostrar();
+
+    // Monta o CSS de prévia a partir dos campos do formulário (mesma lógica do backend).
+    function gerarCss() {
+      var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+      var css = ':root{' +
+        '--config-fonte:' + v('fonte') + ';' +
+        '--config-cor-texto:' + v('cor_texto') + ';' +
+        '--config-cor-fundo:' + v('cor_fundo') + ';' +
+        '--config-cor-destaque:' + v('cor_destaque') + ';}';
+      Object.keys(APARENCIA).forEach(function (pagina) {
+        var info = APARENCIA[pagina];
+        var prefixo = info.escopo ? '.pagina-' + info.escopo + ' ' : '';
+        Object.keys(info.areas).forEach(function (area) {
+          var dados = info.areas[area];
+          var decl = '';
+          dados.props.forEach(function (prop) {
+            var base = pagina + '__' + area + '__' + prop;
+            var usar = form.querySelector('[name="usar__' + base + '"]');
+            var cor = form.querySelector('[name="cor__' + base + '"]');
+            if (usar && usar.checked && cor) {
+              decl += (prop === 'cor_fundo' ? 'background-color' : 'color') + ':' + cor.value + ';';
+            }
+          });
+          if (decl) { css += prefixo + dados.seletor + '{' + decl + '}'; }
+        });
+      });
+      return css;
+    }
+
+    // Injeta o CSS da prévia dentro do iframe (mesmo domínio, então é permitido).
+    function aplicarPrevia() {
+      try {
+        var doc = iframe.contentDocument;
+        if (!doc || !doc.head) { return; }
+        var style = doc.getElementById('previa-cores-admin');
+        if (!style) { style = doc.createElement('style'); style.id = 'previa-cores-admin'; doc.head.appendChild(style); }
+        style.textContent = gerarCss();
+      } catch (e) { /* iframe ainda carregando: ignora. */ }
+    }
+
+    seletor.addEventListener('change', function () {
+      mostrarGrupo();
+      var alvo = URLS[seletor.value] || URLS['inicio'];
+      if (iframe.getAttribute('src') !== alvo) { iframe.setAttribute('src', alvo); } // Navega a prévia para a página escolhida.
+    });
+    form.addEventListener('input', aplicarPrevia);
+    form.addEventListener('change', aplicarPrevia);
+    iframe.addEventListener('load', aplicarPrevia);
+    mostrarGrupo();
   })();
 </script>
 

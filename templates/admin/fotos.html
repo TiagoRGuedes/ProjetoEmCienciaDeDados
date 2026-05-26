@@ -7,6 +7,9 @@
   <p class="texto-suave">Adicione, troque ou remova as fotos exibidas no site. Áreas com várias fotos viram um carrossel na página inicial.</p> <!-- Texto explicativo. -->
 </div>
 
+<div class="editor-com-previa"> <!-- Layout em duas colunas: gestão de fotos à esquerda e prévia do site à direita. -->
+  <div class="editor-coluna"> <!-- Coluna com os cartões de fotos. -->
+
 {% for chave, grupo in locais.items() %} {# Percorre cada local de fotos (galeria, responsável, etc.). #}
 <div class="card" style="max-width: 860px; margin-bottom: 18px;"> <!-- Cartão de um local de fotos. -->
   <div class="fotos-cabecalho"> <!-- Cabeçalho do local. -->
@@ -58,5 +61,30 @@
   </form> <!-- Fecha o formulário de upload. -->
 </div> <!-- Fecha o cartão do local. -->
 {% endfor %} {# Finaliza o loop de locais. #}
+
+  </div> <!-- Fecha a coluna de gestão de fotos. -->
+
+  <aside class="previa-coluna"> <!-- Coluna com a prévia do site. -->
+    <div class="previa-cabecalho"> <!-- Cabeçalho da prévia. -->
+      <strong>Prévia do site</strong> <!-- Título da prévia. -->
+      <button type="button" id="atualizar-previa" class="btn btn-secondary btn-sm">Atualizar</button> <!-- Recarrega a prévia manualmente. -->
+    </div>
+    <div class="previa-frame"> <!-- Moldura que contém o site. -->
+      <iframe id="previa-site" src="{{ url_for('publico.index') }}" title="Prévia do site"></iframe> <!-- Mostra o site com as fotos atuais (galeria e responsável). -->
+    </div>
+    <p class="form-help">A prévia recarrega ao adicionar ou remover uma foto. Use "Atualizar" se precisar forçar.</p> <!-- Explica o comportamento. -->
+  </aside>
+</div> <!-- Fecha o layout de duas colunas. -->
+
+<script>
+  // Recarrega a prévia do site quando o admin clica em "Atualizar".
+  (function () {
+    var botao = document.getElementById('atualizar-previa');
+    var iframe = document.getElementById('previa-site');
+    if (botao && iframe) {
+      botao.addEventListener('click', function () { iframe.contentWindow.location.reload(); });
+    }
+  })();
+</script>
 
 {% endblock %}

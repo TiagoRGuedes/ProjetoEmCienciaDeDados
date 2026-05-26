@@ -277,3 +277,12 @@ body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
 .fotos-form { border-top: 1px dashed var(--nude); padding-top: 14px; } /* Separa o formulário de upload das fotos atuais. */
 .foto-atual-preview { margin-bottom: 10px; } /* Espaço da prévia da foto atual no formulário de profissional. */
 .foto-atual-preview img { width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--nude); display: block; margin-bottom: 4px; } /* Miniatura da foto atual. */
+
+/* ============ EDITOR COM PRÉVIA DO SITE ============ */
+.editor-com-previa { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; } /* Layout em duas colunas: editor + prévia. */
+.editor-coluna { flex: 1 1 460px; min-width: 300px; } /* Coluna do editor (formulário/cartões). */
+.previa-coluna { flex: 1 1 360px; min-width: 280px; position: sticky; top: 70px; } /* Coluna da prévia, acompanha a rolagem. */
+.previa-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; } /* Cabeçalho da prévia. */
+.previa-frame { width: 100%; height: 72vh; border: 1px solid var(--nude); border-radius: var(--radius); overflow: hidden; background: white; box-shadow: var(--shadow); } /* Moldura que mostra o site. */
+.previa-frame iframe { width: 100%; height: 100%; border: 0; display: block; } /* iframe ocupa toda a moldura. */
+@media (max-width: 920px) { .previa-coluna { position: static; } .previa-frame { height: 56vh; } } /* Em telas menores, a prévia vai para baixo. */
