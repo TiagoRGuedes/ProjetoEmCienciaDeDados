@@ -1,0 +1,59 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}{{ titulo }}{% endblock %} {# Define o título da aba conforme a área. #}
+{% block content %} {# Começa o conteúdo. #}
+
+{% set rotulos = {'pendente': 'Pendente', 'confirmado': 'Confirmado', 'concluido': 'Concluído', 'cancelado': 'Cancelado'} %} {# Mapa de status para texto amigável. #}
+
+<div class="page-header"> <!-- Cabeçalho da página. -->
+  <h1 class="page-title">{{ titulo }}</h1> <!-- Título da área. -->
+  <p class="texto-suave">{{ descricao }}</p> <!-- Explicação da área. -->
+</div>
+
+{% for secao in secoes %} {# Percorre cada seção (ex: aguardando confirmação, confirmados). #}
+<div class="card" style="margin-bottom: 18px;"> <!-- Cartão de uma seção. -->
+  <h2 class="page-title" style="font-size: 1.05rem;">{{ secao.titulo }} <span class="page-counter">{{ secao.itens|length }}</span></h2> <!-- Título da seção + contador. -->
+  {% if secao.descricao %}<p class="texto-suave" style="margin: 4px 0 14px;">{{ secao.descricao }}</p>{% endif %} <!-- Descrição opcional da seção. -->
+
+  {% if secao.itens %} <!-- Verifica se há atendimentos na seção. -->
+  <div class="atend-lista"> <!-- Lista de atendimentos. -->
+    {% for a in secao.itens %} {# Percorre cada atendimento. #}
+    <div class="atend-card"> <!-- Cartão de um atendimento. -->
+      <div class="atend-info"> <!-- Dados do atendimento. -->
+        <strong class="atend-cliente">{{ a.cliente_nome }}</strong> <!-- Nome da cliente. -->
+        <span class="atend-meta">{{ a.telefone }}</span> <!-- Telefone para contato. -->
+        <span class="atend-meta">{{ a.servico_nome }} · R$ {{ '%.2f'|format(a.preco) }} · {{ a.duracao_min }} min</span> <!-- Serviço, valor e duração. -->
+        <span class="atend-meta">{{ a.data }} às {{ a.horario }} · {{ a.profissional_nome }}</span> <!-- Data, horário e profissional. -->
+        <span class="atend-badges"> <!-- Etiquetas de status e pagamento. -->
+          <span class="status-badge status-{{ a.status }}">{{ rotulos.get(a.status, a.status) }}</span> <!-- Status atual. -->
+          {% if a.pago %}<span class="status-badge status-pago">Pago</span>{% endif %} <!-- Mostra "Pago" quando aplicável. -->
+        </span>
+      </div> <!-- Fecha os dados. -->
+      <div class="atend-acoes"> <!-- Botões de ação do atendimento. -->
+        {% for acao in secao.acoes %} {# Renderiza cada ação permitida na seção. #}
+          {% if acao == 'confirmar' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}" class="form-inline"><input type="hidden" name="novo_status" value="confirmado"><button type="submit" class="btn btn-success btn-sm">Confirmar</button></form>
+          {% elif acao == 'concluir' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}" class="form-inline"><input type="hidden" name="novo_status" value="concluido"><button type="submit" class="btn btn-primary btn-sm">Concluir</button></form>
+          {% elif acao == 'cancelar' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}" class="form-inline" onsubmit="return confirm('Recusar/cancelar este atendimento?');"><input type="hidden" name="novo_status" value="cancelado"><button type="submit" class="btn btn-danger btn-sm">Recusar</button></form>
+          {% elif acao == 'pagamento' %}
+            {% if a.pago %}
+            <form method="POST" action="{{ url_for('admin.atualizar_pagamento', id=a.id) }}" class="form-inline"><input type="hidden" name="pago" value="0"><button type="submit" class="btn btn-secondary btn-sm">Desfazer pago</button></form>
+            {% else %}
+            <form method="POST" action="{{ url_for('admin.atualizar_pagamento', id=a.id) }}" class="form-inline"><input type="hidden" name="pago" value="1"><button type="submit" class="btn btn-success btn-sm">Marcar como pago</button></form>
+            {% endif %}
+          {% elif acao == 'despagar' %}
+          <form method="POST" action="{{ url_for('admin.atualizar_pagamento', id=a.id) }}" class="form-inline" onsubmit="return confirm('Remover a marcação de pago?');"><input type="hidden" name="pago" value="0"><button type="submit" class="btn btn-danger btn-sm">Desfazer pago</button></form>
+          {% endif %}
+        {% endfor %} {# Finaliza as ações. #}
+      </div> <!-- Fecha os botões. -->
+    </div> <!-- Fecha o cartão do atendimento. -->
+    {% endfor %} {# Finaliza o loop de atendimentos. #}
+  </div> <!-- Fecha a lista. -->
+  {% else %} <!-- Quando a seção está vazia. -->
+  <p class="texto-suave">{{ secao.vazio }}</p> <!-- Mensagem de seção vazia. -->
+  {% endif %} <!-- Fecha a verificação. -->
+</div> <!-- Fecha o cartão da seção. -->
+{% endfor %} {# Finaliza o loop de seções. #}
+
+{% endblock %}

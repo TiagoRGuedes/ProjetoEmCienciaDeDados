@@ -286,3 +286,15 @@ body.com-modal { overflow: hidden; } /* Trava rolagem com modal aberto. */
 .previa-frame { width: 100%; height: 72vh; border: 1px solid var(--nude); border-radius: var(--radius); overflow: hidden; background: white; box-shadow: var(--shadow); } /* Moldura que mostra o site. */
 .previa-frame iframe { width: 100%; height: 100%; border: 0; display: block; } /* iframe ocupa toda a moldura. */
 @media (max-width: 920px) { .previa-coluna { position: static; } .previa-frame { height: 56vh; } } /* Em telas menores, a prévia vai para baixo. */
+
+/* ============ ÁREAS DE ATENDIMENTOS (confirmar / concluídos / pagos) ============ */
+.status-concluido { background: #dbe7ea; color: #2c5560; border: 1px solid #9fc1c9; } /* Etiqueta de atendimento concluído. */
+.status-pago { background: var(--verde-sucesso); color: #fff; border: 1px solid var(--verde-sucesso); } /* Etiqueta de atendimento pago (verde forte). */
+.atend-lista { display: flex; flex-direction: column; gap: 10px; } /* Lista vertical de atendimentos. */
+.atend-card { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; background: var(--bege-claro); border: 1px solid var(--nude); border-radius: var(--radius-sm); padding: 12px 14px; } /* Cartão de cada atendimento. */
+.atend-info { display: flex; flex-direction: column; gap: 3px; } /* Coluna com os dados do atendimento. */
+.atend-cliente { font-size: 1rem; color: var(--marrom-escuro); } /* Nome da cliente em destaque. */
+.atend-meta { font-size: 0.86rem; color: var(--texto-suave); } /* Linhas de detalhe (serviço, data, etc.). */
+.atend-badges { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; } /* Linha das etiquetas. */
+.atend-acoes { display: flex; gap: 8px; flex-wrap: wrap; } /* Botões de ação do atendimento. */
+@media (max-width: 600px) { .atend-card { align-items: flex-start; } .atend-acoes { width: 100%; } } /* Em telas pequenas os botões vão para baixo. */

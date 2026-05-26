@@ -35,7 +35,7 @@
     </div>
     <nav class="sidebar-links" aria-label="Menu administrativo"> <!-- Menu lateral com itens agrupados por tópico. -->
       {% set ep = request.endpoint or '' %} {# Guarda o endpoint atual para destacar o item e abrir o grupo certo. #}
-      {% set g_atendimentos = ep in ['admin.dashboard', 'admin.agenda', 'admin.historico', 'admin.agendamento_restaurar'] or ep.startswith('admin.agendamento') or ep.startswith('admin.bloqueio') %} {# Marca o grupo Atendimentos como ativo. #}
+      {% set g_atendimentos = ep in ['admin.dashboard', 'admin.agenda', 'admin.historico', 'admin.agendamento_restaurar', 'admin.confirmacoes', 'admin.concluidos', 'admin.pagos'] or ep.startswith('admin.agendamento') or ep.startswith('admin.bloqueio') %} {# Marca o grupo Atendimentos como ativo. #}
       {% set g_cadastros = ep.startswith('admin.profissional') or ep.startswith('admin.servic') or ep.startswith('admin.client') %} {# Marca o grupo Cadastros como ativo. #}
       {% set g_site = ep == 'admin.configuracoes' or ep == 'admin.conteudo' or 'foto' in ep %} {# Marca o grupo Site/Aparência como ativo. #}
 
@@ -46,6 +46,9 @@
         </button>
         <div class="sidebar-grupo-itens"> <!-- Itens do grupo (visíveis só quando aberto). -->
           <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if ep == 'admin.dashboard' or (ep.startswith('admin.agendamento') and ep != 'admin.agendamento_restaurar') %}active{% endif %}">Agendamentos</a> <!-- Painel de agendamentos. -->
+          <a href="{{ url_for('admin.confirmacoes') }}" class="sidebar-link {% if ep == 'admin.confirmacoes' %}active{% endif %}">Confirmar clientes</a> <!-- Confirmar pedidos e marcar como concluído. -->
+          <a href="{{ url_for('admin.concluidos') }}" class="sidebar-link {% if ep == 'admin.concluidos' %}active{% endif %}">Concluídos</a> <!-- Atendimentos já realizados. -->
+          <a href="{{ url_for('admin.pagos') }}" class="sidebar-link {% if ep == 'admin.pagos' %}active{% endif %}">Pagos</a> <!-- Atendimentos já pagos. -->
           <a href="{{ url_for('admin.agenda') }}" class="sidebar-link {% if ep == 'admin.agenda' %}active{% endif %}">Agenda</a> <!-- Agenda por profissional. -->
           <a href="{{ url_for('admin.historico') }}" class="sidebar-link {% if ep == 'admin.historico' or ep == 'admin.agendamento_restaurar' %}active{% endif %}">Histórico</a> <!-- Histórico de atendimentos. -->
           <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if ep.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Bloqueios de agenda. -->
