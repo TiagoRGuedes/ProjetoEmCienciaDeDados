@@ -37,7 +37,7 @@
       {% set ep = request.endpoint or '' %} {# Guarda o endpoint atual para destacar o item e abrir o grupo certo. #}
       {% set g_atendimentos = ep in ['admin.dashboard', 'admin.agenda', 'admin.historico', 'admin.agendamento_restaurar'] or ep.startswith('admin.agendamento') or ep.startswith('admin.bloqueio') %} {# Marca o grupo Atendimentos como ativo. #}
       {% set g_cadastros = ep.startswith('admin.profissional') or ep.startswith('admin.servic') or ep.startswith('admin.client') %} {# Marca o grupo Cadastros como ativo. #}
-      {% set g_site = ep == 'admin.configuracoes' or 'foto' in ep %} {# Marca o grupo Site/Aparência como ativo. #}
+      {% set g_site = ep == 'admin.configuracoes' or ep == 'admin.conteudo' or 'foto' in ep %} {# Marca o grupo Site/Aparência como ativo. #}
 
       <div class="sidebar-grupo {% if g_atendimentos %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Atendimentos. -->
         <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_atendimentos else 'false' }}"> <!-- Cabeçalho que abre/fecha o grupo. -->
@@ -72,6 +72,7 @@
         <div class="sidebar-grupo-itens"> <!-- Itens do grupo. -->
           <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if ep == 'admin.configuracoes' %}active{% endif %}">Aparência</a> <!-- Cores e fonte do site. -->
           <a href="{{ url_for('admin.gerenciar_fotos') }}" class="sidebar-link {% if 'foto' in ep %}active{% endif %}">Fotos</a> <!-- Gestão de fotos do site. -->
+          <a href="{{ url_for('admin.conteudo') }}" class="sidebar-link {% if ep == 'admin.conteudo' %}active{% endif %}">Textos</a> <!-- Edição dos textos e informações do site. -->
         </div>
       </div>
 
