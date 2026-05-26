@@ -25,7 +25,7 @@
     <header class="topo"> <!-- Cria o cabeçalho fixo do site. -->
         <div class="container topo-conteudo"> <!-- Cria um container para organizar marca e menu. -->
             <div class="marca"> <!-- Cria a área da marca. -->
-                <p class="marca-subtitulo">Studio de manicure e beleza</p> <!-- Mostra um subtítulo institucional. -->
+                <p class="marca-subtitulo">{{ empresa.marca_subtitulo or 'Studio de manicure e beleza' }}</p> <!-- Mostra um subtítulo institucional (editável pelo admin). -->
                 <h1>{{ empresa.nome }}</h1> <!-- Mostra o nome da empresa. -->
             </div> <!-- Fecha a área da marca. -->
             <nav> <!-- Cria o menu de navegação pública. -->
@@ -60,7 +60,9 @@
                 <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p> <!-- Mostra o usuário do Instagram. -->
                 <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p> <!-- Link para abrir Instagram. -->
                 <p><a class="link-admin-discreto" href="{{ url_for('admin.login') }}">Acesso à Administração</a></p> <!-- Link discreto para a área administrativa. -->
+                {% if existe_profissional_com_senha %} <!-- Só mostra o acesso da profissional quando existe alguma profissional com senha definida. -->
                 <p><a class="link-admin-discreto" href="{{ url_for('profissional.login_profissional') }}">Acesso da Profissional</a></p> <!-- Link discreto para a área restrita da profissional. -->
+                {% endif %} <!-- Fecha a verificação do link da profissional. -->
             </div> <!-- Fecha a terceira coluna. -->
         </div> <!-- Fecha o grid do rodapé. -->
     </footer> <!-- Fecha o rodapé. -->

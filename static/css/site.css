@@ -875,7 +875,8 @@ body.com-modal { /* Trava a rolagem do corpo quando há modal aberto. */
     margin: 0 auto; /* Centraliza o carrossel na seção. */
 } /* Fecha o container do carrossel. */
 
-.carrossel-janela { /* Janela que recorta a trilha de fotos. */
+.carrossel-janela { /* Janela que recorta a trilha de fotos (altura = só a da imagem). */
+    position: relative; /* Serve de referência para centralizar as setas na imagem. */
     overflow: hidden; /* Esconde as fotos que estão fora da área visível. */
     border-radius: 16px; /* Arredonda as bordas do carrossel. */
     border: 1px solid var(--nude); /* Aplica uma borda discreta no tom da paleta. */
@@ -889,8 +890,7 @@ body.com-modal { /* Trava a rolagem do corpo quando há modal aberto. */
 
 .carrossel-item { /* Cada slide ocupa toda a largura da janela. */
     flex: 0 0 100%; /* Impede que o slide encolha e fixa em 100% da largura. */
-    margin: 0; /* Remove a margem padrão do elemento figure. */
-    text-align: center; /* Centraliza a legenda. */
+    margin: 0; /* Remove a margem padrão. */
 } /* Fecha o slide. */
 
 .carrossel-item img { /* Imagem dentro de cada slide. */
@@ -900,34 +900,39 @@ body.com-modal { /* Trava a rolagem do corpo quando há modal aberto. */
     display: block; /* Remove o espaço extra abaixo da imagem. */
 } /* Fecha a imagem do slide. */
 
-.carrossel-item figcaption { /* Legenda exibida abaixo da foto. */
-    padding: 12px 16px; /* Dá espaço interno à legenda. */
+.carrossel-legenda { /* Legenda exibida abaixo da foto, atualizada pelo JS. */
+    text-align: center; /* Centraliza a legenda. */
+    padding: 12px 16px 0; /* Dá espaço acima da legenda. */
     color: var(--texto-base); /* Usa a cor de texto padrão. */
     font-size: 0.95rem; /* Deixa a legenda um pouco menor. */
+    min-height: 1.2em; /* Reserva espaço mesmo quando a foto não tem legenda. */
 } /* Fecha a legenda. */
 
-.carrossel-seta { /* Botões de avançar e voltar do carrossel. */
+.carrossel-seta { /* Botões de avançar e voltar, centralizados sobre a imagem. */
     position: absolute; /* Posiciona as setas sobre a janela. */
-    top: 50%; /* Centraliza verticalmente. */
+    top: 50%; /* Centro vertical da janela (que tem a altura da imagem). */
     transform: translateY(-50%); /* Ajuste fino do centro vertical. */
+    z-index: 2; /* Garante que as setas fiquem acima da imagem. */
     width: 44px; /* Largura do botão. */
     height: 44px; /* Altura do botão. */
     border: none; /* Remove a borda padrão. */
     border-radius: 50%; /* Deixa o botão redondo. */
-    background: var(--marrom-principal); /* Usa o marrom principal da paleta. */
+    background: rgba(75, 51, 41, 0.78); /* Marrom escuro semitransparente que contrasta com qualquer foto. */
     color: var(--branco); /* Deixa a seta branca. */
     font-size: 1.6rem; /* Aumenta o tamanho da seta. */
-    line-height: 1; /* Centraliza o caractere da seta. */
+    display: flex; /* Centraliza o caractere dentro do botão. */
+    align-items: center; /* Alinha o caractere verticalmente. */
+    justify-content: center; /* Alinha o caractere horizontalmente. */
     cursor: pointer; /* Mostra que é clicável. */
-    opacity: 0.9; /* Deixa levemente transparente. */
+    transition: background 0.2s; /* Suaviza o hover. */
 } /* Fecha o estilo das setas. */
 
 .carrossel-seta:hover { /* Realça a seta ao passar o mouse. */
-    opacity: 1; /* Remove a transparência. */
+    background: var(--marrom-escuro); /* Fica mais sólida no hover. */
 } /* Fecha o hover das setas. */
 
-.carrossel-prev { left: 10px; } /* Posiciona a seta de voltar à esquerda. */
-.carrossel-next { right: 10px; } /* Posiciona a seta de avançar à direita. */
+.carrossel-prev { left: 12px; } /* Posiciona a seta de voltar dentro da imagem, à esquerda. */
+.carrossel-next { right: 12px; } /* Posiciona a seta de avançar dentro da imagem, à direita. */
 
 .carrossel-pontos { /* Área dos pontinhos de navegação. */
     display: flex; /* Coloca os pontinhos em linha. */

@@ -3,13 +3,13 @@
 <section class="hero"> <!-- Cria a seção de abertura com destaque. -->
     <div class="container hero-conteudo"> <!-- Organiza o conteúdo principal em colunas. -->
         <div class="hero-texto"> <!-- Cria a coluna de texto institucional. -->
-            <p class="subtitulo">Cuidado estético especializado</p> <!-- Mostra uma frase curta de apoio. -->
+            <p class="subtitulo">{{ textos['texto.hero_subtitulo'] }}</p> <!-- Mostra uma frase curta de apoio (editável). -->
             <h2>{{ empresa.nome }}</h2> <!-- Mostra o nome da empresa em destaque. -->
-            <p>Um espaço dedicado ao cuidado das mãos e unhas, com atendimento personalizado, técnica e atenção aos detalhes.</p> <!-- Apresenta a proposta do espaço. -->
-            <p>Escolha o serviço desejado, selecione a profissional disponível e reserve o melhor horário de forma prática.</p> <!-- Explica a principal ação do site. -->
+            <p>{{ textos['texto.hero_p1'] }}</p> <!-- Apresenta a proposta do espaço (editável). -->
+            <p>{{ textos['texto.hero_p2'] }}</p> <!-- Explica a principal ação do site (editável). -->
             <div class="hero-botoes"> <!-- Cria a área dos botões principais. -->
-                <a class="botao botao-principal" href="{{ url_for('publico.agendar_get') }}">Agendar horário</a> <!-- Botão principal para agendamento. -->
-                <a class="botao-secundario" href="{{ empresa.instagram_url }}" target="_blank">Conhecer trabalhos</a> <!-- Botão para Instagram. -->
+                <a class="botao botao-principal" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.hero_botao'] }}</a> <!-- Botão principal para agendamento (texto editável). -->
+                <a class="botao-secundario" href="{{ empresa.instagram_url }}" target="_blank">{{ textos['texto.hero_botao_insta'] }}</a> <!-- Botão para Instagram (texto editável). -->
             </div> <!-- Fecha a área dos botões. -->
         </div> <!-- Fecha a coluna de texto. -->
         <div class="hero-card"> <!-- Cria o cartão lateral com informações rápidas. -->
@@ -23,17 +23,17 @@
 
 <section class="secao chamada-agendamento"> <!-- Cria uma seção específica para reforçar o agendamento. -->
     <div class="container chamada-final-conteudo"> <!-- Centraliza o conteúdo da chamada. -->
-        <p class="subtitulo subtitulo-escuro">Agendamento prático</p> <!-- Mostra subtítulo da chamada. -->
-        <h2>Reserve seu atendimento com organização e conforto</h2> <!-- Mostra título da chamada. -->
-        <p class="texto-central">O sistema exibe profissionais e horários disponíveis conforme o serviço selecionado.</p> <!-- Explica a funcionalidade principal. -->
-        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">Iniciar agendamento</a> <!-- Botão de destaque para agendar. -->
+        <p class="subtitulo subtitulo-escuro">{{ textos['texto.chamada_subtitulo'] }}</p> <!-- Mostra subtítulo da chamada (editável). -->
+        <h2>{{ textos['texto.chamada_titulo'] }}</h2> <!-- Mostra título da chamada (editável). -->
+        <p class="texto-central">{{ textos['texto.chamada_texto'] }}</p> <!-- Explica a funcionalidade principal (editável). -->
+        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.hero_botao'] }}</a> <!-- Botão de destaque para agendar. -->
     </div> <!-- Fecha o container da chamada. -->
 </section> <!-- Fecha a seção de chamada. -->
 
 <section id="servicos" class="secao"> <!-- Cria a seção de serviços. -->
     <div class="container"> <!-- Centraliza os serviços. -->
-        <h2>Serviços</h2> <!-- Mostra título da seção. -->
-        <p class="texto-central">Confira algumas opções disponíveis para reserva.</p> <!-- Mostra texto de apoio. -->
+        <h2>{{ textos['texto.servicos_titulo'] }}</h2> <!-- Mostra título da seção (editável). -->
+        <p class="texto-central">{{ textos['texto.servicos_texto'] }}</p> <!-- Mostra texto de apoio (editável). -->
         <div class="cards-servicos"> <!-- Cria a grade de serviços. -->
             {% for s in servicos %} {# Percorre todos os serviços recebidos do Flask. #}
             <div class="card-servico"> <!-- Cria um card para cada serviço. -->
@@ -48,22 +48,22 @@
 
 <section id="galeria" class="secao galeria-fundo"> <!-- Cria a seção da galeria. -->
     <div class="container"> <!-- Centraliza a galeria. -->
-        <h2>Galeria de trabalhos</h2> <!-- Mostra título da galeria. -->
-        <p class="texto-central">Resultados que demonstram cuidado, acabamento e atenção aos detalhes.</p> <!-- Mostra descrição da galeria. -->
+        <h2>{{ textos['texto.galeria_titulo'] }}</h2> <!-- Mostra título da galeria (editável). -->
+        <p class="texto-central">{{ textos['texto.galeria_texto'] }}</p> <!-- Mostra descrição da galeria (editável). -->
         {% if galeria %} {# Só mostra o carrossel se houver fotos cadastradas. #}
         <div class="carrossel" data-carrossel> <!-- Cria o carrossel de fotos da galeria. -->
-            <button type="button" class="carrossel-seta carrossel-prev" aria-label="Foto anterior">‹</button> <!-- Botão para voltar uma foto. -->
-            <div class="carrossel-janela"> <!-- Janela que recorta a trilha de fotos. -->
+            <div class="carrossel-janela"> <!-- Janela que recorta a trilha (a altura é só a da imagem). -->
+                <button type="button" class="carrossel-seta carrossel-prev" aria-label="Foto anterior">‹</button> <!-- Seta para voltar (centralizada na imagem). -->
                 <div class="carrossel-trilha"> <!-- Trilha que desliza horizontalmente. -->
                     {% for foto in galeria %} {# Percorre as fotos da galeria vindas do banco. #}
-                    <figure class="carrossel-item"> <!-- Cria o slide de cada foto. -->
-                        <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Trabalho da galeria' }}"> <!-- Carrega a imagem da pasta static/img. -->
-                        {% if foto.titulo %}<figcaption>{{ foto.titulo }}</figcaption>{% endif %} <!-- Mostra a legenda quando existir. -->
-                    </figure> <!-- Fecha o slide. -->
+                    <div class="carrossel-item"> <!-- Cria o slide de cada foto. -->
+                        <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Trabalho da galeria' }}" data-legenda="{{ foto.titulo or '' }}"> <!-- Carrega a imagem e guarda a legenda. -->
+                    </div> <!-- Fecha o slide. -->
                     {% endfor %} {# Finaliza a repetição das fotos. #}
                 </div> <!-- Fecha a trilha. -->
+                <button type="button" class="carrossel-seta carrossel-next" aria-label="Próxima foto">›</button> <!-- Seta para avançar (centralizada na imagem). -->
             </div> <!-- Fecha a janela. -->
-            <button type="button" class="carrossel-seta carrossel-next" aria-label="Próxima foto">›</button> <!-- Botão para avançar uma foto. -->
+            <p class="carrossel-legenda" aria-live="polite"></p> <!-- Legenda da foto atual (preenchida via JS). -->
             <div class="carrossel-pontos" aria-hidden="true"></div> <!-- Área dos pontinhos de navegação (preenchida via JS). -->
         </div> <!-- Fecha o carrossel. -->
         {% else %} {# Quando não há fotos cadastradas. #}
@@ -78,11 +78,11 @@
             <img src="{{ url_for('static', filename='img/' + (foto_dona or empresa.foto_dona)) }}" alt="Foto de {{ empresa.dona }}"> <!-- Exibe a foto da responsável cadastrada pelo admin (ou a padrão). -->
         </div> <!-- Fecha a área da foto. -->
         <div class="dona-texto"> <!-- Cria o bloco de texto sobre a profissional. -->
-            <p class="subtitulo subtitulo-escuro">Responsável pelo atendimento</p> <!-- Mostra subtítulo. -->
+            <p class="subtitulo subtitulo-escuro">{{ textos['texto.responsavel_subtitulo'] }}</p> <!-- Mostra subtítulo (editável). -->
             <h2>{{ empresa.dona }}</h2> <!-- Mostra o nome da responsável. -->
-            <p>Responsável pelo {{ empresa.nome }}, Pamela conduz o atendimento com profissionalismo, cordialidade e precisão técnica.</p> <!-- Apresenta a responsável. -->
-            <p>A proposta do espaço é oferecer uma experiência agradável, organizada e cuidadosa em cada detalhe.</p> <!-- Explica a proposta do espaço. -->
-            <a class="botao" href="{{ url_for('publico.agendar_get') }}">Agendar atendimento</a> <!-- Botão para agendamento. -->
+            <p>{{ textos['texto.responsavel_p1'] }}</p> <!-- Apresenta a responsável (editável). -->
+            <p>{{ textos['texto.responsavel_p2'] }}</p> <!-- Explica a proposta do espaço (editável). -->
+            <a class="botao" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.responsavel_botao'] }}</a> <!-- Botão para agendamento (texto editável). -->
         </div> <!-- Fecha o bloco de texto. -->
     </div> <!-- Fecha o grid da responsável. -->
 </section> <!-- Fecha a seção da responsável. -->

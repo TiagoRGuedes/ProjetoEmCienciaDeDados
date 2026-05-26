@@ -3,9 +3,9 @@
 <section class="secao agendamento-page"> <!-- Cria a seção principal do agendamento. -->
     <div class="container formulario-area"> <!-- Centraliza e limita a largura do conteúdo. -->
         <div class="agendamento-cabecalho"> <!-- Cria o cabeçalho visual da tela de agendamento. -->
-            <p class="subtitulo subtitulo-escuro">Agendamento online</p> <!-- Mostra um subtítulo da página. -->
-            <h2>Vamos começar o seu agendamento</h2> <!-- Mostra o título principal. -->
-            <p>Informe seu nome e telefone para contato. Em seguida vamos escolher serviço, profissional, data e horário em etapas rápidas.</p> <!-- Explica o novo fluxo guiado. -->
+            <p class="subtitulo subtitulo-escuro">{{ textos['texto.agendamento_subtitulo'] }}</p> <!-- Mostra um subtítulo da página (editável). -->
+            <h2>{{ textos['texto.agendamento_titulo'] }}</h2> <!-- Mostra o título principal (editável). -->
+            <p>{{ textos['texto.agendamento_intro'] }}</p> <!-- Explica o fluxo guiado (editável). -->
             <p><strong>Funcionamento:</strong> {{ empresa.horarios }}</p> <!-- Mostra o horário de funcionamento. -->
         </div> <!-- Fecha o cabeçalho visual. -->
 
