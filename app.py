@@ -1052,12 +1052,12 @@ def atualizar_status(id):
         # Redireciona para login se não estiver logado.
     novo_status = request.form.get('novo_status')
     # Recebe o novo status enviado pelo botão.
-    if novo_status not in ('pendente', 'confirmado', 'cancelado'):
-        # Verifica se o status enviado é permitido.
+    if novo_status not in ('pendente', 'confirmado', 'concluido', 'cancelado'):
+        # Verifica se o status enviado é permitido (inclui "concluido").
         flash('Status inválido.', 'error')
         # Mostra mensagem de erro.
-        return redirect(url_for('admin.dashboard'))
-        # Volta para o dashboard.
+        return redirect(request.referrer or url_for('admin.dashboard'))
+        # Volta para a página de origem.
     db = get_db()
     # Abre a conexão com o banco.
     db.execute('UPDATE agendamentos SET status = ? WHERE id = ?', (novo_status, id))
@@ -1066,8 +1066,107 @@ def atualizar_status(id):
     # Salva a alteração.
     flash('Status do agendamento atualizado.', 'success')
     # Mostra mensagem de sucesso.
-    return redirect(url_for('admin.dashboard'))
-    # Volta para o dashboard.
+    return redirect(request.referrer or url_for('admin.dashboard'))
+    # Volta para a página de onde a ação partiu (dashboard, confirmações, etc.).
+
+
+@admin.route('/agendamento/<int:id>/pagamento', methods=['POST'])
+# Cria a rota que marca ou desmarca um atendimento como pago.
+def atualizar_pagamento(id):
+    # Define a função que atualiza o pagamento de um atendimento.
+    if not esta_logado():
+        # Verifica login.
+        return redirect(url_for('admin.login'))
+        # Redireciona para login.
+    pago = 1 if request.form.get('pago') == '1' else 0
+    # Lê se é para marcar (1) ou desmarcar (0) como pago.
+    db = get_db()
+    # Abre o banco.
+    db.execute('UPDATE agendamentos SET pago = ? WHERE id = ?', (pago, id))
+    # Atualiza o campo pago do atendimento.
+    db.commit()
+    # Salva a alteração.
+    flash('Atendimento marcado como pago.' if pago else 'Marcação de pago removida.', 'success')
+    # Mostra a mensagem adequada.
+    return redirect(request.referrer or url_for('admin.concluidos'))
+    # Volta para a página de origem.
+
+
+def buscar_atendimentos(condicao, params):
+    # Busca atendimentos com dados de cliente, serviço e profissional, aplicando a condição informada.
+    db = get_db()
+    # Abre o banco.
+    sql = '''SELECT a.id, a.data, a.horario, a.status, a.pago,
+                    c.nome AS cliente_nome, c.telefone,
+                    s.nome AS servico_nome, s.preco, s.duracao_min,
+                    p.nome AS profissional_nome
+             FROM agendamentos a
+             JOIN clientes c ON c.id = a.cliente_id
+             JOIN servicos s ON s.id = a.servico_id
+             JOIN profissionais p ON p.id = a.profissional_id
+             WHERE ''' + condicao + ' ORDER BY a.data, a.horario'
+    # Monta a consulta reutilizando os mesmos joins do dashboard.
+    return db.execute(sql, params).fetchall()
+    # Retorna a lista de atendimentos encontrada.
+
+
+@admin.route('/confirmacoes')
+# Cria a área onde a Pamela confirma os clientes (saber quem realmente vem).
+def confirmacoes():
+    # Define a função da área de confirmação de clientes.
+    if not esta_logado():
+        # Verifica login.
+        return redirect(url_for('admin.login'))
+        # Redireciona para login.
+    pendentes = buscar_atendimentos("a.arquivado = 0 AND a.status = 'pendente'", [])
+    # Busca os pedidos que ainda aguardam confirmação.
+    confirmados = buscar_atendimentos("a.arquivado = 0 AND a.status = 'confirmado'", [])
+    # Busca os clientes já confirmados (que vão acontecer).
+    secoes = [
+        # Monta as seções exibidas na página.
+        {'titulo': 'Aguardando confirmação', 'descricao': 'Confirme quem realmente vai vir ou recuse o pedido.', 'itens': pendentes, 'acoes': ['confirmar', 'cancelar'], 'vazio': 'Nenhum pedido aguardando confirmação.'},
+        # Seção dos pendentes, com botões de confirmar e recusar.
+        {'titulo': 'Confirmados', 'descricao': 'Clientes confirmados. Marque como concluído depois de atender.', 'itens': confirmados, 'acoes': ['concluir', 'cancelar'], 'vazio': 'Nenhum cliente confirmado no momento.'},
+        # Seção dos confirmados, com botão de concluir.
+    ]
+    return render_template('admin/atendimentos.html', titulo='Confirmar clientes', descricao='Veja os pedidos e confirme quem realmente vai ser atendido.', secoes=secoes, empresa=dados_empresa())
+    # Renderiza a área de confirmação.
+
+
+@admin.route('/concluidos')
+# Cria a área dos atendimentos concluídos.
+def concluidos():
+    # Define a função da área de concluídos.
+    if not esta_logado():
+        # Verifica login.
+        return redirect(url_for('admin.login'))
+        # Redireciona para login.
+    lista = buscar_atendimentos("a.arquivado = 0 AND a.status = 'concluido'", [])
+    # Busca os atendimentos já concluídos.
+    secoes = [
+        # Monta a seção única de concluídos.
+        {'titulo': 'Atendimentos concluídos', 'descricao': 'Atendimentos já realizados. Marque como pago quando receber.', 'itens': lista, 'acoes': ['pagamento'], 'vazio': 'Nenhum atendimento concluído ainda.'},
+    ]
+    return render_template('admin/atendimentos.html', titulo='Atendimentos concluídos', descricao='Atendimentos que já foram realizados.', secoes=secoes, empresa=dados_empresa())
+    # Renderiza a área de concluídos.
+
+
+@admin.route('/pagos')
+# Cria a área dos atendimentos já pagos.
+def pagos():
+    # Define a função da área de pagos.
+    if not esta_logado():
+        # Verifica login.
+        return redirect(url_for('admin.login'))
+        # Redireciona para login.
+    lista = buscar_atendimentos("a.arquivado = 0 AND a.pago = 1", [])
+    # Busca os atendimentos marcados como pagos.
+    secoes = [
+        # Monta a seção única de pagos.
+        {'titulo': 'Atendimentos já pagos', 'descricao': 'Atendimentos com pagamento recebido.', 'itens': lista, 'acoes': ['despagar'], 'vazio': 'Nenhum atendimento marcado como pago.'},
+    ]
+    return render_template('admin/atendimentos.html', titulo='Atendimentos pagos', descricao='Tudo que já foi pago pelas clientes.', secoes=secoes, empresa=dados_empresa())
+    # Renderiza a área de pagos.
 
 
 @admin.route('/agendamento/<int:id>/editar', methods=['GET', 'POST'])

@@ -137,6 +137,12 @@ def init_db():
         # Adiciona a coluna para suportar a área de Histórico (limpeza do dashboard).
         db.commit()
         # Salva a alteração estrutural do banco.
+    if 'pago' not in colunas_agendamentos:
+        # Verifica se a coluna pago ainda não existe em banco antigo.
+        db.execute('ALTER TABLE agendamentos ADD COLUMN pago INTEGER NOT NULL DEFAULT 0')
+        # Adiciona a coluna para controlar os atendimentos já pagos.
+        db.commit()
+        # Salva a alteração estrutural do banco.
 
     colunas_profissionais = _colunas_da_tabela(db, 'profissionais')
     # Busca as colunas atuais da tabela profissionais.
