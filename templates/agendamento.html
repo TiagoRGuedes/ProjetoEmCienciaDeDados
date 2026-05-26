@@ -29,7 +29,7 @@
             <input type="text" id="nome" name="nome" value="{{ dados.nome if dados else '' }}" placeholder="Digite seu nome" required> <!-- Campo para digitar o nome da cliente. -->
 
             <label for="telefone">Telefone para contato:</label> <!-- Identifica o campo de telefone. -->
-            <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="Digite seu telefone" required> <!-- Campo para digitar o telefone da cliente. -->
+            <input type="text" id="telefone" name="telefone" value="{{ dados.telefone if dados else '' }}" placeholder="(11) 99999-9999" inputmode="tel" maxlength="16" required> <!-- Campo de telefone com máscara: DDD entre parênteses e traço separando os 4 últimos dígitos. -->
 
             <div class="resumo-escolhas oculto" id="resumo-escolhas"> <!-- Cria área que resume as escolhas feitas nos modais. -->
                 <h4>Resumo do seu agendamento</h4> <!-- Mostra título do resumo. -->
@@ -191,6 +191,26 @@ const campoData = document.getElementById('data'); // Busca o input hidden de da
 const campoHorario = document.getElementById('horario'); // Busca o input hidden de horário.
 const campoNome = document.getElementById('nome'); // Busca o campo de nome.
 const campoTelefone = document.getElementById('telefone'); // Busca o campo de telefone.
+
+// Aplica a máscara de telefone no formato (DD) NNNNN-NNNN, sempre com os 4 últimos dígitos após o traço. //
+function formatarTelefone(valor) { // Recebe o que está digitado e devolve já formatado.
+    const digitos = valor.replace(/\D/g, '').slice(0, 11); // Mantém só números e limita a 11 dígitos (DDD + 9).
+    if (digitos.length === 0) { return ''; } // Campo vazio fica vazio.
+    const ddd = digitos.slice(0, 2); // Pega o DDD (2 primeiros dígitos).
+    const resto = digitos.slice(2); // Pega o restante do número.
+    let saida = '(' + ddd; // Começa com o DDD entre parênteses.
+    if (digitos.length > 2) { saida += ') '; } // Fecha o parêntese só quando o DDD está completo.
+    if (resto.length > 4) { // Quando há mais de 4 dígitos, separa os 4 últimos com traço.
+        saida += resto.slice(0, resto.length - 4) + '-' + resto.slice(resto.length - 4); // Junta o miolo + traço + 4 finais.
+    } else { // Enquanto não há dígitos suficientes para o traço.
+        saida += resto; // Mostra o que foi digitado.
+    }
+    return saida; // Devolve o telefone formatado.
+}
+campoTelefone.addEventListener('input', function () { // A cada digitação, reformata o campo.
+    campoTelefone.value = formatarTelefone(campoTelefone.value); // Atualiza o valor já com a máscara.
+});
+campoTelefone.value = formatarTelefone(campoTelefone.value); // Formata também o valor inicial (caso volte do servidor).
 
 // Elementos do passo de serviço (modal). //
 const selectServicoModal = document.getElementById('modal-servico-select'); // Busca o select de serviços do modal.

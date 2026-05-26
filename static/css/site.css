@@ -99,6 +99,32 @@ nav a:hover { /* Estiliza links ao passar o mouse. */
     color: var(--branco); /* Deixa texto branco. */
 } /* Fecha o hover dos links. */
 
+.nav-destaque { /* Botão "Agendar horário" do menu, destacado para atrair atenção. */
+    background-color: var(--rosa-detalhe) !important; /* Usa o rosa da marca, que contrasta com o topo marrom. */
+    color: var(--branco) !important; /* Mantém o texto branco e legível. */
+    font-weight: 800; /* Deixa o texto mais forte. */
+    padding: 9px 20px; /* Aumenta a área do botão. */
+    border-radius: 999px; /* Dá formato de pílula. */
+    box-shadow: 0 4px 14px rgba(201, 135, 154, 0.55); /* Brilho rosado suave para destacar. */
+    animation: pulsar-agendar 2.4s ease-in-out infinite; /* Pulsa de leve para chamar o olhar. */
+} /* Fecha o botão de destaque. */
+
+.nav-destaque:hover { /* Estado do botão de destaque ao passar o mouse. */
+    background-color: #b3697e !important; /* Escurece um pouco o rosa. */
+    color: var(--branco) !important; /* Mantém o texto branco. */
+    transform: translateY(-1px) scale(1.05); /* Levanta e aumenta levemente o botão. */
+    box-shadow: 0 6px 20px rgba(201, 135, 154, 0.75); /* Realça a sombra no hover. */
+} /* Fecha o hover do botão de destaque. */
+
+@keyframes pulsar-agendar { /* Animação que faz o botão pulsar suavemente. */
+    0%, 100% { box-shadow: 0 4px 14px rgba(201, 135, 154, 0.5); } /* Estado normal do pulso. */
+    50% { box-shadow: 0 6px 22px rgba(201, 135, 154, 0.95); } /* Pico do pulso, mais aceso. */
+} /* Fecha a animação. */
+
+@media (prefers-reduced-motion: reduce) { /* Respeita quem prefere menos movimento. */
+    .nav-destaque { animation: none; } /* Desliga o pulso do botão. */
+} /* Fecha a regra de acessibilidade. */
+
 .hero { /* Estiliza a seção principal. */
     background: linear-gradient(135deg, var(--hero-terracota-escuro), var(--hero-terracota-claro)); /* Cria fundo em degradê terracota (cor escolhida pela Pamela). */
     color: var(--branco); /* Deixa o texto branco. */
