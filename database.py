@@ -24,13 +24,9 @@ SERVICOS_INICIAIS = [
 # Fecha a lista de serviços iniciais.
 
 PROFISSIONAIS_INICIAIS = [
-    # Cria uma lista de profissionais iniciais para o agendamento.
+    # Cria a lista de profissionais iniciais para o agendamento.
     ('Pamela Francisco', 'Manicure e nail designer', 'pamela_francisco.png', 1),
-    # Define a profissional principal com foto real.
-    ('Equipe Refúgio 1', 'Esmaltação e pedicure', 'trabalho2.png', 1),
-    # Define uma profissional/equipe para demonstrar agenda separada.
-    ('Equipe Refúgio 2', 'Alongamento e banho em gel', 'trabalho3.png', 1),
-    # Define outra profissional/equipe para demonstrar agenda separada.
+    # Define a profissional principal (a Pamela trabalha sozinha, com atendimento a domicílio).
 ]
 # Fecha a lista de profissionais iniciais.
 
@@ -38,11 +34,7 @@ PROFISSIONAIS_INICIAIS = [
 PROFISSIONAIS_SERVICOS_INICIAIS = {
     # Cria um dicionário que indica quais serviços cada profissional atende.
     'Pamela Francisco': ['Pedicure', 'Manicure', 'Unhas de gel', 'Alongamentos'],
-    # Define que Pamela aparece para todos os serviços principais.
-    'Equipe Refúgio 1': ['Pedicure', 'Manicure'],
-    # Define que a Equipe Refúgio 1 aparece apenas para serviços básicos.
-    'Equipe Refúgio 2': ['Unhas de gel', 'Alongamentos'],
-    # Define que a Equipe Refúgio 2 aparece apenas para gel e alongamentos.
+    # Define que a Pamela atende todos os serviços oferecidos.
 }
 # Fecha o dicionário de vínculos entre profissionais e serviços.
 

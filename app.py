@@ -60,17 +60,23 @@ def injetar_configuracoes():
             # Bloco de CSS gerado a partir das cores por página/área escolhidas no admin.
             'pagina_atual': pagina_atual(),
             # Nome curto da página atual, usado para aplicar as cores só na página certa.
+            'textos': carregar_textos(),
+            # Textos editáveis do site (títulos, parágrafos) já com os padrões aplicados.
+            'existe_profissional_com_senha': existe_profissional_com_senha(),
+            # Controla se o link da área da profissional aparece no rodapé.
         }
     except Exception:
         # Em caso de erro (banco indisponível), devolve valores vazios e seguros.
-        return {'config_visual': {}, 'css_aparencia': '', 'pagina_atual': ''}
-        # Templates ficam usando os defaults do próprio CSS.
+        return {'config_visual': {}, 'css_aparencia': '', 'pagina_atual': '', 'textos': TEXTOS_PADRAO, 'existe_profissional_com_senha': False}
+        # Templates ficam usando os defaults do próprio CSS e os textos padrão.
 
 
 EMPRESA = {
-    # Cria um dicionário com as informações fixas da empresa.
+    # Cria um dicionário com as informações padrão da empresa (podem ser editadas pelo admin e gravadas no banco).
     'nome': 'Refúgio da Preta',
     # Define o nome da empresa que aparece no site.
+    'marca_subtitulo': 'Studio de manicure e beleza',
+    # Define o subtítulo que aparece acima do nome no topo do site.
     'dona': 'Pamela Francisco',
     # Define o nome da dona/profissional principal.
     'telefone': '(11) 99220-4706',
@@ -89,6 +95,112 @@ EMPRESA = {
     # Define uma frase curta de identidade da empresa.
 }
 # Fecha o dicionário de informações da empresa.
+
+
+TEXTOS_CAMPOS = [
+    # Define os textos editáveis do site, agrupados por seção (chave, rótulo, valor padrão, tipo do campo).
+    ('Informações da empresa', [
+        ('empresa.nome', 'Nome da empresa', 'Refúgio da Preta', 'text'),
+        ('empresa.marca_subtitulo', 'Subtítulo no topo do site', 'Studio de manicure e beleza', 'text'),
+        ('empresa.dona', 'Nome da responsável', 'Pamela Francisco', 'text'),
+        ('empresa.slogan', 'Slogan (rodapé)', 'Beleza, cuidado e acolhimento.', 'text'),
+        ('empresa.telefone', 'Telefone', '(11) 99220-4706', 'text'),
+        ('empresa.horarios', 'Horários de atendimento', 'Terça a sábado, das 10h às 19h', 'text'),
+        ('empresa.atendimento', 'Como é o atendimento', 'Atendimento a domicílio e na residência da profissional', 'text'),
+        ('empresa.instagram_nome', 'Instagram (@)', '@refugiodapreta', 'text'),
+        ('empresa.instagram_url', 'Link do Instagram', 'https://www.instagram.com/refugiodapreta/', 'text'),
+    ]),
+    ('Início — Destaque (topo)', [
+        ('texto.hero_subtitulo', 'Frase pequena acima do nome', 'Cuidado estético especializado', 'text'),
+        ('texto.hero_p1', 'Primeiro parágrafo', 'Um espaço dedicado ao cuidado das mãos e unhas, com atendimento personalizado, técnica e atenção aos detalhes.', 'textarea'),
+        ('texto.hero_p2', 'Segundo parágrafo', 'Escolha o serviço desejado, selecione a profissional disponível e reserve o melhor horário de forma prática.', 'textarea'),
+        ('texto.hero_botao', 'Texto do botão principal', 'Agendar horário', 'text'),
+        ('texto.hero_botao_insta', 'Texto do botão do Instagram', 'Conhecer trabalhos', 'text'),
+    ]),
+    ('Início — Chamada de agendamento', [
+        ('texto.chamada_subtitulo', 'Subtítulo', 'Agendamento prático', 'text'),
+        ('texto.chamada_titulo', 'Título', 'Reserve seu atendimento com organização e conforto', 'text'),
+        ('texto.chamada_texto', 'Texto', 'O sistema exibe profissionais e horários disponíveis conforme o serviço selecionado.', 'textarea'),
+    ]),
+    ('Início — Serviços', [
+        ('texto.servicos_titulo', 'Título', 'Serviços', 'text'),
+        ('texto.servicos_texto', 'Descrição', 'Confira algumas opções disponíveis para reserva.', 'textarea'),
+    ]),
+    ('Início — Galeria', [
+        ('texto.galeria_titulo', 'Título', 'Galeria de trabalhos', 'text'),
+        ('texto.galeria_texto', 'Descrição', 'Resultados que demonstram cuidado, acabamento e atenção aos detalhes.', 'textarea'),
+    ]),
+    ('Início — Responsável', [
+        ('texto.responsavel_subtitulo', 'Subtítulo', 'Responsável pelo atendimento', 'text'),
+        ('texto.responsavel_p1', 'Primeiro parágrafo', 'Responsável pelo Refúgio da Preta, Pamela conduz o atendimento com profissionalismo, cordialidade e precisão técnica.', 'textarea'),
+        ('texto.responsavel_p2', 'Segundo parágrafo', 'A proposta do espaço é oferecer uma experiência agradável, organizada e cuidadosa em cada detalhe.', 'textarea'),
+        ('texto.responsavel_botao', 'Texto do botão', 'Agendar atendimento', 'text'),
+    ]),
+    ('Página de agendamento', [
+        ('texto.agendamento_subtitulo', 'Subtítulo', 'Agendamento online', 'text'),
+        ('texto.agendamento_titulo', 'Título', 'Vamos começar o seu agendamento', 'text'),
+        ('texto.agendamento_intro', 'Texto de introdução', 'Informe seu nome e telefone para contato. Em seguida vamos escolher serviço, profissional, data e horário em etapas rápidas.', 'textarea'),
+    ]),
+]
+# Fecha a lista de textos editáveis.
+
+TEXTOS_PADRAO = {chave: padrao for _grupo, campos in TEXTOS_CAMPOS for chave, _rotulo, padrao, _tipo in campos}
+# Cria um dicionário simples chave->valor padrão para uso rápido.
+
+
+def carregar_textos():
+    # Lê os textos salvos no banco e completa com os padrões, devolvendo tudo pronto para os templates.
+    db = get_db()
+    # Abre o banco.
+    salvos = {linha['chave']: linha['valor'] for linha in db.execute("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'texto.%' OR chave LIKE 'empresa.%'").fetchall()}
+    # Busca o que já foi personalizado (textos e dados da empresa).
+    completo = dict(TEXTOS_PADRAO)
+    # Começa com todos os valores padrão.
+    completo.update({c: v for c, v in salvos.items() if v})
+    # Sobrescreve com os valores personalizados que não estão vazios.
+    return completo
+    # Devolve os textos prontos (chave -> valor).
+
+
+def dados_empresa():
+    # Monta as informações da empresa juntando os padrões com o que foi personalizado no admin.
+    dados = dict(EMPRESA)
+    # Começa com os valores padrão.
+    try:
+        # Protege contra banco indisponível.
+        db = get_db()
+        # Abre o banco.
+        linhas = db.execute("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'empresa.%'").fetchall()
+        # Busca as informações personalizadas da empresa.
+        for linha in linhas:
+            # Percorre cada personalização.
+            if linha['valor']:
+                # Só usa quando há valor preenchido.
+                dados[linha['chave'].split('.', 1)[1]] = linha['valor']
+                # Substitui o valor padrão pelo personalizado (campo depois de 'empresa.').
+    except Exception:
+        # Em caso de erro, mantém apenas os padrões.
+        pass
+        # Não interrompe a renderização.
+    return dados
+    # Devolve o dicionário final da empresa.
+
+
+def existe_profissional_com_senha():
+    # Verifica se há alguma profissional ativa com senha definida (controla a exibição do link da área restrita).
+    try:
+        # Protege contra banco indisponível.
+        db = get_db()
+        # Abre o banco.
+        total = db.execute("SELECT COUNT(*) FROM profissionais WHERE ativo = 1 AND senha IS NOT NULL AND senha != ''").fetchone()[0]
+        # Conta profissionais ativas que já têm senha.
+        return total > 0
+        # Retorna True quando existe ao menos uma.
+    except Exception:
+        # Em caso de erro, esconde o link por segurança.
+        return False
+        # Não mostra o acesso da profissional.
+
 
 HORARIOS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']
 # Cria a lista de horários padrão que podem aparecer no agendamento.
@@ -537,7 +649,7 @@ def index():
     # Busca a foto da responsável cadastrada pelo admin.
     foto_dona = fotos_responsavel[0]['arquivo'] if fotos_responsavel else EMPRESA['foto_dona']
     # Usa a foto cadastrada ou cai no arquivo padrão caso ainda não haja nenhuma.
-    return render_template('index.html', servicos=servicos, empresa=EMPRESA, galeria=galeria, foto_dona=foto_dona)
+    return render_template('index.html', servicos=servicos, empresa=dados_empresa(), galeria=galeria, foto_dona=foto_dona)
     # Abre o template index.html e envia serviços, empresa, galeria e a foto da responsável para o HTML.
 
 
@@ -553,7 +665,7 @@ def agendar_get():
     # Busca quais profissionais atendem cada serviço para filtrar os cards na tela.
     dados = {'nome': '', 'telefone': '', 'servico_id': '', 'profissional_id': '', 'data': '', 'horario': ''}
     # Cria um dicionário vazio para preencher o formulário sem erro.
-    return render_template('agendamento.html', servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, empresa=EMPRESA, horarios=HORARIOS, horarios_ocupados=[], dados=dados, erro=None)
+    return render_template('agendamento.html', servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, empresa=dados_empresa(), horarios=HORARIOS, horarios_ocupados=[], dados=dados, erro=None)
     # Renderiza a página de agendamento com dados iniciais vazios.
 
 
@@ -588,7 +700,7 @@ def agendar_post():
         # Busca os vínculos para manter a filtragem por serviço na tela.
         horarios_ocupados = buscar_horarios_indisponiveis(data_texto, profissional_id)
         # Busca os horários ocupados conforme a profissional e a data escolhidas.
-        return render_template('agendamento.html', servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, empresa=EMPRESA, horarios=HORARIOS, horarios_ocupados=horarios_ocupados, dados=dados, erro=msg)
+        return render_template('agendamento.html', servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, empresa=dados_empresa(), horarios=HORARIOS, horarios_ocupados=horarios_ocupados, dados=dados, erro=msg)
         # Retorna a página com mensagem de erro.
 
     if len(nome) < 2:
@@ -653,7 +765,7 @@ def agendar_post():
 # Cria a rota da página de confirmação.
 def confirmacao():
     # Define a função que abre a página de confirmação.
-    return render_template('confirmacao.html', empresa=EMPRESA)
+    return render_template('confirmacao.html', empresa=dados_empresa())
     # Renderiza a página informando que o agendamento foi enviado.
 
 
@@ -715,9 +827,9 @@ def login():
             # Marca a sessão como logada.
             return redirect(url_for('admin.dashboard'))
             # Redireciona para o dashboard.
-        return render_template('admin/login.html', erro='Usuário ou senha inválidos.', empresa=EMPRESA)
+        return render_template('admin/login.html', erro='Usuário ou senha inválidos.', empresa=dados_empresa())
         # Reabre o login com erro se os dados estiverem incorretos.
-    return render_template('admin/login.html', empresa=EMPRESA)
+    return render_template('admin/login.html', empresa=dados_empresa())
     # Mostra o formulário de login.
 
 
@@ -741,7 +853,7 @@ def agenda():
         # Envia para o login quando não há sessão.
     profissionais = buscar_profissionais(False)
     # Busca todas as profissionais (inclusive inativas) para o admin escolher.
-    return render_template('admin/agenda.html', profissionais=profissionais, empresa=EMPRESA)
+    return render_template('admin/agenda.html', profissionais=profissionais, empresa=dados_empresa())
     # Renderiza a página de agenda do admin.
 
 
@@ -870,7 +982,7 @@ def dashboard():
         (hoje_iso,)
     ).fetchone()['n'] > 0
     # Guarda como booleano para o template decidir mostrar o aviso/botão em massa.
-    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=EMPRESA, kpis=kpis, hoje=hoje_iso, tem_completos_para_arquivar=tem_completos_para_arquivar)
+    return render_template('admin/dashboard.html', agendamentos=agendamentos, profissionais=profissionais, filtro_status=filtro_status, filtro_data=filtro_data, filtro_profissional=filtro_profissional, empresa=dados_empresa(), kpis=kpis, hoje=hoje_iso, tem_completos_para_arquivar=tem_completos_para_arquivar)
     # Renderiza o dashboard com KPIs, lista filtrada e dados auxiliares para o botão de histórico.
 
 
@@ -1000,7 +1112,7 @@ def agendamento_editar(id):
             # Mostra erro.
             lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
             # Recalcula a disponibilidade do horário para mostrar no formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=dados_empresa())
             # Reabre formulário.
         if not profissional_atende_servico(profissional_id, servico_id):
             # Verifica se o serviço e a profissional combinam.
@@ -1008,7 +1120,7 @@ def agendamento_editar(id):
             # Mostra mensagem de erro.
             lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
             # Recalcula a disponibilidade para devolver ao formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=dados_empresa())
             # Reabre formulário.
         if status != 'cancelado' and conflito_agenda(data_texto, horario, profissional_id, id):
             # Verifica conflito ao remarcar, ignorando o próprio agendamento.
@@ -1016,7 +1128,7 @@ def agendamento_editar(id):
             # Mostra erro.
             lista_horarios = montar_lista_horarios(data_texto, profissional_id, ignorar_agendamento_id=id)
             # Recalcula a disponibilidade do horário para mostrar no formulário.
-            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+            return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=dados_empresa())
             # Reabre formulário.
         db.execute('UPDATE agendamentos SET servico_id = ?, profissional_id = ?, data = ?, horario = ?, status = ? WHERE id = ?', (servico_id, profissional_id, data_texto, horario, status, id))
         # Atualiza o agendamento; a vaga antiga volta automaticamente porque a linha mudou.
@@ -1028,7 +1140,7 @@ def agendamento_editar(id):
         # Volta para o dashboard.
     lista_horarios = montar_lista_horarios(agendamento['data'], str(agendamento['profissional_id']), ignorar_agendamento_id=id)
     # Calcula horários disponíveis para a combinação data/profissional do agendamento atual, ignorando ele mesmo.
-    return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=EMPRESA)
+    return render_template('admin/agendamento_form.html', agendamento=agendamento, servicos=servicos, profissionais=profissionais, profissionais_servicos=profissionais_servicos, lista_horarios=lista_horarios, empresa=dados_empresa())
     # Abre o formulário de edição com horários filtrados por disponibilidade.
 
 
@@ -1054,7 +1166,7 @@ def servicos():
         # Junta serviços com as profissionais ativas vinculadas, para exibir no painel.
     ).fetchall()
     # Carrega o resultado para o template.
-    return render_template('admin/servicos.html', servicos=lista, empresa=EMPRESA)
+    return render_template('admin/servicos.html', servicos=lista, empresa=dados_empresa())
     # Renderiza a lista de serviços com as profissionais.
 
 
@@ -1118,7 +1230,7 @@ def servico_novo():
         # Lê quais profissionais foram marcadas como aptas a realizar o serviço.
         if erro:
             # Verifica erro.
-            return render_template('admin/servico_form.html', servico=None, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=EMPRESA)
+            return render_template('admin/servico_form.html', servico=None, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=dados_empresa())
             # Reabre formulário com erro mantendo as profissionais marcadas.
         cursor = db.execute('INSERT INTO servicos (nome, preco, duracao_min) VALUES (?, ?, ?)', (nome, preco, duracao))
         # Insere serviço.
@@ -1140,7 +1252,7 @@ def servico_novo():
         # Mostra sucesso.
         return redirect(url_for('admin.servicos'))
         # Volta para serviços.
-    return render_template('admin/servico_form.html', servico=None, form=None, profissionais=profissionais, profissionais_selecionadas=set(), empresa=EMPRESA)
+    return render_template('admin/servico_form.html', servico=None, form=None, profissionais=profissionais, profissionais_selecionadas=set(), empresa=dados_empresa())
     # Abre formulário vazio com a lista de profissionais para vincular.
 
 
@@ -1180,7 +1292,7 @@ def servico_editar(id):
         # Lê as profissionais marcadas no formulário.
         if erro:
             # Verifica erro.
-            return render_template('admin/servico_form.html', servico=servico, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=EMPRESA)
+            return render_template('admin/servico_form.html', servico=servico, form=request.form, erro=erro, profissionais=profissionais, profissionais_selecionadas=set(ids_profissionais), empresa=dados_empresa())
             # Reabre formulário com erro mantendo o que foi marcado.
         db.execute('UPDATE servicos SET nome = ?, preco = ?, duracao_min = ? WHERE id = ?', (nome, preco, duracao, id))
         # Atualiza serviço.
@@ -1202,7 +1314,7 @@ def servico_editar(id):
         # Mostra sucesso.
         return redirect(url_for('admin.servicos'))
         # Volta para lista.
-    return render_template('admin/servico_form.html', servico=servico, form=None, profissionais=profissionais, profissionais_selecionadas=vinculadas_atual, empresa=EMPRESA)
+    return render_template('admin/servico_form.html', servico=servico, form=None, profissionais=profissionais, profissionais_selecionadas=vinculadas_atual, empresa=dados_empresa())
     # Abre formulário preenchido com profissionais já vinculadas marcadas.
 
 
@@ -1291,7 +1403,7 @@ def bloqueios():
         # Junta bloqueios com o nome da profissional.
     ).fetchall()
     # Guarda a lista de bloqueios.
-    return render_template('admin/bloqueios.html', bloqueios=bloqueios_lista, profissionais=profissionais, horarios=HORARIOS, empresa=EMPRESA)
+    return render_template('admin/bloqueios.html', bloqueios=bloqueios_lista, profissionais=profissionais, horarios=HORARIOS, empresa=dados_empresa())
     # Renderiza a tela de bloqueios.
 
 
@@ -1337,7 +1449,7 @@ def profissionais():
         # Junta as tabelas para listar profissionais com seus serviços.
     ).fetchall()
     # Carrega a lista para o template.
-    return render_template('admin/profissionais.html', profissionais=lista, empresa=EMPRESA)
+    return render_template('admin/profissionais.html', profissionais=lista, empresa=dados_empresa())
     # Renderiza a página de profissionais.
 
 
@@ -1397,7 +1509,7 @@ def profissional_nova():
         # Lê quais serviços foram marcados para essa profissional.
         if erro:
             # Verifica se houve erro de validação.
-            return render_template('admin/profissional_form.html', profissional=None, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=EMPRESA)
+            return render_template('admin/profissional_form.html', profissional=None, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=dados_empresa())
             # Reabre o formulário com erro mantendo o que foi digitado.
         cursor = db.execute(
             # Insere a profissional no banco.
@@ -1425,7 +1537,7 @@ def profissional_nova():
         # Mostra mensagem de sucesso.
         return redirect(url_for('admin.profissionais'))
         # Volta para a lista.
-    return render_template('admin/profissional_form.html', profissional=None, form=None, servicos=servicos, servicos_selecionados=set(), empresa=EMPRESA)
+    return render_template('admin/profissional_form.html', profissional=None, form=None, servicos=servicos, servicos_selecionados=set(), empresa=dados_empresa())
     # Abre o formulário vazio.
 
 
@@ -1465,7 +1577,7 @@ def profissional_editar(id):
         # Lê os serviços marcados.
         if erro:
             # Verifica erro de validação.
-            return render_template('admin/profissional_form.html', profissional=profissional, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=EMPRESA)
+            return render_template('admin/profissional_form.html', profissional=profissional, form=request.form, erro=erro, servicos=servicos, servicos_selecionados=set(ids_servicos), empresa=dados_empresa())
             # Reabre o formulário mantendo o que foi digitado.
         if senha:
             # Quando o admin digita uma nova senha, atualiza inclusive a coluna senha.
@@ -1505,7 +1617,7 @@ def profissional_editar(id):
         # Mensagem de sucesso.
         return redirect(url_for('admin.profissionais'))
         # Volta para a lista.
-    return render_template('admin/profissional_form.html', profissional=profissional, form=None, servicos=servicos, servicos_selecionados=vinculadas_atual, empresa=EMPRESA)
+    return render_template('admin/profissional_form.html', profissional=profissional, form=None, servicos=servicos, servicos_selecionados=vinculadas_atual, empresa=dados_empresa())
     # Abre o formulário preenchido com os dados atuais.
 
 
@@ -1619,7 +1731,7 @@ def clientes():
     # Finaliza agrupando por cliente.
     lista = db.execute(sql, params).fetchall()
     # Executa a consulta.
-    return render_template('admin/clientes.html', clientes=lista, busca=busca, empresa=EMPRESA)
+    return render_template('admin/clientes.html', clientes=lista, busca=busca, empresa=dados_empresa())
     # Renderiza a página de clientes.
 
 
@@ -1656,7 +1768,7 @@ def cliente_detalhe(id):
         # Envia o id da cliente.
     ).fetchall()
     # Carrega o histórico.
-    return render_template('admin/cliente_detalhe.html', cliente=cliente, agendamentos=agendamentos, empresa=EMPRESA)
+    return render_template('admin/cliente_detalhe.html', cliente=cliente, agendamentos=agendamentos, empresa=dados_empresa())
     # Renderiza a página de detalhe.
 
 
@@ -1829,7 +1941,7 @@ def historico():
                            filtro_data_inicio=filtro_data_inicio, filtro_data_fim=filtro_data_fim,
                            filtro_profissional=filtro_profissional, filtro_q=filtro_q,
                            pagina=pagina, total_paginas=total_paginas, total=total,
-                           empresa=EMPRESA)
+                           empresa=dados_empresa())
     # Renderiza a página de Histórico.
 
 
@@ -1929,13 +2041,54 @@ def configuracoes():
         # Renderiza a página de configurações com tudo que o painel precisa.
         'admin/configuracoes.html',
         config=config,
-        empresa=EMPRESA,
+        empresa=dados_empresa(),
         aparencia_paginas=APARENCIA_PAGINAS,
         aparencia_valores=aparencia_valores,
         prop_rotulo=PROP_ROTULO,
         prop_padrao=PROP_PADRAO,
     )
     # Renderiza a página de configurações.
+
+
+@admin.route('/conteudo', methods=['GET', 'POST'])
+# Cria a rota do editor de textos e informações do site.
+def conteudo():
+    # Define a função que mostra e grava os textos editáveis.
+    if not esta_logado():
+        # Bloqueia acesso sem login.
+        return redirect(url_for('admin.login'))
+        # Envia para o login.
+    db = get_db()
+    # Abre o banco.
+    if request.method == 'POST':
+        # Verifica se o admin enviou o formulário.
+        for _grupo, campos in TEXTOS_CAMPOS:
+            # Percorre cada grupo de campos.
+            for chave, _rotulo, _padrao, _tipo in campos:
+                # Percorre cada campo editável do grupo.
+                valor = request.form.get(chave, '').strip()
+                # Lê o valor enviado para essa chave.
+                if valor:
+                    # Quando há conteúdo, salva (cria ou atualiza).
+                    db.execute(
+                        'INSERT INTO configuracoes (chave, valor) VALUES (?, ?) ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor',
+                        (chave, valor)
+                    )
+                    # Finaliza o upsert.
+                else:
+                    # Campo vazio volta ao texto padrão removendo a personalização.
+                    db.execute('DELETE FROM configuracoes WHERE chave = ?', (chave,))
+                    # Remove a chave personalizada.
+        db.commit()
+        # Salva todas as alterações.
+        flash('Textos e informações do site atualizados.', 'success')
+        # Mostra mensagem de sucesso.
+        return redirect(url_for('admin.conteudo'))
+        # Recarrega a página com os novos valores.
+    valores = carregar_textos()
+    # GET: carrega os textos atuais (salvos ou padrão) para preencher o formulário.
+    return render_template('admin/conteudo.html', grupos=TEXTOS_CAMPOS, valores=valores, empresa=dados_empresa())
+    # Renderiza o editor de textos e informações.
 
 
 @admin.route('/fotos')
@@ -1952,7 +2105,7 @@ def gerenciar_fotos():
         # Percorre cada local de fotos configurável.
         locais[chave] = {'info': info, 'fotos': buscar_fotos(chave)}
         # Guarda os dados do local e a lista de fotos já cadastradas.
-    return render_template('admin/fotos.html', locais=locais, empresa=EMPRESA)
+    return render_template('admin/fotos.html', locais=locais, empresa=dados_empresa())
     # Renderiza a página de gestão de fotos.
 
 
@@ -2112,9 +2265,9 @@ def login_profissional():
                 # Marca a sessão como pertencente a esta profissional.
                 return redirect(url_for('profissional.agenda_profissional'))
                 # Envia para a agenda dela.
-        return render_template('profissional/login.html', profissionais=profissionais_lista, erro='Profissional ou senha inválida.', empresa=EMPRESA)
+        return render_template('profissional/login.html', profissionais=profissionais_lista, erro='Profissional ou senha inválida.', empresa=dados_empresa())
         # Reabre o login com mensagem de erro.
-    return render_template('profissional/login.html', profissionais=profissionais_lista, erro=None, empresa=EMPRESA)
+    return render_template('profissional/login.html', profissionais=profissionais_lista, erro=None, empresa=dados_empresa())
     # GET: mostra o formulário vazio.
 
 
@@ -2138,7 +2291,7 @@ def agenda_profissional():
         # Sem profissional logada, redireciona para o login.
         return redirect(url_for('profissional.login_profissional'))
         # Envia para o login.
-    return render_template('profissional/agenda.html', profissional=prof, empresa=EMPRESA)
+    return render_template('profissional/agenda.html', profissional=prof, empresa=dados_empresa())
     # Renderiza a página de agenda.
 
 
@@ -2297,7 +2450,7 @@ def bloqueios_profissional():
         (prof['id'],)
     ).fetchall()
     # Carrega a lista.
-    return render_template('profissional/bloqueios.html', profissional=prof, bloqueios=lista, horarios=HORARIOS, empresa=EMPRESA)
+    return render_template('profissional/bloqueios.html', profissional=prof, bloqueios=lista, horarios=HORARIOS, empresa=dados_empresa())
     # Renderiza a tela.
 
 
