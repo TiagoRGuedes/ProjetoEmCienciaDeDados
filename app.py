@@ -817,12 +817,12 @@ def login():
     # Define a função de login.
     if request.method == 'POST':
         # Verifica se o formulário foi enviado.
-        usuario = request.form.get('usuario', '')
-        # Recebe o usuário digitado.
-        senha = request.form.get('senha', '')
-        # Recebe a senha digitada.
-        if usuario == ADMIN_USUARIO and senha == ADMIN_SENHA:
-            # Confere se usuário e senha estão corretos.
+        usuario = request.form.get('usuario', '').strip()
+        # Recebe o usuário digitado, removendo espaços nas pontas.
+        senha = request.form.get('senha', '').strip()
+        # Recebe a senha digitada, removendo espaços nas pontas (evita falha por espaço acidental ou autocompletar).
+        if usuario.lower() == ADMIN_USUARIO and senha == ADMIN_SENHA:
+            # Confere usuário (sem diferenciar maiúsculas) e senha (exata) corretos.
             session['logado'] = True
             # Marca a sessão como logada.
             return redirect(url_for('admin.dashboard'))
