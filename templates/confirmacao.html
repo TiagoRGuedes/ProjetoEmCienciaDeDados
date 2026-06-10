@@ -1,0 +1,14 @@
+{% extends "base.html" %} {# Usa o layout base do site. #}
+{% block conteudo %} {# Começa o conteúdo da confirmação. #}
+<section class="secao confirmado"> <!-- Cria a seção de confirmação. -->
+    <div class="container"> <!-- Centraliza o conteúdo. -->
+        <h2>Solicitação enviada com sucesso</h2> <!-- Mostra a mensagem principal. -->
+        <p>Seu pedido foi registrado como pendente e será confirmado pela equipe do {{ empresa.nome }}.</p> <!-- Explica que a confirmação será feita depois. -->
+        <p><strong>Contato:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone da empresa. -->
+        <div style="text-align: center; margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a class="botao" href="{{ url_for('publico.index') }}">Voltar ao início</a>
+            <a class="botao-secundario" href="{{ url_for('publico.agendar_get') }}">Novo agendamento</a>
+        </div>
+    </div> <!-- Fecha o container. -->
+</section> <!-- Fecha a seção de confirmação. -->
+{% endblock %} {# Finaliza o conteúdo. #}

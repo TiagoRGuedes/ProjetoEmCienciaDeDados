@@ -1,0 +1,57 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Textos{% endblock %} {# Define o título da aba. #}
+{% block content %} {# Começa o conteúdo. #}
+
+<div class="page-header"> <!-- Cabeçalho da página. -->
+  <h1 class="page-title">Textos e informações do site</h1> <!-- Título. -->
+  <p class="texto-suave">Edite os títulos, textos e informações que aparecem no site. Deixe um campo vazio para voltar ao texto padrão.</p> <!-- Explica como usar. -->
+</div>
+
+<div class="editor-com-previa"> <!-- Layout em duas colunas: editor + prévia do site. -->
+  <div class="editor-coluna"> <!-- Coluna do editor de textos. -->
+
+    <form method="POST" action="{{ url_for('admin.conteudo') }}"> <!-- Formulário que salva todos os textos de uma vez. -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for grupo, campos in grupos %} {# Percorre cada grupo de campos (seção do site). #}
+      <div class="card" style="max-width: 760px; margin-bottom: 18px;"> <!-- Cartão de um grupo de textos. -->
+        <h2 class="page-title" style="font-size: 1.05rem;">{{ grupo }}</h2> <!-- Nome do grupo. -->
+        <div class="form-grid"> <!-- Organiza os campos do grupo. -->
+          {% for chave, rotulo, padrao, tipo in campos %} {# Percorre cada campo editável. #}
+          <div class="form-group"> <!-- Grupo de um campo. -->
+            <label class="form-label" for="{{ chave }}">{{ rotulo }}</label> <!-- Rótulo amigável do campo. -->
+            {% if tipo == 'textarea' %} <!-- Campos longos usam área de texto. -->
+            <textarea class="form-input" id="{{ chave }}" name="{{ chave }}" rows="3" placeholder="{{ padrao }}">{{ valores[chave] }}</textarea> <!-- Texto longo (parágrafos). -->
+            {% else %} <!-- Campos curtos usam input simples. -->
+            <input class="form-input" type="text" id="{{ chave }}" name="{{ chave }}" value="{{ valores[chave] }}" placeholder="{{ padrao }}"> <!-- Texto curto (título, telefone, etc.). -->
+            {% endif %} <!-- Fecha a escolha do tipo de campo. -->
+          </div> <!-- Fecha o grupo do campo. -->
+          {% endfor %} {# Finaliza o loop de campos. #}
+        </div> <!-- Fecha o grid de campos. -->
+      </div> <!-- Fecha o cartão do grupo. -->
+      {% endfor %} {# Finaliza o loop de grupos. #}
+
+      <div class="form-actions" style="max-width: 760px;">
+        <button type="submit" class="btn btn-primary">Salvar textos</button>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a>
+      </div>
+    </form>
+    <form method="POST" action="{{ url_for('admin.redefinir_padrao', aba='texto') }}" style="max-width: 760px; margin-top: 10px;" onsubmit="return confirm('Redefinir todos os textos para os valores padrão?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-secondary">Redefinir padrão</button>
+    </form>
+
+  </div> <!-- Fecha a coluna do editor. -->
+
+  <aside class="previa-coluna"> <!-- Coluna com a prévia do site. -->
+    <div class="previa-cabecalho"> <!-- Cabeçalho da prévia. -->
+      <strong>Prévia do site</strong> <!-- Título da prévia. -->
+      <a href="{{ url_for('publico.index') }}" target="_blank" class="btn btn-secondary btn-sm">Abrir em nova aba</a> <!-- Abre o site real em outra aba. -->
+    </div>
+    <div class="previa-frame"> <!-- Moldura que contém o site. -->
+      <iframe id="previa-site" src="{{ url_for('publico.index') }}" title="Prévia do site"></iframe> <!-- Mostra o site com os textos atuais. -->
+    </div>
+    <p class="form-help">Salve para ver os novos textos no site. A prévia recarrega ao salvar.</p> <!-- Explica o comportamento. -->
+  </aside>
+</div> <!-- Fecha o layout de duas colunas. -->
+
+{% endblock %}

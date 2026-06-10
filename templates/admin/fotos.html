@@ -1,0 +1,98 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Fotos{% endblock %} {# Define o título da aba. #}
+{% block content %} {# Começa o conteúdo. #}
+
+<div class="page-header">
+  <h1 class="page-title">Fotos do site</h1>
+  <p class="texto-suave">Adicione, troque ou remova as fotos exibidas no site. Áreas com várias fotos viram um carrossel na página inicial.</p>
+  <form method="POST" action="{{ url_for('admin.redefinir_padrao', aba='fotos') }}" style="margin-top: 10px;" onsubmit="return confirm('Remover todas as fotos e restaurar as imagens padrão?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-secondary">Redefinir padrão</button>
+  </form>
+</div>
+
+<div class="editor-com-previa"> <!-- Layout em duas colunas: gestão de fotos à esquerda e prévia do site à direita. -->
+  <div class="editor-coluna"> <!-- Coluna com os cartões de fotos. -->
+
+{% for chave, grupo in locais.items() %} {# Percorre cada local de fotos (galeria, responsável, etc.). #}
+<div class="card" style="max-width: 860px; margin-bottom: 18px;"> <!-- Cartão de um local de fotos. -->
+  <div class="fotos-cabecalho"> <!-- Cabeçalho do local. -->
+    <h2 class="page-title" style="font-size: 1.1rem;">{{ grupo.info.rotulo }}</h2> <!-- Nome amigável do local. -->
+    <span class="fotos-tag">{% if grupo.info.multiplas %}Várias fotos (carrossel){% else %}Foto única{% endif %}</span> <!-- Indica se aceita várias fotos. -->
+  </div> <!-- Fecha o cabeçalho do local. -->
+
+  {% if grupo.fotos %} <!-- Verifica se já há fotos neste local. -->
+  <div class="fotos-grade"> <!-- Grade com as fotos atuais. -->
+    {% for foto in grupo.fotos %} {# Percorre as fotos do local. #}
+    <div class="foto-admin"> <!-- Cartão de uma foto. -->
+      <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Foto' }}"> <!-- Mostra a miniatura da foto. -->
+      {% if foto.titulo %}<p class="foto-admin-titulo">{{ foto.titulo }}</p>{% endif %} <!-- Mostra a legenda quando existir. -->
+      <div class="foto-admin-acoes"> <!-- Botões de ação da foto. -->
+        {% if grupo.info.multiplas %} <!-- Reordenação só faz sentido quando há várias fotos. -->
+        <form method="POST" action="{{ url_for('admin.mover_foto', id=foto.id) }}" class="form-inline"> <!-- Formulário para subir a foto. -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="direcao" value="subir"> <!-- Define a direção como subir. -->
+          <button type="submit" class="btn btn-secondary btn-sm" {% if loop.first %}disabled{% endif %} aria-label="Subir">↑</button> <!-- Botão de subir (desativado na primeira). -->
+        </form>
+        <form method="POST" action="{{ url_for('admin.mover_foto', id=foto.id) }}" class="form-inline"> <!-- Formulário para descer a foto. -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="direcao" value="descer"> <!-- Define a direção como descer. -->
+          <button type="submit" class="btn btn-secondary btn-sm" {% if loop.last %}disabled{% endif %} aria-label="Descer">↓</button> <!-- Botão de descer (desativado na última). -->
+        </form>
+        {% endif %} <!-- Fecha a verificação de reordenação. -->
+        <form method="POST" action="{{ url_for('admin.remover_foto', id=foto.id) }}" class="form-inline" onsubmit="return confirm('Remover esta foto?');"> <!-- Formulário para remover a foto. -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-sm">Remover</button> <!-- Botão de remover com confirmação. -->
+        </form>
+      </div> <!-- Fecha os botões da foto. -->
+    </div> <!-- Fecha o cartão da foto. -->
+    {% endfor %} {# Finaliza o loop de fotos. #}
+  </div> <!-- Fecha a grade de fotos. -->
+  {% else %} <!-- Quando o local ainda não tem fotos. -->
+  <p class="texto-suave">Nenhuma foto cadastrada ainda.</p> <!-- Mensagem de local vazio. -->
+  {% endif %} <!-- Fecha a verificação de fotos. -->
+
+  <form method="POST" action="{{ url_for('admin.adicionar_foto', local=chave) }}" enctype="multipart/form-data" class="form-grid fotos-form"> <!-- Formulário de upload de nova foto. -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group"> <!-- Grupo do arquivo. -->
+      <label class="form-label" for="foto-{{ chave }}">{% if grupo.info.multiplas %}Adicionar nova foto{% else %}Trocar a foto{% endif %}</label> <!-- Rótulo conforme aceita várias ou única. -->
+      <input class="form-input" type="file" id="foto-{{ chave }}" name="foto" accept="image/*" required> <!-- Campo de upload de imagem. -->
+      <span class="form-help">Formatos aceitos: png, jpg, jpeg, webp ou gif (até 5 MB).</span> <!-- Ajuda sobre os formatos. -->
+    </div> <!-- Fecha o grupo do arquivo. -->
+    <div class="form-group"> <!-- Grupo da legenda. -->
+      <label class="form-label" for="titulo-{{ chave }}">Legenda (opcional)</label> <!-- Rótulo da legenda. -->
+      <input class="form-input" type="text" id="titulo-{{ chave }}" name="titulo" maxlength="120" placeholder="Ex: Esmaltação nude"> <!-- Campo de legenda opcional. -->
+    </div> <!-- Fecha o grupo da legenda. -->
+    <div class="form-actions"> <!-- Área do botão. -->
+      <button type="submit" class="btn btn-primary">{% if grupo.info.multiplas %}Adicionar foto{% else %}Salvar foto{% endif %}</button> <!-- Botão de enviar. -->
+    </div> <!-- Fecha a área do botão. -->
+  </form> <!-- Fecha o formulário de upload. -->
+</div> <!-- Fecha o cartão do local. -->
+{% endfor %} {# Finaliza o loop de locais. #}
+
+  </div> <!-- Fecha a coluna de gestão de fotos. -->
+
+  <aside class="previa-coluna"> <!-- Coluna com a prévia do site. -->
+    <div class="previa-cabecalho"> <!-- Cabeçalho da prévia. -->
+      <strong>Prévia do site</strong> <!-- Título da prévia. -->
+      <button type="button" id="atualizar-previa" class="btn btn-secondary btn-sm">Atualizar</button> <!-- Recarrega a prévia manualmente. -->
+    </div>
+    <div class="previa-frame"> <!-- Moldura que contém o site. -->
+      <iframe id="previa-site" src="{{ url_for('publico.index') }}" title="Prévia do site"></iframe> <!-- Mostra o site com as fotos atuais (galeria e responsável). -->
+    </div>
+    <p class="form-help">A prévia recarrega ao adicionar ou remover uma foto. Use "Atualizar" se precisar forçar.</p> <!-- Explica o comportamento. -->
+  </aside>
+</div> <!-- Fecha o layout de duas colunas. -->
+
+<script>
+  // Recarrega a prévia do site quando o admin clica em "Atualizar".
+  (function () {
+    var botao = document.getElementById('atualizar-previa');
+    var iframe = document.getElementById('previa-site');
+    if (botao && iframe) {
+      botao.addEventListener('click', function () { iframe.contentWindow.location.reload(); });
+    }
+  })();
+</script>
+
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
+{% block title %}Aparência{% endblock %} {# Define o título da aba. #}
+{% block content %} {# Começa o conteúdo. #}
+
+<div class="page-header"> <!-- Cabeçalho da página. -->
+  <h1 class="page-title">Configurações visuais</h1> <!-- Título. -->
+  <p class="texto-suave">Personalize a fonte, as cores gerais e as cores de cada página e área do site público.</p> <!-- Texto explicativo. -->
+</div>
+
+<div class="editor-com-previa"> <!-- Layout em duas colunas: editor à esquerda e prévia do site à direita. -->
+  <div class="editor-coluna"> <!-- Coluna do editor (formulário). -->
+
+<form method="POST" action="{{ url_for('admin.configuracoes') }}"> <!-- Formulário único que salva fonte, cores gerais e cores por área. -->
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="card" style="max-width: 760px;"> <!-- Cartão das configurações gerais. -->
+    <h2 class="page-title" style="font-size: 1.1rem;">Fonte e cores principais</h2> <!-- Subtítulo da seção geral. -->
+    <div class="form-grid"> <!-- Organiza os campos gerais. -->
+
+      <div class="form-group"> <!-- Grupo da fonte. -->
+        <label class="form-label" for="fonte">Fonte do site</label>
+        <select class="form-select" id="fonte" name="fonte"> <!-- Lista de fontes pré-definidas e seguras para web. -->
+          {% set opcoes_fonte = [
+            ('Arial, Helvetica, sans-serif', 'Arial'),
+            ('Georgia, serif', 'Georgia'),
+            ('"Times New Roman", Times, serif', 'Times New Roman'),
+            ('Tahoma, Geneva, sans-serif', 'Tahoma'),
+            ('Verdana, Geneva, sans-serif', 'Verdana'),
+            ('"Trebuchet MS", sans-serif', 'Trebuchet MS'),
+            ('"Courier New", Courier, monospace', 'Courier New')
+          ] %}
+          {% for valor, rotulo in opcoes_fonte %}
+          <option value="{{ valor }}" {% if config.fonte == valor %}selected{% endif %}>{{ rotulo }}</option>
+          {% endfor %}
+        </select>
+        <span class="form-help">A fonte se aplica em todas as páginas, tanto admin quanto pública.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de texto. -->
+        <label class="form-label" for="cor_texto">Cor do texto</label>
+        <input class="form-input" type="color" id="cor_texto" name="cor_texto" value="{{ config.cor_texto or '#3f2d25' }}" style="height: 48px; padding: 4px;"> <!-- Picker de cor de texto. -->
+        <span class="form-help">Cor principal dos textos. Sugestão: tons escuros para boa leitura.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de fundo. -->
+        <label class="form-label" for="cor_fundo">Cor de fundo</label>
+        <input class="form-input" type="color" id="cor_fundo" name="cor_fundo" value="{{ config.cor_fundo or '#efe0d1' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de fundo. -->
+        <span class="form-help">Cor de fundo geral. Use tons claros para combinar com a paleta marrom/bege.</span>
+      </div>
+
+      <div class="form-group"> <!-- Grupo da cor de destaque. -->
+        <label class="form-label" for="cor_destaque">Cor de destaque (botões e topo)</label>
+        <input class="form-input" type="color" id="cor_destaque" name="cor_destaque" value="{{ config.cor_destaque or '#6f4f3f' }}" style="height: 48px; padding: 4px;"> <!-- Picker da cor de destaque. -->
+        <span class="form-help">Cor de botões principais e elementos de destaque.</span>
+      </div>
+
+    </div> <!-- Fecha o grid de campos gerais. -->
+  </div> <!-- Fecha o cartão geral. -->
+
+  <div class="card" style="max-width: 760px; margin-top: 18px;"> <!-- Cartão das cores por página e área. -->
+    <h2 class="page-title" style="font-size: 1.1rem;">Cores por página e área</h2> <!-- Subtítulo da seção por área. -->
+    <p class="texto-suave">Escolha a página, depois ajuste as cores de cada área. Marque a opção para personalizar; desmarque para voltar à cor padrão do site.</p> <!-- Explica como usar. -->
+
+    <div class="form-group"> <!-- Grupo do seletor de página. -->
+      <label class="form-label" for="seletor-pagina">Página</label> <!-- Rótulo do seletor. -->
+      <select class="form-select" id="seletor-pagina"> <!-- Seletor que escolhe qual página editar. -->
+        {% for pagina, info in aparencia_paginas.items() %} {# Percorre cada página configurável. #}
+        <option value="{{ pagina }}">{{ info.rotulo }}</option> <!-- Opção com o nome amigável da página. -->
+        {% endfor %} {# Finaliza o loop de páginas. #}
+      </select>
+    </div> <!-- Fecha o grupo do seletor. -->
+
+    {% for pagina, info in aparencia_paginas.items() %} {# Percorre cada página para montar seu bloco de áreas. #}
+    <div class="grupo-aparencia" data-pagina="{{ pagina }}" {% if not loop.first %}style="display: none;"{% endif %}> <!-- Bloco de uma página (só o primeiro aparece de início). -->
+      {% for area, dados in info.areas.items() %} {# Percorre cada área da página. #}
+      <div class="area-aparencia"> <!-- Cartão de uma área editável. -->
+        <h3 class="area-aparencia-titulo">{{ dados.rotulo }}</h3> <!-- Nome amigável da área. -->
+        <div class="area-aparencia-cores"> <!-- Lista de cores da área. -->
+          {% for prop in dados.props %} {# Percorre cada propriedade de cor da área. #}
+          {% set chave = 'aparencia.' ~ pagina ~ '.' ~ area ~ '.' ~ prop %} {# Monta a chave salva no banco. #}
+          {% set valor_salvo = aparencia_valores.get(chave) %} {# Busca o valor já salvo, se houver. #}
+          <div class="cor-item"> <!-- Linha com a caixinha de personalizar e o seletor de cor. -->
+            <label class="checkbox-item cor-item-toggle"> <!-- Caixinha "personalizar esta cor". -->
+              <input type="checkbox" name="usar__{{ pagina }}__{{ area }}__{{ prop }}" {% if valor_salvo %}checked{% endif %}> <!-- Marca quando a cor está personalizada. -->
+              <span>{{ prop_rotulo[prop] }}</span> <!-- Mostra "Cor de fundo" ou "Cor do texto". -->
+            </label>
+            <input type="color" name="cor__{{ pagina }}__{{ area }}__{{ prop }}" value="{{ valor_salvo or prop_padrao[prop] }}" class="cor-item-picker"> <!-- Seletor de cor da propriedade. -->
+          </div> <!-- Fecha a linha da cor. -->
+          {% endfor %} {# Finaliza o loop de propriedades. #}
+        </div> <!-- Fecha a lista de cores da área. -->
+      </div> <!-- Fecha o cartão da área. -->
+      {% endfor %} {# Finaliza o loop de áreas. #}
+    </div> <!-- Fecha o bloco da página. -->
+    {% endfor %} {# Finaliza o loop de páginas. #}
+
+    <div class="card" style="margin: 6px 0; background: var(--bege-claro);"> <!-- Aviso de pré-visualização. -->
+      <strong>Dica</strong> <!-- Destaque do aviso. -->
+      <p style="margin-top: 6px;">A prévia ao lado mostra as mudanças na hora. Ao trocar a página no seletor acima, a prévia também muda de página.</p> <!-- Explica a prévia ao vivo. -->
+    </div>
+  </div> <!-- Fecha o cartão de cores por área. -->
+
+  <div class="form-actions" style="max-width: 760px;">
+    <button type="submit" class="btn btn-primary">Salvar configurações</button>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Voltar</a>
+  </div>
+</form>
+<form method="POST" action="{{ url_for('admin.redefinir_padrao', aba='aparencia') }}" style="max-width: 760px; margin-top: 10px;" onsubmit="return confirm('Redefinir aparência para os valores padrão?');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn btn-secondary">Redefinir padrão</button>
+</form>
+
+  </div> <!-- Fecha a coluna do editor. -->
+
+  <aside class="previa-coluna"> <!-- Coluna com a prévia do site. -->
+    <div class="previa-cabecalho"> <!-- Cabeçalho da prévia. -->
+      <strong>Prévia do site</strong> <!-- Título da prévia. -->
+      <a href="{{ url_for('publico.index') }}" target="_blank" class="btn btn-secondary btn-sm">Abrir em nova aba</a> <!-- Abre o site real em outra aba. -->
+    </div>
+    <div class="previa-frame"> <!-- Moldura que contém o site. -->
+      <iframe id="previa-site" src="{{ url_for('publico.index') }}" title="Prévia do site"></iframe> <!-- Mostra o site público com as cores aplicadas ao vivo. -->
+    </div>
+    <p class="form-help">As cores mudam aqui na hora enquanto você escolhe. Clique em <strong>Salvar</strong> para aplicar de verdade no site.</p> <!-- Explica o comportamento da prévia. -->
+  </aside>
+</div> <!-- Fecha o layout de duas colunas. -->
+
+<script>
+  // Controla o seletor de página, a prévia ao vivo e a navegação da prévia.
+  (function () {
+    var seletor = document.getElementById('seletor-pagina');
+    var grupos = document.querySelectorAll('.grupo-aparencia');
+    var form = document.querySelector('.editor-coluna form');
+    var iframe = document.getElementById('previa-site');
+    var APARENCIA = {{ aparencia_paginas|tojson }} || {}; // Mapa de páginas/áreas vindo do backend.
+    var URLS = { // Para qual página a prévia navega conforme o seletor.
+      'global': '{{ url_for('publico.index') }}',
+      'inicio': '{{ url_for('publico.index') }}',
+      'agendamento': '{{ url_for('publico.agendar_get') }}'
+    };
+
+    // Mostra apenas o bloco de áreas da página escolhida.
+    function mostrarGrupo() {
+      grupos.forEach(function (grupo) {
+        grupo.style.display = (grupo.dataset.pagina === seletor.value) ? '' : 'none';
+      });
+    }
+
+    // Monta o CSS de prévia a partir dos campos do formulário (mesma lógica do backend).
+    function gerarCss() {
+      var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+      var css = ':root{' +
+        '--config-fonte:' + v('fonte') + ';' +
+        '--config-cor-texto:' + v('cor_texto') + ';' +
+        '--config-cor-fundo:' + v('cor_fundo') + ';' +
+        '--config-cor-destaque:' + v('cor_destaque') + ';}';
+      Object.keys(APARENCIA).forEach(function (pagina) {
+        var info = APARENCIA[pagina];
+        var prefixo = info.escopo ? '.pagina-' + info.escopo + ' ' : '';
+        Object.keys(info.areas).forEach(function (area) {
+          var dados = info.areas[area];
+          var decl = '';
+          dados.props.forEach(function (prop) {
+            var base = pagina + '__' + area + '__' + prop;
+            var usar = form.querySelector('[name="usar__' + base + '"]');
+            var cor = form.querySelector('[name="cor__' + base + '"]');
+            if (usar && usar.checked && cor) {
+              decl += (prop === 'cor_fundo' ? 'background-color' : 'color') + ':' + cor.value + ';';
+            }
+          });
+          if (decl) { css += prefixo + dados.seletor + '{' + decl + '}'; }
+        });
+      });
+      return css;
+    }
+
+    // Injeta o CSS da prévia dentro do iframe (mesmo domínio, então é permitido).
+    function aplicarPrevia() {
+      try {
+        var doc = iframe.contentDocument;
+        if (!doc || !doc.head) { return; }
+        var style = doc.getElementById('previa-cores-admin');
+        if (!style) { style = doc.createElement('style'); style.id = 'previa-cores-admin'; doc.head.appendChild(style); }
+        style.textContent = gerarCss();
+      } catch (e) { /* iframe ainda carregando: ignora. */ }
+    }
+
+    seletor.addEventListener('change', function () {
+      mostrarGrupo();
+      var alvo = URLS[seletor.value] || URLS['inicio'];
+      if (iframe.getAttribute('src') !== alvo) { iframe.setAttribute('src', alvo); } // Navega a prévia para a página escolhida.
+    });
+    form.addEventListener('input', aplicarPrevia);
+    form.addEventListener('change', aplicarPrevia);
+    iframe.addEventListener('load', aplicarPrevia);
+    mostrarGrupo();
+  })();
+</script>
+
+{% endblock %}

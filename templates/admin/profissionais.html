@@ -1,0 +1,56 @@
+{% extends 'admin/_base.html' %}
+{% block title %}Profissionais{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    Profissionais
+    <span class="page-counter">{{ profissionais|length }} cadastrada{{ '' if profissionais|length == 1 else 's' }}</span>
+  </h1>
+  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary">+ Nova profissional</a>
+</div>
+
+{% if profissionais %}
+<div class="profissional-card-grid">
+  {% for p in profissionais %}
+  <article class="profissional-card">
+    <img src="{{ url_for('static', filename='img/' ~ p.foto) }}" alt="Foto de {{ p.nome }}" onerror="this.src='{{ url_for('static', filename='img/pamela_francisco.png') }}'">
+    <h3>{{ p.nome }}</h3>
+    <p style="margin:0;color:var(--texto-suave);">{{ p.especialidade }}</p>
+    <span class="badge badge-{{ 'ativo' if p.ativo else 'inativo' }}">
+      {{ 'Ativa' if p.ativo else 'Inativa' }}
+    </span>
+    <div class="servicos-chips">
+      {% if p.servicos_atende %}
+        {% for nome_servico in p.servicos_atende.split(', ') %}
+          <span class="chip">{{ nome_servico }}</span>
+        {% endfor %}
+      {% else %}
+        <span class="chip chip-rosa">Sem serviços vinculados</span>
+      {% endif %}
+    </div>
+    <div class="form-actions" style="margin-top:8px;">
+      <a href="{{ url_for('admin.profissional_editar', id=p.id) }}" class="btn btn-sm btn-secondary">Editar</a>
+      <form method="POST" action="{{ url_for('admin.profissional_alternar_ativo', id=p.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm {{ 'btn-danger' if p.ativo else 'btn-success' }}">
+          {{ 'Inativar' if p.ativo else 'Reativar' }}
+        </button>
+      </form>
+      <form method="POST" action="{{ url_for('admin.profissional_excluir', id=p.id) }}" onsubmit="return confirm('Excluir {{ p.nome }}? Essa ação só funciona se não houver agendamentos.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-secondary">Excluir</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty-state">
+  <p><strong>Nenhuma profissional cadastrada.</strong></p>
+  <p>Cadastre as profissionais para que apareçam na tela pública de agendamento.</p>
+  <a href="{{ url_for('admin.profissional_nova') }}" class="btn btn-primary" style="margin-top:10px;">+ Nova profissional</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'admin/_base.html' %}
+{% block title %}Clientes{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    Clientes
+    <span class="page-counter">{{ clientes|length }} cadastrada{{ '' if clientes|length == 1 else 's' }}</span>
+  </h1>
+</div>
+
+<form method="GET" class="filters">
+  <div class="form-group">
+    <label class="form-label" for="q">Buscar por nome ou telefone</label>
+    <input class="form-input" id="q" name="q" type="text" value="{{ busca }}" placeholder="Ex: Mariana ou 11 99999-0000">
+  </div>
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    <a href="{{ url_for('admin.clientes') }}" class="btn btn-secondary">Limpar</a>
+  </div>
+</form>
+
+{% if clientes %}
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Telefone</th>
+        <th>Agendamentos</th>
+        <th>Último atendimento</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td><strong>{{ c.nome }}</strong></td>
+        <td>{{ c.telefone }}</td>
+        <td>
+          {{ c.total_agendamentos or 0 }} no total
+          <div style="font-size:0.82rem;color:var(--texto-suave);">
+            {{ c.total_confirmados or 0 }} confirmados · {{ c.total_cancelados or 0 }} cancelados
+          </div>
+        </td>
+        <td>{{ c.ultimo_atendimento or '—' }}</td>
+        <td class="actions">
+          <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.cliente_detalhe', id=c.id) }}">Ver histórico</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p><strong>Nenhuma cliente encontrada.</strong></p>
+  <p>{% if busca %}Tente uma busca diferente ou{% else %}As clientes aparecem aqui assim que{% endif %} algum agendamento for registrado.</p>
+</div>
+{% endif %}
+
+{% endblock %}

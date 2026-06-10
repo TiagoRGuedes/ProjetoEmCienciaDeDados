@@ -1,0 +1,140 @@
+<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
+<html lang="pt-BR"> <!-- Abre o documento HTML e define português do Brasil como idioma. -->
+<head> <!-- Abre a área de configurações da página admin. -->
+  <meta charset="UTF-8"> <!-- Permite acentos e caracteres especiais. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o painel se adaptar a diferentes telas. -->
+  <title>{% block title %}Admin{% endblock %} — Esmalteria</title> <!-- Define o título da aba com um bloco editável. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Carrega o CSS do painel administrativo. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}"> <!-- Widget de acessibilidade (skip-link, alto contraste, foco, etc.). -->
+  <style>
+    /* Aplica as preferências visuais globais usando variáveis CSS para sobrescrever cores e fonte. */
+    :root {
+      --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
+      --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
+      --config-cor-fundo: {{ config_visual.cor_fundo or '#efe0d1' }};
+      --config-cor-destaque: {{ config_visual.cor_destaque or '#6f4f3f' }};
+    }
+    body { font-family: var(--config-fonte); background: var(--config-cor-fundo); color: var(--config-cor-texto); }
+    .btn-primary, .btn-success { background: var(--config-cor-destaque); border-color: var(--config-cor-destaque); }
+    .navbar { background: var(--config-cor-destaque); }
+    .page-title, .table thead th, .form-label { color: var(--config-cor-texto); }
+  </style>
+</head> <!-- Fecha o head. -->
+<body> <!-- Abre o corpo visível da página admin. -->
+
+  <header class="topbar"> <!-- Barra superior fixa com hamburguer e marca. -->
+    <button id="botao-menu" class="botao-menu" aria-label="Abrir menu" aria-controls="sidebar-admin" aria-expanded="false">
+      <span></span><span></span><span></span> <!-- Três barras do ícone hamburguer. -->
+    </button>
+    <a href="{{ url_for('admin.dashboard') }}" class="topbar-brand">Refúgio da Preta · Admin</a> <!-- Marca clicável que volta ao dashboard. -->
+  </header>
+
+  <aside id="sidebar-admin" class="sidebar" aria-hidden="true"> <!-- Menu lateral escondido por padrão. -->
+    <div class="sidebar-cabecalho"> <!-- Topo da sidebar. -->
+      <strong>Administração</strong>
+      <button id="botao-fechar-menu" class="botao-fechar-menu" aria-label="Fechar menu">×</button>
+    </div>
+    <nav class="sidebar-links" aria-label="Menu administrativo"> <!-- Menu lateral com itens agrupados por tópico. -->
+      {% set ep = request.endpoint or '' %} {# Guarda o endpoint atual para destacar o item e abrir o grupo certo. #}
+      {% set g_atendimentos = ep in ['admin.dashboard', 'admin.agenda', 'admin.historico', 'admin.agendamento_restaurar', 'admin.confirmacoes', 'admin.atendimentos', 'admin.concluidos', 'admin.pagos'] or ep.startswith('admin.agendamento') or ep.startswith('admin.bloqueio') %} {# Marca o grupo Atendimentos como ativo. #}
+      {% set g_cadastros = ep.startswith('admin.profissional') or ep.startswith('admin.servic') or ep.startswith('admin.client') %} {# Marca o grupo Cadastros como ativo. #}
+      {% set g_site = ep == 'admin.configuracoes' or ep == 'admin.conteudo' or 'foto' in ep %} {# Marca o grupo Site/Aparência como ativo. #}
+
+      <div class="sidebar-grupo {% if g_atendimentos %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Atendimentos. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_atendimentos else 'false' }}"> <!-- Cabeçalho que abre/fecha o grupo. -->
+          <span>Atendimentos</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta que gira ao abrir. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo (visíveis só quando aberto). -->
+          <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if ep in ['admin.dashboard', 'admin.atendimentos', 'admin.confirmacoes', 'admin.concluidos', 'admin.pagos'] or (ep.startswith('admin.agendamento') and ep != 'admin.agendamento_restaurar') %}active{% endif %}">Agendamentos</a> <!-- Entrada unificada: dashboard + tabs (Confirmados / Concluídos / Pagos). -->
+          <a href="{{ url_for('admin.agenda') }}" class="sidebar-link {% if ep == 'admin.agenda' %}active{% endif %}">Agenda</a> <!-- Agenda por profissional. -->
+          <a href="{{ url_for('admin.historico') }}" class="sidebar-link {% if ep == 'admin.historico' or ep == 'admin.agendamento_restaurar' %}active{% endif %}">Histórico</a> <!-- Histórico de atendimentos. -->
+          <a href="{{ url_for('admin.bloqueios') }}" class="sidebar-link {% if ep.startswith('admin.bloqueio') %}active{% endif %}">Bloqueios</a> <!-- Bloqueios de agenda. -->
+        </div>
+      </div>
+
+      <div class="sidebar-grupo {% if g_cadastros %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Cadastros. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_cadastros else 'false' }}"> <!-- Cabeçalho do grupo. -->
+          <span>Cadastros</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo. -->
+          <a href="{{ url_for('admin.profissionais') }}" class="sidebar-link {% if ep.startswith('admin.profissional') %}active{% endif %}">Profissionais</a> <!-- Cadastro de profissionais. -->
+          <a href="{{ url_for('admin.servicos') }}" class="sidebar-link {% if ep.startswith('admin.servic') %}active{% endif %}">Serviços</a> <!-- Cadastro de serviços. -->
+          <a href="{{ url_for('admin.clientes') }}" class="sidebar-link {% if ep.startswith('admin.client') %}active{% endif %}">Clientes</a> <!-- Cadastro de clientes. -->
+        </div>
+      </div>
+
+      <div class="sidebar-grupo {% if g_site %}aberto{% endif %}" data-grupo> <!-- Grupo recolhível: Site / Aparência. -->
+        <button type="button" class="sidebar-grupo-titulo" aria-expanded="{{ 'true' if g_site else 'false' }}"> <!-- Cabeçalho do grupo. -->
+          <span>Site / Aparência</span> <!-- Nome do tópico. -->
+          <span class="sidebar-grupo-seta" aria-hidden="true">&rsaquo;</span> <!-- Seta. -->
+        </button>
+        <div class="sidebar-grupo-itens"> <!-- Itens do grupo. -->
+          <a href="{{ url_for('admin.configuracoes') }}" class="sidebar-link {% if ep == 'admin.configuracoes' %}active{% endif %}">Aparência</a> <!-- Cores e fonte do site. -->
+          <a href="{{ url_for('admin.gerenciar_fotos') }}" class="sidebar-link {% if 'foto' in ep %}active{% endif %}">Fotos</a> <!-- Gestão de fotos do site. -->
+          <a href="{{ url_for('admin.conteudo') }}" class="sidebar-link {% if ep == 'admin.conteudo' %}active{% endif %}">Textos</a> <!-- Edição dos textos e informações do site. -->
+        </div>
+      </div>
+
+      <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-link-sair">Sair</a> <!-- Sair fica solto no final. -->
+    </nav>
+  </aside>
+
+  <div id="backdrop-sidebar" class="sidebar-backdrop" aria-hidden="true"></div> <!-- Fundo escuro que aparece junto com a sidebar. -->
+
+  <main id="conteudo-principal" class="container" tabindex="-1"> <!-- Abre o conteúdo principal do admin (alvo do "pular para o conteúdo"). -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {# Busca mensagens temporárias enviadas pelo Flask. #}
+      {% if messages %} {# Verifica se existem mensagens para mostrar. #}
+        <ul class="flash-list"> <!-- Cria uma lista visual de mensagens. -->
+          {% for category, msg in messages %} {# Percorre cada mensagem recebida. #}
+            <li class="flash flash-{{ category if category in ['success','error','info'] else 'info' }}">{{ msg }}</li> <!-- Mostra a mensagem com classe de cor adequada. -->
+          {% endfor %} {# Finaliza o loop de mensagens. #}
+        </ul> <!-- Fecha a lista de mensagens. -->
+      {% endif %} {# Finaliza a verificação de mensagens. #}
+    {% endwith %} {# Finaliza o bloco de mensagens flash. #}
+
+    {% block content %}{% endblock %} <!-- Define o espaço onde cada página admin coloca seu conteúdo. -->
+  </main> <!-- Fecha o conteúdo principal do admin. -->
+
+  <script>
+    // Controla a abertura/fechamento da sidebar do admin.
+    (function () {
+      const sidebar = document.getElementById('sidebar-admin');
+      const backdrop = document.getElementById('backdrop-sidebar');
+      const botaoMenu = document.getElementById('botao-menu');
+      const botaoFechar = document.getElementById('botao-fechar-menu');
+      function abrir() {
+        sidebar.classList.add('aberta');
+        backdrop.classList.add('visivel');
+        sidebar.setAttribute('aria-hidden', 'false');
+        botaoMenu.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('sidebar-aberta');
+      }
+      function fechar() {
+        sidebar.classList.remove('aberta');
+        backdrop.classList.remove('visivel');
+        sidebar.setAttribute('aria-hidden', 'true');
+        botaoMenu.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('sidebar-aberta');
+      }
+      botaoMenu.addEventListener('click', abrir);
+      botaoFechar.addEventListener('click', fechar);
+      backdrop.addEventListener('click', fechar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+    })();
+
+    // Abre e fecha os grupos do menu lateral (acordeão por tópico).
+    (function () {
+      document.querySelectorAll('[data-grupo] .sidebar-grupo-titulo').forEach(function (titulo) {
+        titulo.addEventListener('click', function () {
+          const grupo = titulo.closest('[data-grupo]');
+          const aberto = grupo.classList.toggle('aberto');
+          titulo.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+        });
+      });
+    })();
+  </script>
+  <script src="{{ url_for('static', filename='js/acessibilidade.js') }}"></script> <!-- Widget de acessibilidade. -->
+</body> <!-- Fecha o corpo da página. -->
+</html> <!-- Fecha o documento HTML. -->

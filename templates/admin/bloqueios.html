@@ -1,0 +1,86 @@
+{% extends 'admin/_base.html' %}
+{% block title %}Bloqueios de agenda{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">Bloqueios de agenda</h1>
+</div>
+
+<div class="card">
+  <h2 style="margin-bottom: 12px;">Adicionar folga, feriado ou horário bloqueado</h2>
+  <form method="POST" class="form-grid bloqueio-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <label class="form-label" for="profissional_id">Profissional</label>
+      <select class="form-select" id="profissional_id" name="profissional_id" required>
+        <option value="">Selecione</option>
+        {% for p in profissionais %}
+        <option value="{{ p.id }}">{{ p.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="data">Data</label>
+      <input class="form-input" type="date" id="data" name="data" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="horario">Horário</label>
+      <select class="form-select" id="horario" name="horario">
+        <option value="dia_inteiro">Dia inteiro</option>
+        {% for h in horarios %}
+        <option value="{{ h }}">{{ h }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="motivo">Motivo</label>
+      <input class="form-input" type="text" id="motivo" name="motivo" placeholder="Ex: folga, feriado, curso, compromisso interno">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Adicionar bloqueio</button>
+    </div>
+  </form>
+</div>
+
+{% if bloqueios %}
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Profissional</th>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Motivo</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bloqueios %}
+      <tr>
+        <td>{{ b.profissional_nome }}</td>
+        <td>{{ b.data }}</td>
+        <td>{{ b.horario if b.horario else 'Dia inteiro' }}</td>
+        <td>{{ b.motivo }}</td>
+        <td class="actions">
+          <form method="POST" action="{{ url_for('admin.bloqueio_excluir', id=b.id) }}" onsubmit="return confirm('Remover este bloqueio?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-danger">Remover</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p><strong>Nenhum bloqueio cadastrado.</strong></p>
+  <p>Bloqueios adicionados aqui deixam dias ou horários indisponíveis no agendamento público.</p>
+</div>
+{% endif %}
+
+{% endblock %}
