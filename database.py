@@ -34,14 +34,13 @@ FOTOS_INICIAIS = [
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES)
-        g.db.row_factory = sqlite3.Row  # Permite acessar colunas pelo nome: row['coluna']
+        g.db.row_factory = sqlite3.Row
     return g.db
 
 
 def _colunas_da_tabela(db, tabela):
     linhas = db.execute(f'PRAGMA table_info({tabela})').fetchall()
     return {linha[1] for linha in linhas}
-
 
 
 def popular_profissionais_servicos(db):

@@ -5,3 +5,4 @@ esmalteria.db
 venv/
 .venv/
 static/img/uploads/
+.DS_Store

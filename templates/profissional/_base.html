@@ -1,13 +1,12 @@
-<!DOCTYPE html> <!-- Informa ao navegador que este arquivo usa HTML5. -->
-<html lang="pt-BR"> <!-- Define português do Brasil como idioma. -->
-<head> <!-- Início do head. -->
-  <meta charset="UTF-8"> <!-- Suporta acentos. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Layout adaptativo. -->
-  <title>{% block title %}Área da Profissional{% endblock %} — Refúgio da Preta</title> <!-- Título da aba. -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Reaproveita os estilos do admin. -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}"> <!-- Widget de acessibilidade (skip-link, alto contraste, foco, etc.). -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Área da Profissional{% endblock %} — Refúgio da Preta</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}">
   <style>
-    /* Aplica as preferências visuais globais também nesta área. */
     :root {
       --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
       --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
@@ -22,7 +21,7 @@
 </head>
 <body>
 
-  <header class="topbar"> <!-- Topo simples só com marca e logout. -->
+  <header class="topbar">
     {% if profissional %}
       <button id="botao-menu" class="botao-menu" aria-label="Abrir menu" aria-controls="sidebar-profissional" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -91,6 +90,6 @@
     })();
   </script>
   {% endif %}
-  <script src="{{ url_for('static', filename='js/acessibilidade.js') }}"></script> <!-- Widget de acessibilidade. -->
+  <script src="{{ url_for('static', filename='js/acessibilidade.js') }}"></script>
 </body>
 </html>

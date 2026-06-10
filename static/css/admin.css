@@ -291,7 +291,6 @@ body.com-modal { overflow: hidden; }
 .atend-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
 @media (max-width: 600px) { .atend-card { align-items: flex-start; } .atend-acoes { width: 100%; } }
 
-/* ============ TABS (dashboard de atendimentos) ============ */
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--nude); margin: 0 0 22px; overflow-x: auto; }
 .tab { padding: 12px 20px; color: var(--texto-suave); font-weight: 500; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
 .tab:hover { color: var(--marrom-escuro); text-decoration: none; }

@@ -22,7 +22,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-troque-em-producao')  # Nunca use o valor padrão em produção; defina SECRET_KEY no .env
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-troque-em-producao')
 
 csrf = CSRFProtect(app)
 
@@ -229,7 +229,6 @@ FOTOS_LOCAIS = {
 
 
 def cor_valida(valor):
-    # Valida formato hex (#rgb ou #rrggbb) para evitar injeção de CSS via inputs de cor do admin
     return bool(valor) and bool(re.fullmatch(r'#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?', valor))
 
 
@@ -659,7 +658,6 @@ def atualizar_pagamento(id):
         return redirect(url_for('admin.login'))
     pago = 1 if request.form.get('pago') == '1' else 0
     db = get_db()
-    # Marca pago e arquiva (vai para o histórico) ou desmarca pago e restaura para os ativos.
     db.execute('UPDATE agendamentos SET pago = ?, arquivado = ? WHERE id = ?', (pago, pago, id))
     db.commit()
     flash('Atendimento marcado como pago e movido para o histórico.' if pago else 'Marcação de pago removida e atendimento restaurado.', 'success')
@@ -682,7 +680,6 @@ def buscar_atendimentos(condicao, params):
 
 @admin.route('/confirmacoes')
 def confirmacoes():
-    # Mantém URL antiga apontando para os agendamentos pendentes no dashboard unificado.
     return redirect(url_for('admin.dashboard', status='pendente'))
 
 
@@ -721,13 +718,11 @@ def atendimentos():
 
 @admin.route('/concluidos')
 def concluidos():
-    # Mantém URL antiga apontando para a tab correspondente do dashboard unificado.
     return redirect(url_for('admin.atendimentos', aba='concluidos'))
 
 
 @admin.route('/pagos')
 def pagos():
-    # Mantém URL antiga apontando para a tab correspondente do dashboard unificado.
     return redirect(url_for('admin.atendimentos', aba='pagos'))
 
 
@@ -1571,6 +1566,11 @@ app.register_blueprint(admin)
 
 app.register_blueprint(profissional)
 
+try:
+    init_db()
+except Exception:
+    pass
+
 @app.teardown_appcontext
 def close_db(e=None):
     from flask import g
@@ -1580,6 +1580,5 @@ def close_db(e=None):
 
 
 if __name__ == '__main__':
-    init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')

@@ -1,14 +1,13 @@
-<!DOCTYPE html> <!-- Informa ao navegador que este documento usa HTML5. -->
-<html lang="pt-BR"> <!-- Abre o documento HTML e define o idioma como português do Brasil. -->
-<head> <!-- Abre a área de configurações da página. -->
-    <meta charset="UTF-8"> <!-- Permite exibir acentos e caracteres especiais corretamente. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Faz o site se adaptar melhor a celulares e computadores. -->
-    <title>{{ empresa.nome }}</title> <!-- Define o título da aba usando o nome da empresa. -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ empresa.nome }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}"> <!-- Widget de acessibilidade (skip-link, alto contraste, foco, etc.). -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"> <!-- Carrega o CSS público do site. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <style>
-        /* Aplica as preferências visuais globais sobre as variáveis do tema padrão. */
         :root {
             --config-fonte: {{ config_visual.fonte or 'Arial, Helvetica, sans-serif' }};
             --config-cor-texto: {{ config_visual.cor_texto or '#3f2d25' }};
@@ -19,13 +18,12 @@
         .topo, .rodape { background: var(--config-cor-destaque); }
         .botao, .botao-form, button[type="submit"], .botao-destaque { background: var(--config-cor-destaque); }
         nav a:hover { background: var(--config-cor-destaque) !important; }
-        /* Aplica as cores escolhidas pelo admin para cada página/área (vem depois para ter prioridade). */
         {{ css_aparencia|safe }}
     </style>
-</head> <!-- Fecha a área de configurações. -->
-<body class="pagina-{{ pagina_atual or 'outras' }}"> <!-- Abre o corpo e marca a página atual para aplicar as cores por área. -->
-    <header class="topo"> <!-- Cria o cabeçalho fixo do site. -->
-        <div class="container topo-conteudo"> <!-- Cria um container para organizar marca e menu. -->
+</head>
+<body class="pagina-{{ pagina_atual or 'outras' }}">
+    <header class="topo">
+        <div class="container topo-conteudo">
             <div class="marca">
                 <p class="marca-subtitulo">{{ empresa.marca_subtitulo or 'Studio de manicure e beleza' }}</p>
                 <div class="marca-nome-linha">
@@ -33,45 +31,45 @@
                     <h1>{{ empresa.nome }}</h1>
                 </div>
             </div>
-            <nav> <!-- Cria o menu de navegação pública. -->
-                <a href="{{ url_for('publico.index') }}">Início</a> <!-- Link para a página inicial. -->
-                <a href="{{ url_for('publico.index') }}#servicos">Serviços</a> <!-- Link para a seção de serviços. -->
-                <a href="{{ url_for('publico.index') }}#galeria">Galeria</a> <!-- Link para a galeria. -->
-                <a class="nav-destaque" href="{{ url_for('publico.agendar_get') }}">Agendar horário</a> <!-- Link principal para agendamento. -->
-                <a href="#contato">Contato</a> <!-- Link para o rodapé de contato. -->
-            </nav> <!-- Fecha o menu. -->
-        </div> <!-- Fecha o container do topo. -->
-    </header> <!-- Fecha o cabeçalho. -->
+            <nav>
+                <a href="{{ url_for('publico.index') }}">Início</a>
+                <a href="{{ url_for('publico.index') }}#servicos">Serviços</a>
+                <a href="{{ url_for('publico.index') }}#galeria">Galeria</a>
+                <a class="nav-destaque" href="{{ url_for('publico.agendar_get') }}">Agendar horário</a>
+                <a href="#contato">Contato</a>
+            </nav>
+        </div>
+    </header>
 
-    <main id="conteudo-principal" tabindex="-1"> <!-- Abre a área principal da página (alvo do "pular para o conteúdo"). -->
-        {% block conteudo %}{% endblock %} <!-- Define o espaço que cada página filha vai preencher. -->
-    </main> <!-- Fecha a área principal. -->
+    <main id="conteudo-principal" tabindex="-1">
+        {% block conteudo %}{% endblock %}
+    </main>
 
-    <footer id="contato" class="rodape"> <!-- Cria o rodapé com id para o link de contato funcionar. -->
-        <div class="container rodape-grid"> <!-- Organiza o rodapé em colunas. -->
-            <div> <!-- Abre a primeira coluna do rodapé. -->
-                <h3>{{ empresa.nome }}</h3> <!-- Mostra o nome da empresa no rodapé. -->
-                <p>{{ empresa.slogan }}</p> <!-- Mostra o slogan da empresa. -->
-                <p><strong>Responsável:</strong> {{ empresa.dona }}</p> <!-- Mostra o nome da responsável. -->
-            </div> <!-- Fecha a primeira coluna. -->
-            <div> <!-- Abre a segunda coluna do rodapé. -->
-                <h3>Atendimento</h3> <!-- Mostra o título da coluna de atendimento. -->
-                <p><strong>Telefone:</strong> {{ empresa.telefone }}</p> <!-- Mostra o telefone. -->
-                <p><strong>Horários:</strong> {{ empresa.horarios }}</p> <!-- Mostra horário de funcionamento. -->
-                <p><strong>Atendimento:</strong> {{ empresa.atendimento or 'Atendimento a domicílio' }}</p> <!-- Mostra como é o atendimento (a domicílio/na residência da profissional), sem endereço público. -->
-            </div> <!-- Fecha a segunda coluna. -->
-            <div> <!-- Abre a terceira coluna do rodapé. -->
-                <h3>Informações</h3> <!-- Mostra o título da coluna informativa. -->
-                <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p> <!-- Mostra o usuário do Instagram. -->
-                <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p> <!-- Link para abrir Instagram. -->
-                <p><a class="link-admin-discreto" href="{{ url_for('admin.login') }}">Acesso à Administração</a></p> <!-- Link discreto para a área administrativa. -->
-                {% if existe_profissional_com_senha %} <!-- Só mostra o acesso da profissional quando existe alguma profissional com senha definida. -->
-                <p><a class="link-admin-discreto" href="{{ url_for('profissional.login_profissional') }}">Acesso da Profissional</a></p> <!-- Link discreto para a área restrita da profissional. -->
-                {% endif %} <!-- Fecha a verificação do link da profissional. -->
-            </div> <!-- Fecha a terceira coluna. -->
-        </div> <!-- Fecha o grid do rodapé. -->
-    </footer> <!-- Fecha o rodapé. -->
-    <script src="{{ url_for('static', filename='js/carrossel.js') }}"></script> <!-- Carrega o JavaScript que controla os carrosséis de fotos. -->
-    <script src="{{ url_for('static', filename='js/acessibilidade.js') }}"></script> <!-- Widget de acessibilidade. -->
-</body> <!-- Fecha o corpo da página. -->
-</html> <!-- Fecha o documento HTML. -->
+    <footer id="contato" class="rodape">
+        <div class="container rodape-grid">
+            <div>
+                <h3>{{ empresa.nome }}</h3>
+                <p>{{ empresa.slogan }}</p>
+                <p><strong>Responsável:</strong> {{ empresa.dona }}</p>
+            </div>
+            <div>
+                <h3>Atendimento</h3>
+                <p><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+                <p><strong>Horários:</strong> {{ empresa.horarios }}</p>
+                <p><strong>Atendimento:</strong> {{ empresa.atendimento or 'Atendimento a domicílio' }}</p>
+            </div>
+            <div>
+                <h3>Informações</h3>
+                <p><strong>Instagram:</strong> {{ empresa.instagram_nome }}</p>
+                <p><a class="link-rodape" href="{{ empresa.instagram_url }}" target="_blank">Abrir Instagram</a></p>
+                <p><a class="link-admin-discreto" href="{{ url_for('admin.login') }}">Acesso à Administração</a></p>
+                {% if existe_profissional_com_senha %}
+                <p><a class="link-admin-discreto" href="{{ url_for('profissional.login_profissional') }}">Acesso da Profissional</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/carrossel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/acessibilidade.js') }}"></script>
+</body>
+</html>

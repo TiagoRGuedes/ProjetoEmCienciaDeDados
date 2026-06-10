@@ -1,15 +1,15 @@
-{% extends 'admin/_base.html' %} {# Usa o layout base do painel administrativo. #}
-{% block title %}{{ titulo }}{% endblock %} {# Define o título da aba conforme a área. #}
-{% block content %} {# Começa o conteúdo. #}
+{% extends 'admin/_base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
 
-{% set rotulos = {'pendente': 'Pendente', 'confirmado': 'Confirmado', 'concluido': 'Concluído', 'cancelado': 'Cancelado'} %} {# Mapa de status para texto amigável. #}
+{% set rotulos = {'pendente': 'Pendente', 'confirmado': 'Confirmado', 'concluido': 'Concluído', 'cancelado': 'Cancelado'} %}
 
-<div class="page-header"> <!-- Cabeçalho da página. -->
-  <h1 class="page-title">{{ titulo }}</h1> <!-- Título da área. -->
-  <p class="texto-suave">{{ descricao }}</p> <!-- Explicação da área. -->
+<div class="page-header">
+  <h1 class="page-title">{{ titulo }}</h1>
+  <p class="texto-suave">{{ descricao }}</p>
 </div>
 
-{% if tabs %} {# Barra de tabs (só aparece no dashboard unificado). #}
+{% if tabs %}
 <nav class="tabs" aria-label="Tabs de atendimentos">
   {% for t in tabs %}
   <a href="{{ t.url }}" class="tab {% if t.aba == aba_atual %}tab-active{% endif %}">{{ t.rotulo }}</a>
@@ -17,27 +17,27 @@
 </nav>
 {% endif %}
 
-{% for secao in secoes %} {# Percorre cada seção (ex: aguardando confirmação, confirmados). #}
-<div class="card" style="margin-bottom: 18px;"> <!-- Cartão de uma seção. -->
-  <h2 class="page-title" style="font-size: 1.05rem;">{{ secao.titulo }} <span class="page-counter">{{ secao.itens|length }}</span></h2> <!-- Título da seção + contador. -->
-  {% if secao.descricao %}<p class="texto-suave" style="margin: 4px 0 14px;">{{ secao.descricao }}</p>{% endif %} <!-- Descrição opcional da seção. -->
+{% for secao in secoes %}
+<div class="card" style="margin-bottom: 18px;">
+  <h2 class="page-title" style="font-size: 1.05rem;">{{ secao.titulo }} <span class="page-counter">{{ secao.itens|length }}</span></h2>
+  {% if secao.descricao %}<p class="texto-suave" style="margin: 4px 0 14px;">{{ secao.descricao }}</p>{% endif %}
 
-  {% if secao.itens %} <!-- Verifica se há atendimentos na seção. -->
-  <div class="atend-lista"> <!-- Lista de atendimentos. -->
-    {% for a in secao.itens %} {# Percorre cada atendimento. #}
-    <div class="atend-card"> <!-- Cartão de um atendimento. -->
-      <div class="atend-info"> <!-- Dados do atendimento. -->
-        <strong class="atend-cliente">{{ a.cliente_nome }}</strong> <!-- Nome da cliente. -->
-        <span class="atend-meta">{{ a.telefone }}</span> <!-- Telefone para contato. -->
-        <span class="atend-meta">{{ a.servico_nome }} · R$ {{ '%.2f'|format(a.preco) }} · {{ a.duracao_min }} min</span> <!-- Serviço, valor e duração. -->
-        <span class="atend-meta">{{ a.data }} às {{ a.horario }} · {{ a.profissional_nome }}</span> <!-- Data, horário e profissional. -->
-        <span class="atend-badges"> <!-- Etiquetas de status e pagamento. -->
-          <span class="status-badge status-{{ a.status }}">{{ rotulos.get(a.status, a.status) }}</span> <!-- Status atual. -->
-          {% if a.pago %}<span class="status-badge status-pago">Pago</span>{% endif %} <!-- Mostra "Pago" quando aplicável. -->
+  {% if secao.itens %}
+  <div class="atend-lista">
+    {% for a in secao.itens %}
+    <div class="atend-card">
+      <div class="atend-info">
+        <strong class="atend-cliente">{{ a.cliente_nome }}</strong>
+        <span class="atend-meta">{{ a.telefone }}</span>
+        <span class="atend-meta">{{ a.servico_nome }} · R$ {{ '%.2f'|format(a.preco) }} · {{ a.duracao_min }} min</span>
+        <span class="atend-meta">{{ a.data }} às {{ a.horario }} · {{ a.profissional_nome }}</span>
+        <span class="atend-badges">
+          <span class="status-badge status-{{ a.status }}">{{ rotulos.get(a.status, a.status) }}</span>
+          {% if a.pago %}<span class="status-badge status-pago">Pago</span>{% endif %}
         </span>
-      </div> <!-- Fecha os dados. -->
-      <div class="atend-acoes"> <!-- Botões de ação do atendimento. -->
-        {% for acao in secao.acoes %} {# Renderiza cada ação permitida na seção. #}
+      </div>
+      <div class="atend-acoes">
+        {% for acao in secao.acoes %}
           {% if acao == 'confirmar' %}
           <form method="POST" action="{{ url_for('admin.atualizar_status', id=a.id) }}" class="form-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="novo_status" value="confirmado"><button type="submit" class="btn btn-success btn-sm">Confirmar</button></form>
           {% elif acao == 'concluir' %}
@@ -53,15 +53,15 @@
           {% elif acao == 'despagar' %}
           <form method="POST" action="{{ url_for('admin.atualizar_pagamento', id=a.id) }}" class="form-inline" onsubmit="return confirm('Remover a marcação de pago?');"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="pago" value="0"><button type="submit" class="btn btn-danger btn-sm">Desfazer pago</button></form>
           {% endif %}
-        {% endfor %} {# Finaliza as ações. #}
-      </div> <!-- Fecha os botões. -->
-    </div> <!-- Fecha o cartão do atendimento. -->
-    {% endfor %} {# Finaliza o loop de atendimentos. #}
-  </div> <!-- Fecha a lista. -->
-  {% else %} <!-- Quando a seção está vazia. -->
-  <p class="texto-suave">{{ secao.vazio }}</p> <!-- Mensagem de seção vazia. -->
-  {% endif %} <!-- Fecha a verificação. -->
-</div> <!-- Fecha o cartão da seção. -->
-{% endfor %} {# Finaliza o loop de seções. #}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="texto-suave">{{ secao.vazio }}</p>
+  {% endif %}
+</div>
+{% endfor %}
 
 {% endblock %}

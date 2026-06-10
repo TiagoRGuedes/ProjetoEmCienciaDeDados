@@ -1,20 +1,12 @@
-/* ===================================================== */
-/* ============== ACESSIBILIDADE (site todo) ============ */
-/* ===================================================== */
-
-/* Texto invisível para leitor de tela (boa prática). */
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-/* Link "pular para o conteúdo principal" — fica escondido até receber foco pelo teclado. */
 .a11y-skip { position: fixed; top: -100px; left: 0; background: #111; color: #fff; padding: 12px 18px; z-index: 100001; text-decoration: none; font-weight: 700; font-size: 1rem; border-bottom-right-radius: 6px; transition: top 0.2s; }
 .a11y-skip:focus { top: 0; outline: 3px solid #ffb400; outline-offset: 0; }
 
-/* Botão flutuante de acessibilidade (canto inferior direito, sempre visível). */
 .a11y-fab { position: fixed; right: 20px; bottom: 20px; width: 54px; height: 54px; border-radius: 50%; background: #1e3a8a; color: #fff; border: 2px solid #fff; cursor: pointer; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28); z-index: 100000; display: flex; align-items: center; justify-content: center; font-size: 24px; line-height: 1; transition: transform 0.15s, background 0.15s; }
 .a11y-fab:hover, .a11y-fab:focus-visible { background: #1e40af; transform: scale(1.05); outline: 3px solid #ffb400; outline-offset: 2px; }
 .a11y-fab svg { width: 28px; height: 28px; }
 
-/* Painel que abre ao clicar no botão. */
 .a11y-painel { position: fixed; right: 20px; bottom: 88px; width: 280px; max-width: calc(100vw - 40px); background: #fff; color: #1f2937; border-radius: 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22); z-index: 100000; padding: 16px; font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
 .a11y-painel[hidden] { display: none; }
 .a11y-painel-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
@@ -38,9 +30,6 @@
 .a11y-reset { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; background: #f9fafb; color: #1f2937; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 4px; }
 .a11y-reset:hover, .a11y-reset:focus-visible { background: #f3f4f6; }
 
-/* ============ MODOS DE ACESSIBILIDADE ============ */
-
-/* Modo alto contraste: preto + amarelo. Usa !important para sobrescrever os temas. */
 body.a11y-alto-contraste,
 body.a11y-alto-contraste main,
 body.a11y-alto-contraste section,
@@ -53,25 +42,19 @@ body.a11y-alto-contraste h1, body.a11y-alto-contraste h2, body.a11y-alto-contras
 body.a11y-alto-contraste a, body.a11y-alto-contraste a * { color: #ffff00 !important; text-decoration: underline !important; }
 body.a11y-alto-contraste button:not(.a11y-fab):not(.a11y-fechar):not(.a11y-toggle):not(.a11y-reset), body.a11y-alto-contraste .btn, body.a11y-alto-contraste input, body.a11y-alto-contraste select, body.a11y-alto-contraste textarea { background: #000 !important; color: #ffff00 !important; border: 2px solid #ffff00 !important; }
 body.a11y-alto-contraste img { filter: grayscale(1) contrast(1.25); }
-/* O widget mantém o próprio visual em alto contraste, mas com contraste suficiente. */
 body.a11y-alto-contraste .a11y-painel { background: #000 !important; color: #fff !important; border: 2px solid #ffff00 !important; }
 body.a11y-alto-contraste .a11y-painel * { color: #fff !important; }
 body.a11y-alto-contraste .a11y-toggle { background: #000 !important; color: #fff !important; border-color: #fff !important; }
 body.a11y-alto-contraste .a11y-toggle[aria-pressed="true"] { background: #ffff00 !important; color: #000 !important; border-color: #ffff00 !important; }
 
-/* Modo foco destacado: contorno bem visível em qualquer elemento focável. */
 body.a11y-foco-forte *:focus-visible { outline: 4px solid #f59e0b !important; outline-offset: 3px !important; box-shadow: 0 0 0 2px #111 !important; }
 
-/* Modo sublinhar links: todos os links com underline visível. */
 body.a11y-sublinha-links a { text-decoration: underline !important; text-underline-offset: 2px; }
 
-/* Modo sem animação: respeita quem prefere menos movimento, ao escolher o toggle. */
 body.a11y-sem-animacao *, body.a11y-sem-animacao *::before, body.a11y-sem-animacao *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 
-/* Foco padrão visível para QUALQUER usuário (boa prática global). */
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
 
-/* Em telas pequenas, encolhe um pouco o painel. */
 @media (max-width: 480px) {
   .a11y-fab { right: 14px; bottom: 14px; width: 48px; height: 48px; }
   .a11y-painel { right: 14px; bottom: 78px; width: calc(100vw - 28px); }

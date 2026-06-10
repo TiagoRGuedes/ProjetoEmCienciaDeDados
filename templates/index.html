@@ -15,69 +15,69 @@
     </div>
 </section>
 
-<section class="secao chamada-agendamento"> <!-- Cria uma seção específica para reforçar o agendamento. -->
-    <div class="container chamada-final-conteudo"> <!-- Centraliza o conteúdo da chamada. -->
-        <p class="subtitulo subtitulo-escuro">{{ textos['texto.chamada_subtitulo'] }}</p> <!-- Mostra subtítulo da chamada (editável). -->
-        <h2>{{ textos['texto.chamada_titulo'] }}</h2> <!-- Mostra título da chamada (editável). -->
-        <p class="texto-central">{{ textos['texto.chamada_texto'] }}</p> <!-- Explica a funcionalidade principal (editável). -->
-        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.hero_botao'] }}</a> <!-- Botão de destaque para agendar. -->
-    </div> <!-- Fecha o container da chamada. -->
-</section> <!-- Fecha a seção de chamada. -->
+<section class="secao chamada-agendamento">
+    <div class="container chamada-final-conteudo">
+        <p class="subtitulo subtitulo-escuro">{{ textos['texto.chamada_subtitulo'] }}</p>
+        <h2>{{ textos['texto.chamada_titulo'] }}</h2>
+        <p class="texto-central">{{ textos['texto.chamada_texto'] }}</p>
+        <a class="botao-destaque" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.hero_botao'] }}</a>
+    </div>
+</section>
 
-<section id="servicos" class="secao"> <!-- Cria a seção de serviços. -->
-    <div class="container"> <!-- Centraliza os serviços. -->
-        <h2>{{ textos['texto.servicos_titulo'] }}</h2> <!-- Mostra título da seção (editável). -->
-        <p class="texto-central">{{ textos['texto.servicos_texto'] }}</p> <!-- Mostra texto de apoio (editável). -->
-        <div class="cards-servicos"> <!-- Cria a grade de serviços. -->
-            {% for s in servicos %} {# Percorre todos os serviços recebidos do Flask. #}
-            <div class="card-servico"> <!-- Cria um card para cada serviço. -->
-                <h3>{{ s.nome }}</h3> <!-- Mostra o nome do serviço. -->
-                <p><strong>Valor:</strong> R$ {{ "%.2f"|format(s.preco) }}</p> <!-- Mostra o preço do serviço. -->
-                <p><strong>Duração:</strong> {{ s.duracao_min }} minutos</p> <!-- Mostra a duração do serviço. -->
-            </div> <!-- Fecha o card do serviço. -->
-            {% endfor %} {# Finaliza a repetição de serviços. #}
-        </div> <!-- Fecha a grade de serviços. -->
-    </div> <!-- Fecha o container. -->
-</section> <!-- Fecha a seção de serviços. -->
+<section id="servicos" class="secao">
+    <div class="container">
+        <h2>{{ textos['texto.servicos_titulo'] }}</h2>
+        <p class="texto-central">{{ textos['texto.servicos_texto'] }}</p>
+        <div class="cards-servicos">
+            {% for s in servicos %}
+            <div class="card-servico">
+                <h3>{{ s.nome }}</h3>
+                <p><strong>Valor:</strong> R$ {{ "%.2f"|format(s.preco) }}</p>
+                <p><strong>Duração:</strong> {{ s.duracao_min }} minutos</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-<section id="galeria" class="secao galeria-fundo"> <!-- Cria a seção da galeria. -->
-    <div class="container"> <!-- Centraliza a galeria. -->
-        <h2>{{ textos['texto.galeria_titulo'] }}</h2> <!-- Mostra título da galeria (editável). -->
-        <p class="texto-central">{{ textos['texto.galeria_texto'] }}</p> <!-- Mostra descrição da galeria (editável). -->
-        {% if galeria %} {# Só mostra o carrossel se houver fotos cadastradas. #}
-        <div class="carrossel" data-carrossel> <!-- Cria o carrossel de fotos da galeria. -->
-            <div class="carrossel-janela"> <!-- Janela que recorta a trilha (a altura é só a da imagem). -->
-                <button type="button" class="carrossel-seta carrossel-prev" aria-label="Foto anterior">‹</button> <!-- Seta para voltar (centralizada na imagem). -->
-                <div class="carrossel-trilha"> <!-- Trilha que desliza horizontalmente. -->
-                    {% for foto in galeria %} {# Percorre as fotos da galeria vindas do banco. #}
-                    <div class="carrossel-item"> <!-- Cria o slide de cada foto. -->
-                        <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Trabalho da galeria' }}" data-legenda="{{ foto.titulo or '' }}"> <!-- Carrega a imagem e guarda a legenda. -->
-                    </div> <!-- Fecha o slide. -->
-                    {% endfor %} {# Finaliza a repetição das fotos. #}
-                </div> <!-- Fecha a trilha. -->
-                <button type="button" class="carrossel-seta carrossel-next" aria-label="Próxima foto">›</button> <!-- Seta para avançar (centralizada na imagem). -->
-            </div> <!-- Fecha a janela. -->
-            <p class="carrossel-legenda" aria-live="polite"></p> <!-- Legenda da foto atual (preenchida via JS). -->
-            <div class="carrossel-pontos" aria-hidden="true"></div> <!-- Área dos pontinhos de navegação (preenchida via JS). -->
-        </div> <!-- Fecha o carrossel. -->
-        {% else %} {# Quando não há fotos cadastradas. #}
-        <p class="texto-central">Em breve novas fotos dos trabalhos.</p> <!-- Mensagem amigável de galeria vazia. -->
-        {% endif %} {# Fecha a verificação de galeria. #}
-    </div> <!-- Fecha o container da galeria. -->
-</section> <!-- Fecha a seção da galeria. -->
+<section id="galeria" class="secao galeria-fundo">
+    <div class="container">
+        <h2>{{ textos['texto.galeria_titulo'] }}</h2>
+        <p class="texto-central">{{ textos['texto.galeria_texto'] }}</p>
+        {% if galeria %}
+        <div class="carrossel" data-carrossel>
+            <div class="carrossel-janela">
+                <button type="button" class="carrossel-seta carrossel-prev" aria-label="Foto anterior">‹</button>
+                <div class="carrossel-trilha">
+                    {% for foto in galeria %}
+                    <div class="carrossel-item">
+                        <img src="{{ url_for('static', filename='img/' + foto.arquivo) }}" alt="{{ foto.titulo or 'Trabalho da galeria' }}" data-legenda="{{ foto.titulo or '' }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="carrossel-seta carrossel-next" aria-label="Próxima foto">›</button>
+            </div>
+            <p class="carrossel-legenda" aria-live="polite"></p>
+            <div class="carrossel-pontos" aria-hidden="true"></div>
+        </div>
+        {% else %}
+        <p class="texto-central">Em breve novas fotos dos trabalhos.</p>
+        {% endif %}
+    </div>
+</section>
 
-<section id="dona" class="secao"> <!-- Cria a seção sobre a responsável. -->
-    <div class="container dona-grid"> <!-- Organiza foto e texto em grade. -->
-        <div class="dona-foto"> <!-- Cria a área da foto. -->
-            <img src="{{ url_for('static', filename='img/' + (foto_dona or empresa.foto_dona)) }}" alt="Foto de {{ empresa.dona }}"> <!-- Exibe a foto da responsável cadastrada pelo admin (ou a padrão). -->
-        </div> <!-- Fecha a área da foto. -->
-        <div class="dona-texto"> <!-- Cria o bloco de texto sobre a profissional. -->
-            <p class="subtitulo subtitulo-escuro">{{ textos['texto.responsavel_subtitulo'] }}</p> <!-- Mostra subtítulo (editável). -->
-            <h2>{{ empresa.dona }}</h2> <!-- Mostra o nome da responsável. -->
-            <p>{{ textos['texto.responsavel_p1'] }}</p> <!-- Apresenta a responsável (editável). -->
-            <p>{{ textos['texto.responsavel_p2'] }}</p> <!-- Explica a proposta do espaço (editável). -->
-            <a class="botao" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.responsavel_botao'] }}</a> <!-- Botão para agendamento (texto editável). -->
-        </div> <!-- Fecha o bloco de texto. -->
-    </div> <!-- Fecha o grid da responsável. -->
-</section> <!-- Fecha a seção da responsável. -->
-{% endblock %} {# Finaliza o conteúdo da página inicial. #}
+<section id="dona" class="secao">
+    <div class="container dona-grid">
+        <div class="dona-foto">
+            <img src="{{ url_for('static', filename='img/' + (foto_dona or empresa.foto_dona)) }}" alt="Foto de {{ empresa.dona }}">
+        </div>
+        <div class="dona-texto">
+            <p class="subtitulo subtitulo-escuro">{{ textos['texto.responsavel_subtitulo'] }}</p>
+            <h2>{{ empresa.dona }}</h2>
+            <p>{{ textos['texto.responsavel_p1'] }}</p>
+            <p>{{ textos['texto.responsavel_p2'] }}</p>
+            <a class="botao" href="{{ url_for('publico.agendar_get') }}">{{ textos['texto.responsavel_botao'] }}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

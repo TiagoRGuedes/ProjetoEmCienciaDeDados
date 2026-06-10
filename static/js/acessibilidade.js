@@ -1,4 +1,3 @@
-// Widget de acessibilidade aplicado em todo o site (cliente, admin e profissional).
 (function () {
   'use strict';
 
@@ -6,7 +5,6 @@
   var ZOOM_MIN = 1;
   var ZOOM_MAX = 1.5;
   var ZOOM_PASSO = 0.1;
-  // Estado padrão de cada opção.
   var padrao = {
     altoContraste: false,
     focoForte: false,
@@ -15,7 +13,6 @@
     zoom: 1,
   };
 
-  // Lê preferências salvas (ou usa o padrão).
   function carregar() {
     try {
       var dados = JSON.parse(localStorage.getItem(CHAVE) || '{}');
@@ -25,32 +22,26 @@
     }
   }
 
-  // Salva preferências.
   function salvar(estado) {
     try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) {}
   }
 
-  // Aplica o estado atual ao body (classes + zoom).
   function aplicar(estado) {
     var b = document.body;
     b.classList.toggle('a11y-alto-contraste', !!estado.altoContraste);
     b.classList.toggle('a11y-foco-forte', !!estado.focoForte);
     b.classList.toggle('a11y-sublinha-links', !!estado.sublinhaLinks);
     b.classList.toggle('a11y-sem-animacao', !!estado.semAnimacao);
-    // O zoom altera o tamanho geral do conteúdo. Valor 1 = sem alteração.
     b.style.zoom = estado.zoom && estado.zoom !== 1 ? estado.zoom : '';
   }
 
-  // Cria os elementos do widget e do skip-link no início do body.
   function montar(estado) {
-    // Link "pular para o conteúdo principal", para navegação por teclado.
     var skip = document.createElement('a');
     skip.className = 'a11y-skip';
     skip.href = '#conteudo-principal';
     skip.textContent = 'Pular para o conteúdo principal';
     document.body.insertBefore(skip, document.body.firstChild);
 
-    // Botão flutuante.
     var fab = document.createElement('button');
     fab.type = 'button';
     fab.className = 'a11y-fab';
@@ -60,7 +51,6 @@
     fab.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><circle cx="12" cy="4.5" r="2"/><path d="M19 8h-5v13h-2v-6h-1v6H9V8H4V6h15v2z"/></svg>';
     document.body.appendChild(fab);
 
-    // Painel.
     var painel = document.createElement('div');
     painel.className = 'a11y-painel';
     painel.id = 'a11y-painel';
@@ -93,7 +83,6 @@
     return { fab: fab, painel: painel };
   }
 
-  // Sincroniza visualmente os toggles e o rótulo de zoom com o estado.
   function refletir(estado, painel) {
     var toggles = painel.querySelectorAll('.a11y-toggle[data-toggle]');
     toggles.forEach(function (botao) {
@@ -104,7 +93,6 @@
     if (rotulo) { rotulo.textContent = Math.round(estado.zoom * 100) + '%'; }
   }
 
-  // Abre/fecha o painel.
   function alternar(fab, painel, mostrar) {
     var aberto = typeof mostrar === 'boolean' ? mostrar : painel.hidden;
     painel.hidden = !aberto;
@@ -115,7 +103,6 @@
     }
   }
 
-  // Inicializa quando o DOM está pronto.
   function iniciar() {
     var estado = carregar();
     aplicar(estado);
@@ -126,19 +113,16 @@
 
     fab.addEventListener('click', function () { alternar(fab, painel); });
 
-    // Fecha ao clicar no X ou pressionar Esc.
     painel.querySelector('.a11y-fechar').addEventListener('click', function () { alternar(fab, painel, false); fab.focus(); });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !painel.hidden) { alternar(fab, painel, false); fab.focus(); }
     });
-    // Fecha clicando fora.
     document.addEventListener('click', function (e) {
       if (painel.hidden) { return; }
       if (painel.contains(e.target) || fab.contains(e.target)) { return; }
       alternar(fab, painel, false);
     });
 
-    // Toggles (alto contraste, foco, links, animação).
     painel.querySelectorAll('.a11y-toggle[data-toggle]').forEach(function (botao) {
       botao.addEventListener('click', function () {
         var chave = botao.getAttribute('data-toggle');
@@ -147,7 +131,6 @@
       });
     });
 
-    // Aumentar/diminuir texto.
     painel.querySelectorAll('[data-acao]').forEach(function (botao) {
       botao.addEventListener('click', function () {
         var acao = botao.getAttribute('data-acao');
